@@ -1,6 +1,7 @@
 ---
 phase: 1
-status: human_needed
+status: gaps_found
+updated: 2026-03-06
 verified_date: 2026-03-06
 ---
 
@@ -65,4 +66,67 @@ The following items pass code inspection but need manual browser testing:
 
 ## Gaps
 
-None identified at the code level. All 9 requirements have corresponding implementations, tests, and passing builds. PAT-04 shows a "No visits yet" placeholder for encounter/prescription history, which is correct since those features are Phase 2 scope.
+Human UAT testing identified 10 issues (1 deferred to Phase 2):
+
+### Gap 1: Recovery code shown at wrong time
+- **status: failed**
+- **severity: high**
+- **requirement: FOUND-04**
+- Recovery/security code is shown after changing password, which doesn't make sense UX-wise. Should be shown during initial setup or accessible from settings, not as a post-change-password artifact.
+
+### Gap 2: No breadcrumb navigation
+- **status: failed**
+- **severity: medium**
+- **requirement: FOUND-04**
+- No breadcrumbs for navigating between pages. User has no sense of where they are in the app hierarchy.
+
+### Gap 3: Poor UI aesthetics / layout overhaul needed
+- **status: failed**
+- **severity: high**
+- **requirement: PAT-01**
+- UI is visually unappealing. Big ugly "Register New Patient" button in the middle of the home page. Need a proper layout: side panel navigation (home, patients, future: prescriptions), table-based patient list instead of cards, overall visual polish.
+
+### Gap 4: Gender options should be Male/Female only
+- **status: failed**
+- **severity: low**
+- **requirement: PAT-01**
+- Registration form offers more gender options than needed. Should only have Male and Female for this clinic context.
+
+### Gap 5: Patient ID not shown before save
+- **status: failed**
+- **severity: medium**
+- **requirement: PAT-02**
+- Patient ID should be visible/assigned on save and shown immediately, not hidden. The ID preview/assignment flow needs clarity.
+
+### Gap 6: CNIC field needs auto-formatting
+- **status: failed**
+- **severity: medium**
+- **requirement: PAT-01**
+- CNIC field should auto-format to Pakistani CNIC pattern: XXXXX-XXXXXXX-X (e.g., 35202-8337552-7). Currently accepts free-form text.
+
+### Gap 7: Missing "Create New Patient" CTA on patients listing
+- **status: failed**
+- **severity: medium**
+- **requirement: PAT-01**
+- The patients listing page should have a create new patient call-to-action, not just the home page.
+
+### Gap 8: Need table layout + sidebar navigation
+- **status: failed**
+- **severity: high**
+- **requirement: PAT-03, PAT-04**
+- Replace patient cards with a traditional table. Add a persistent sidebar navigation for switching between Home, Patients, and future sections (prescriptions, etc.). This is a structural UI change.
+
+### Gap 9: Patient row click should navigate to detail page
+- **status: failed**
+- **severity: medium**
+- **requirement: PAT-04**
+- Clicking a patient from the patients table should navigate to the patient detail page showing editable info and visit history (list/table).
+
+### Gap 10: Inconsistent hover/cursor behavior on CTAs
+- **status: failed**
+- **severity: low**
+- **requirement: FOUND-04**
+- Some buttons/links change cursor to pointer on hover, others don't. Needs consistent `cursor-pointer` across all interactive elements.
+
+### Deferred to Phase 2
+- **Visit detail view**: Clicking a specific visit from patient history should open visit details. This is Phase 2 scope (encounters/prescriptions).
