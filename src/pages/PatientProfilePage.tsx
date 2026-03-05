@@ -37,7 +37,7 @@ export function PatientProfilePage() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto p-6">
+      <div className="max-w-4xl">
         <p className="text-gray-500">Loading patient...</p>
       </div>
     )
@@ -45,7 +45,7 @@ export function PatientProfilePage() {
 
   if (notFound || !patient) {
     return (
-      <div className="max-w-4xl mx-auto p-6 text-center">
+      <div className="max-w-4xl text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Patient not found</h2>
         <p className="text-gray-500 mb-4">The patient you are looking for does not exist.</p>
         <Link to="/" className="text-blue-600 hover:text-blue-800 font-medium">
@@ -56,7 +56,7 @@ export function PatientProfilePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
+    <div className="max-w-4xl space-y-6">
       <PatientInfoCard patient={patient} onUpdated={handleUpdated} />
 
       {/* Visit History */}

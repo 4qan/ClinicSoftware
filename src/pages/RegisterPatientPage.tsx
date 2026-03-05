@@ -81,7 +81,7 @@ export function RegisterPatientPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="max-w-2xl">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-gray-900">Register New Patient</h2>
         <Link to="/" className="text-base text-gray-500 hover:text-gray-700">
