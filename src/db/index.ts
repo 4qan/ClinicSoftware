@@ -41,4 +41,10 @@ export class ClinicDatabase extends Dexie {
   }
 }
 
-export const db = new ClinicDatabase()
+export let db = new ClinicDatabase()
+
+/** Reset the database instance (for testing). Deletes all data and re-creates. */
+export async function resetDatabase(): Promise<void> {
+  await db.delete()
+  db = new ClinicDatabase()
+}
