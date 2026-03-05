@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { registerPatient, searchPatients } from '@/db/patients'
 import type { Patient } from '@/db/index'
 import type { PatientInput } from '@/db/patients'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 
 export function RegisterPatientPage() {
   const navigate = useNavigate()
@@ -82,6 +83,7 @@ export function RegisterPatientPage() {
 
   return (
     <div className="max-w-2xl">
+      <Breadcrumbs crumbs={[{ label: 'Home', path: '/' }, { label: 'Register Patient' }]} />
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-gray-900">Register New Patient</h2>
         <Link to="/" className="text-base text-gray-500 hover:text-gray-700">

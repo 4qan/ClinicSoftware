@@ -4,6 +4,7 @@ import { getPatient, addToRecent } from '@/db/patients'
 import type { Patient } from '@/db/index'
 import type { PatientInput } from '@/db/patients'
 import { PatientInfoCard } from '@/components/PatientInfoCard'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 
 export function PatientProfilePage() {
   const { id } = useParams<{ id: string }>()
@@ -57,6 +58,11 @@ export function PatientProfilePage() {
 
   return (
     <div className="max-w-4xl space-y-6">
+      <Breadcrumbs crumbs={[
+        { label: 'Home', path: '/' },
+        { label: 'Patients', path: '/patients' },
+        { label: `${patient.firstName} ${patient.lastName}` },
+      ]} />
       <PatientInfoCard patient={patient} onUpdated={handleUpdated} />
 
       {/* Visit History */}

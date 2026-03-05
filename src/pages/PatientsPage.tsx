@@ -2,12 +2,14 @@ import { Link } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/index'
 import { PatientTable } from '@/components/PatientTable'
+import { Breadcrumbs } from '@/components/Breadcrumbs'
 
 export function PatientsPage() {
   const patients = useLiveQuery(() => db.patients.orderBy('createdAt').reverse().toArray()) ?? []
 
   return (
     <div>
+      <Breadcrumbs crumbs={[{ label: 'Home', path: '/' }, { label: 'Patients' }]} />
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Patients</h2>
         <Link
