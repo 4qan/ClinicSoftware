@@ -90,13 +90,37 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated during roadmap creation) | | |
+| FOUND-01 | Phase 1: Foundation and Patient Management | Not Started |
+| FOUND-02 | Phase 1: Foundation and Patient Management | Not Started |
+| FOUND-03 | Phase 1: Foundation and Patient Management | Not Started |
+| FOUND-04 | Phase 1: Foundation and Patient Management | Not Started |
+| FOUND-05 | Phase 1: Foundation and Patient Management | Not Started |
+| PAT-01 | Phase 1: Foundation and Patient Management | Not Started |
+| PAT-02 | Phase 1: Foundation and Patient Management | Not Started |
+| PAT-03 | Phase 1: Foundation and Patient Management | Not Started |
+| PAT-04 | Phase 1: Foundation and Patient Management | Not Started |
+| ENC-01 | Phase 2: Clinical Workflow | Not Started |
+| ENC-02 | Phase 2: Clinical Workflow | Not Started |
+| ENC-03 | Phase 2: Clinical Workflow | Not Started |
+| RX-01 | Phase 2: Clinical Workflow | Not Started |
+| RX-02 | Phase 2: Clinical Workflow | Not Started |
+| RX-03 | Phase 2: Clinical Workflow | Not Started |
+| RX-04 | Phase 2: Clinical Workflow | Not Started |
+| RX-05 | Phase 2: Clinical Workflow | Not Started |
+| DRUG-01 | Phase 2: Clinical Workflow | Not Started |
+| DRUG-02 | Phase 2: Clinical Workflow | Not Started |
+| DRUG-03 | Phase 2: Clinical Workflow | Not Started |
+| DRUG-04 | Phase 2: Clinical Workflow | Not Started |
+| PRINT-01 | Phase 3: Printing and Visit Completion | Not Started |
+| PRINT-02 | Phase 3: Printing and Visit Completion | Not Started |
+| PRINT-03 | Phase 3: Printing and Visit Completion | Not Started |
+| PRINT-04 | Phase 3: Printing and Visit Completion | Not Started |
 
 **Coverage:**
-- v1 requirements: 21 total
-- Mapped to phases: 0
-- Unmapped: 21
+- v1 requirements: 25 total (corrected from original count of 21)
+- Mapped to phases: 25
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-05*
-*Last updated: 2026-03-05 after initial definition*
+*Last updated: 2026-03-05 after roadmap creation*

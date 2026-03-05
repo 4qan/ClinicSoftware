@@ -1,0 +1,96 @@
+# Roadmap: ClinicSoftware
+
+**Created:** 2026-03-05
+**Granularity:** Coarse
+**Phases:** 3
+**Requirements:** 25 mapped
+
+---
+
+## Phase 1: Foundation and Patient Management
+
+**Goal:** A working offline PWA where the doctor can log in, register patients, search them, and view patient profiles, with all data persisted locally in IndexedDB.
+
+**Requirements:**
+- FOUND-01: App is installable as PWA from browser
+- FOUND-02: App works 100% offline using IndexedDB
+- FOUND-03: Service worker caches all app assets for offline use
+- FOUND-04: User logs in with simple password/PIN
+- FOUND-05: All records auto-timestamped for compliance audit trail
+- PAT-01: Register new patient (name, age, gender, contact, optional CNIC)
+- PAT-02: Auto-generate unique patient ID in 2026-XXXX format (UUID as internal key)
+- PAT-03: Search patients by name, ID, or contact in under 1 second
+- PAT-04: View patient profile with all encounters and prescriptions chronologically
+
+**Success Criteria:**
+1. Doctor installs PWA from Chrome/Edge, opens it offline, and logs in with PIN.
+2. Doctor registers a patient, sees the auto-generated 2026-XXXX ID, and finds them via search.
+3. Patient profile page loads (empty history) and all data survives a browser restart.
+
+**Plans:** 2
+
+---
+
+## Phase 2: Clinical Workflow (Encounters, Prescriptions, Drug Database)
+
+**Goal:** The doctor can log encounters, write prescriptions with medication autocomplete from a pre-seeded drug database, and manage custom medications, completing the core clinical data loop.
+
+**Requirements:**
+- ENC-01: Log encounter for a patient (complaint, examination notes, diagnosis)
+- ENC-02: Encounters automatically dated and timestamped
+- ENC-03: View past encounters on patient profile in reverse chronological order
+- RX-01: Write a prescription linked to an encounter
+- RX-02: Add medications with dosage, frequency, duration, and optional notes per item
+- RX-03: Medication autocomplete from local drug database (salt name + brand name)
+- RX-04: Autocomplete performs in under 300ms on older hardware
+- RX-05: Prescriptions immutable once saved (append-only for compliance)
+- DRUG-01: Pre-seeded local database of common medications
+- DRUG-02: Add custom medications via settings
+- DRUG-03: Edit existing custom medications
+- DRUG-04: Custom medications appear in autocomplete alongside pre-seeded ones
+
+**Success Criteria:**
+1. Doctor opens a patient, logs an encounter with complaint and diagnosis, and sees it appear in the patient history.
+2. Doctor writes a prescription, types a partial drug name, and gets autocomplete suggestions within 300ms.
+3. Doctor adds a custom medication in settings and it appears in autocomplete on the next prescription.
+4. Saved prescriptions cannot be edited or deleted (immutability verified).
+
+**Plans:** 3
+
+---
+
+## Phase 3: Printing and Visit Completion
+
+**Goal:** The doctor can print a prescription slip and a separate dispensary slip from any prescription, completing the full visit workflow in under 2 minutes.
+
+**Requirements:**
+- PRINT-01: Print prescription slip in small format (non-A4) with patient info, date, and medications
+- PRINT-02: Print separate dispensary slip with medication list only (for dispenser)
+- PRINT-03: Print layouts work correctly in Chrome/Edge print dialog
+- PRINT-04: Both prints triggered from prescription view with clear, separate buttons
+
+**Success Criteria:**
+1. Doctor clicks "Print Prescription" and gets a correctly formatted small-format slip in the browser print dialog.
+2. Doctor clicks "Print Dispensary Slip" and gets a medication-only list formatted for the dispenser.
+3. Full visit workflow (find patient, log encounter, write Rx, print both slips) completes in under 2 minutes.
+
+**Plans:** 1
+
+---
+
+## Coverage Validation
+
+| Category | Requirements | Phase | Count |
+|----------|-------------|-------|-------|
+| Foundation | FOUND-01 to FOUND-05 | 1 | 5 |
+| Patient Management | PAT-01 to PAT-04 | 1 | 4 |
+| Encounters | ENC-01 to ENC-03 | 2 | 3 |
+| Prescriptions | RX-01 to RX-05 | 2 | 5 |
+| Drug Database | DRUG-01 to DRUG-04 | 2 | 4 |
+| Printing | PRINT-01 to PRINT-04 | 3 | 4 |
+| **Total** | | | **25** |
+
+**Note:** REQUIREMENTS.md originally stated 21 v1 requirements, but the actual enumerated list contains 25 discrete items. The count has been corrected to 25. All 25 are mapped.
+
+---
+*Created: 2026-03-05*
