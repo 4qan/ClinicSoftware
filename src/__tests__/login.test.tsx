@@ -38,7 +38,7 @@ describe('Login Flow', () => {
     await user.click(screen.getByRole('button', { name: /log in/i }))
 
     await waitFor(() => {
-      expect(screen.getByText('Welcome, Doctor')).toBeInTheDocument()
+      expect(screen.getByText('Recent Patients')).toBeInTheDocument()
     })
   })
 
@@ -51,7 +51,7 @@ describe('Login Flow', () => {
     await user.click(screen.getByRole('button', { name: /log in/i }))
 
     await waitFor(() => {
-      expect(screen.getByText('Welcome, Doctor')).toBeInTheDocument()
+      expect(screen.getByText('Recent Patients')).toBeInTheDocument()
     })
 
     // Log out

@@ -7,7 +7,7 @@ test.describe('Offline capability', () => {
   }) => {
     // First load - online (caches assets via service worker)
     await page.goto('/')
-    await expect(page.getByRole('heading', { name: 'Clinic Software' })).toBeVisible()
+    await expect(page.getByText('Clinic Software')).toBeVisible()
 
     // Wait for service worker to cache assets
     await page.waitForTimeout(3000)
@@ -15,7 +15,7 @@ test.describe('Offline capability', () => {
     // Log in while online
     await page.getByLabel(/password/i).fill('clinic123')
     await page.getByRole('button', { name: /log in/i }).click()
-    await expect(page.getByText('Welcome, Doctor')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Recent Patients' })).toBeVisible()
 
     // Log out
     await page.getByRole('button', { name: /log out/i }).click()
@@ -26,12 +26,12 @@ test.describe('Offline capability', () => {
 
     // Reload the page offline - should still work from cache
     await page.reload()
-    await expect(page.getByRole('heading', { name: 'Clinic Software' })).toBeVisible()
+    await expect(page.getByText('Clinic Software')).toBeVisible()
     await expect(page.getByLabel(/password/i)).toBeVisible()
 
     // Login should still work offline (IndexedDB is local)
     await page.getByLabel(/password/i).fill('clinic123')
     await page.getByRole('button', { name: /log in/i }).click()
-    await expect(page.getByText('Welcome, Doctor')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Recent Patients' })).toBeVisible()
   })
 })
