@@ -92,9 +92,11 @@ export function RegisterPatientPage() {
       </div>
 
       {/* Patient ID preview */}
-      <div className="mb-4 p-3 bg-gray-100 rounded-lg">
-        <label className="block text-sm font-medium text-gray-500 mb-1">Patient ID</label>
-        <p className="text-base text-gray-400 italic">Will be assigned on save</p>
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <label className="block text-sm font-medium text-blue-700 mb-1">Patient ID</label>
+        <p className="text-base text-blue-600 font-medium">
+          Assigned automatically when you save
+        </p>
       </div>
 
       {/* Duplicate check results */}

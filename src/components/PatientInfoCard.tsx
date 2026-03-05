@@ -168,7 +168,7 @@ export function PatientInfoCard({ patient, onUpdated }: PatientInfoCardProps) {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-sm font-mono bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+            <span className="text-base font-mono font-bold bg-blue-100 text-blue-800 px-4 py-1.5 rounded-full">
               {patient.patientId}
             </span>
           </div>
