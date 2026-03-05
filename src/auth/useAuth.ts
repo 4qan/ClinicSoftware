@@ -147,6 +147,28 @@ export function useAuth() {
     setIsAuthenticated(false)
   }, [])
 
+  const regenerateRecoveryCode = useCallback(async (currentPassword: string): Promise<{ success: boolean; recoveryCode?: string; error?: string }> => {
+    const auth = await getAuthRecord()
+    if (!auth) return { success: false, error: 'No auth record found' }
+    const salt = base64ToSalt(auth.salt)
+    const valid = await verifyPassword(currentPassword, salt, auth.hash)
+    if (!valid) return { success: false, error: 'Incorrect password' }
+    const code = generateRecoveryCode()
+    const recoverySalt = generateSalt()
+    const recoveryHash = await hashPassword(code, recoverySalt)
+    await setAuthRecord({
+      ...auth,
+      recoveryHash,
+      recoverySalt: saltToBase64(recoverySalt),
+    })
+    return { success: true, recoveryCode: code }
+  }, [])
+
+  const checkRecoveryCodeExists = useCallback(async (): Promise<boolean> => {
+    const auth = await getAuthRecord()
+    return !!(auth?.recoveryHash && auth?.recoverySalt)
+  }, [])
+
   return {
     isAuthenticated,
     isLoading,
@@ -154,5 +176,7 @@ export function useAuth() {
     logout,
     changePassword,
     recoverWithCode,
+    regenerateRecoveryCode,
+    checkRecoveryCodeExists,
   }
 }

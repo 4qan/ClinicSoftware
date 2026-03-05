@@ -7,13 +7,13 @@ export function ChangePassword() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
-  const [recoveryCode, setRecoveryCode] = useState('')
+  const [success, setSuccess] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError('')
-    setRecoveryCode('')
+    setSuccess(false)
 
     if (newPassword !== confirmPassword) {
       setError('New passwords do not match')
@@ -31,8 +31,8 @@ export function ChangePassword() {
       const result = await changePassword(currentPassword, newPassword)
       if (!result.success) {
         setError(result.error || 'Password change failed')
-      } else if (result.recoveryCode) {
-        setRecoveryCode(result.recoveryCode)
+      } else {
+        setSuccess(true)
         setCurrentPassword('')
         setNewPassword('')
         setConfirmPassword('')
@@ -46,21 +46,18 @@ export function ChangePassword() {
     <div className="max-w-sm mx-auto">
       <h2 className="text-xl font-bold text-gray-900 mb-4">Change Password</h2>
 
-      {recoveryCode ? (
+      {success ? (
         <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-green-800 mb-2">
-            Password Changed Successfully
-          </h3>
-          <p className="text-base text-gray-700 mb-3">
-            Your recovery code is:
+          <p className="text-lg font-semibold text-green-800 flex items-center gap-2">
+            <span>&#10003;</span> Password changed successfully.
           </p>
-          <p className="text-2xl font-mono font-bold text-center bg-white border border-green-300 rounded p-3 mb-3 select-all">
-            {recoveryCode}
-          </p>
-          <p className="text-sm text-gray-600">
-            Write this code down on paper and keep it safe. You will need it to reset your
-            password if you forget it. This code can only be used once.
-          </p>
+          <button
+            type="button"
+            onClick={() => setSuccess(false)}
+            className="mt-3 text-sm text-blue-600 hover:text-blue-800"
+          >
+            Change again
+          </button>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
