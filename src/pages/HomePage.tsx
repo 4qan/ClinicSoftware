@@ -1,27 +1,27 @@
 import { Link } from 'react-router-dom'
-import { RecentPatients } from '@/components/RecentPatients'
+import { PatientTable } from '@/components/PatientTable'
 import { useRecentPatients } from '@/hooks/useRecentPatients'
 
 export function HomePage() {
   const recentPatients = useRecentPatients(10)
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div>
       {/* Register button */}
-      <div className="mb-8 text-center">
+      <div className="mb-8">
         <Link
           to="/register"
-          className="inline-block px-8 py-3 text-lg font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 text-base font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer transition-colors"
         >
           Register New Patient
         </Link>
       </div>
 
-      {/* Recent patients - only show when there are patients */}
+      {/* Recent patients - table-based */}
       {recentPatients.length > 0 && (
         <div>
           <h3 className="text-xl font-bold text-gray-900 mb-4">Recent Patients</h3>
-          <RecentPatients patients={recentPatients} />
+          <PatientTable patients={recentPatients} />
         </div>
       )}
     </div>
