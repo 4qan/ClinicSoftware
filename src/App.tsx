@@ -5,6 +5,7 @@ import { Header } from './components/Header'
 import { HomePage } from './pages/HomePage'
 import { RegisterPatientPage } from './pages/RegisterPatientPage'
 import { PatientProfilePage } from './pages/PatientProfilePage'
+import { SettingsPage } from './pages/SettingsPage'
 
 function AppContent() {
   const { isAuthenticated } = useAuthContext()
@@ -21,12 +22,7 @@ function AppContent() {
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterPatientPage />} />
           <Route path="/patient/:id" element={<PatientProfilePage />} />
-          <Route path="/settings" element={
-            <div className="max-w-2xl mx-auto p-6">
-              <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-              <p className="text-gray-500 mt-2">Settings page coming soon.</p>
-            </div>
-          } />
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </main>
     </div>
