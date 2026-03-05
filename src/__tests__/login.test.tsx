@@ -12,7 +12,7 @@ describe('Login Flow', () => {
 
   it('renders login form with password input and submit button', () => {
     render(<App />)
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument()
+    expect(screen.getByLabelText('Password')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /log in/i })).toBeInTheDocument()
   })
 
@@ -20,7 +20,7 @@ describe('Login Flow', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.type(screen.getByLabelText(/password/i), 'wrongpassword')
+    await user.type(screen.getByLabelText('Password'), 'wrongpassword')
     await user.click(screen.getByRole('button', { name: /log in/i }))
 
     await waitFor(() => {
@@ -34,11 +34,11 @@ describe('Login Flow', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.type(screen.getByLabelText(/password/i), 'clinic123')
+    await user.type(screen.getByLabelText('Password'), 'clinic123')
     await user.click(screen.getByRole('button', { name: /log in/i }))
 
     await waitFor(() => {
-      expect(screen.getByText('Recent Patients')).toBeInTheDocument()
+      expect(screen.getByText('Register New Patient')).toBeInTheDocument()
     })
   })
 
@@ -47,18 +47,18 @@ describe('Login Flow', () => {
     render(<App />)
 
     // Log in first
-    await user.type(screen.getByLabelText(/password/i), 'clinic123')
+    await user.type(screen.getByLabelText('Password'), 'clinic123')
     await user.click(screen.getByRole('button', { name: /log in/i }))
 
     await waitFor(() => {
-      expect(screen.getByText('Recent Patients')).toBeInTheDocument()
+      expect(screen.getByText('Register New Patient')).toBeInTheDocument()
     })
 
     // Log out
     await user.click(screen.getByRole('button', { name: /log out/i }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/password/i)).toBeInTheDocument()
+      expect(screen.getByLabelText('Password')).toBeInTheDocument()
     })
   })
 })

@@ -82,7 +82,7 @@ export function RegisterPatientPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-gray-900">Register New Patient</h2>
         <Link to="/" className="text-base text-gray-500 hover:text-gray-700">
           Cancel
@@ -90,14 +90,14 @@ export function RegisterPatientPage() {
       </div>
 
       {/* Patient ID preview */}
-      <div className="mb-6 p-4 bg-gray-100 rounded-lg">
+      <div className="mb-4 p-3 bg-gray-100 rounded-lg">
         <label className="block text-sm font-medium text-gray-500 mb-1">Patient ID</label>
-        <p className="text-lg text-gray-400 italic">Will be assigned on save</p>
+        <p className="text-base text-gray-400 italic">Will be assigned on save</p>
       </div>
 
       {/* Duplicate check results */}
       {duplicates.length > 0 && (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
           <p className="text-sm font-medium text-yellow-800 mb-2">Patient already exists?</p>
           {duplicates.map((dup) => (
             <Link
@@ -119,10 +119,10 @@ export function RegisterPatientPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* First Name */}
         <div>
-          <label htmlFor="firstName" className="block text-lg font-medium text-gray-900 mb-1">
+          <label htmlFor="firstName" className="block text-base font-medium text-gray-900 mb-1">
             First Name <span className="text-red-500">*</span>
           </label>
           <input
@@ -130,7 +130,7 @@ export function RegisterPatientPage() {
             type="text"
             value={form.firstName}
             onChange={(e) => updateField('firstName', e.target.value)}
-            className={`w-full px-4 py-3 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               errors.firstName ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="Enter first name"
@@ -140,7 +140,7 @@ export function RegisterPatientPage() {
 
         {/* Last Name */}
         <div>
-          <label htmlFor="lastName" className="block text-lg font-medium text-gray-900 mb-1">
+          <label htmlFor="lastName" className="block text-base font-medium text-gray-900 mb-1">
             Last Name <span className="text-red-500">*</span>
           </label>
           <input
@@ -148,7 +148,7 @@ export function RegisterPatientPage() {
             type="text"
             value={form.lastName}
             onChange={(e) => updateField('lastName', e.target.value)}
-            className={`w-full px-4 py-3 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               errors.lastName ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="Enter last name"
@@ -157,8 +157,8 @@ export function RegisterPatientPage() {
         </div>
 
         {/* Gender */}
-        <div>
-          <label className="block text-lg font-medium text-gray-900 mb-2">
+        <div className="sm:col-span-2">
+          <label className="block text-base font-medium text-gray-900 mb-2">
             Gender <span className="text-red-500">*</span>
           </label>
           <div className="flex gap-4">
@@ -181,7 +181,7 @@ export function RegisterPatientPage() {
 
         {/* Age */}
         <div>
-          <label htmlFor="age" className="block text-lg font-medium text-gray-900 mb-1">
+          <label htmlFor="age" className="block text-base font-medium text-gray-900 mb-1">
             Age (years) <span className="text-red-500">*</span>
           </label>
           <input
@@ -190,7 +190,7 @@ export function RegisterPatientPage() {
             min="0"
             value={form.age || ''}
             onChange={(e) => updateField('age', parseInt(e.target.value) || 0)}
-            className={`w-full px-4 py-3 text-lg border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               errors.age ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="Enter age"
@@ -200,7 +200,7 @@ export function RegisterPatientPage() {
 
         {/* Contact */}
         <div>
-          <label htmlFor="contact" className="block text-lg font-medium text-gray-900 mb-1">
+          <label htmlFor="contact" className="block text-base font-medium text-gray-900 mb-1">
             Contact Number
           </label>
           <input
@@ -208,14 +208,14 @@ export function RegisterPatientPage() {
             type="text"
             value={form.contact}
             onChange={(e) => updateField('contact', e.target.value)}
-            className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter contact number (optional)"
+            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Contact (optional)"
           />
         </div>
 
         {/* CNIC */}
-        <div>
-          <label htmlFor="cnic" className="block text-lg font-medium text-gray-900 mb-1">
+        <div className="sm:col-span-2">
+          <label htmlFor="cnic" className="block text-base font-medium text-gray-900 mb-1">
             CNIC
           </label>
           <input
@@ -223,8 +223,8 @@ export function RegisterPatientPage() {
             type="text"
             value={form.cnic}
             onChange={(e) => updateField('cnic', e.target.value)}
-            className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter CNIC (optional)"
+            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="CNIC (optional)"
           />
         </div>
 
@@ -232,8 +232,8 @@ export function RegisterPatientPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-3 text-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 rounded-lg transition-colors"
-          style={{ minHeight: '48px' }}
+          className="sm:col-span-2 w-full py-2 text-base font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 rounded-lg transition-colors"
+          style={{ minHeight: '44px' }}
         >
           {isSubmitting ? 'Saving...' : 'Save Patient'}
         </button>
