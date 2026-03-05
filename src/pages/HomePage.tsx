@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { SearchBar } from '@/components/SearchBar'
 import { RecentPatients } from '@/components/RecentPatients'
 import { useRecentPatients } from '@/hooks/useRecentPatients'
 
@@ -8,11 +7,6 @@ export function HomePage() {
 
   return (
     <div className="max-w-3xl mx-auto p-6">
-      {/* Search */}
-      <div className="mb-6">
-        <SearchBar variant="prominent" />
-      </div>
-
       {/* Register button */}
       <div className="mb-8 text-center">
         <Link
@@ -23,11 +17,13 @@ export function HomePage() {
         </Link>
       </div>
 
-      {/* Recent patients */}
-      <div>
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Recent Patients</h3>
-        <RecentPatients patients={recentPatients} />
-      </div>
+      {/* Recent patients - only show when there are patients */}
+      {recentPatients.length > 0 && (
+        <div>
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Recent Patients</h3>
+          <RecentPatients patients={recentPatients} />
+        </div>
+      )}
     </div>
   )
 }
