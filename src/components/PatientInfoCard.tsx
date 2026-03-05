@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { updatePatient } from '@/db/patients'
 import type { Patient } from '@/db/index'
 import type { PatientInput } from '@/db/patients'
+import { formatCNIC } from '@/utils/formatCNIC'
 
 interface PatientInfoCardProps {
   patient: Patient
@@ -43,6 +44,12 @@ export function PatientInfoCard({ patient, onUpdated }: PatientInfoCardProps) {
     if (!form.firstName.trim()) newErrors.firstName = 'First name is required'
     if (!form.lastName.trim()) newErrors.lastName = 'Last name is required'
     if (!form.age || form.age <= 0) newErrors.age = 'Age must be a positive number'
+    if (form.cnic) {
+      const cnicDigits = form.cnic.replace(/\D/g, '')
+      if (cnicDigits.length > 0 && cnicDigits.length !== 13) {
+        newErrors.cnic = 'CNIC must be 13 digits'
+      }
+    }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -154,9 +161,13 @@ export function PatientInfoCard({ patient, onUpdated }: PatientInfoCardProps) {
               id="edit-cnic"
               type="text"
               value={form.cnic}
-              onChange={(e) => setForm((f) => ({ ...f, cnic: e.target.value }))}
-              className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setForm((f) => ({ ...f, cnic: formatCNIC(e.target.value) }))}
+              maxLength={15}
+              className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.cnic ? 'border-red-500' : 'border-gray-300'}`}
+              placeholder="XXXXX-XXXXXXX-X"
             />
+            <p className="mt-1 text-xs text-gray-400">Format: XXXXX-XXXXXXX-X</p>
+            {errors.cnic && <p className="mt-1 text-sm text-red-600">{errors.cnic}</p>}
           </div>
         </div>
       </div>

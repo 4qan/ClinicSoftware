@@ -47,7 +47,7 @@ describe('PatientProfilePage', () => {
       expect(screen.getByText(testPatient.patientId)).toBeInTheDocument()
     })
 
-    expect(screen.getByText('Ahmed Khan')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Ahmed Khan' })).toBeInTheDocument()
     expect(screen.getByText(/35 years/)).toBeInTheDocument()
     expect(screen.getByText(/male/i)).toBeInTheDocument()
     expect(screen.getByText(/03001234567/)).toBeInTheDocument()
@@ -58,7 +58,7 @@ describe('PatientProfilePage', () => {
     renderProfile(testPatient.id)
 
     await waitFor(() => {
-      expect(screen.getByText('Ahmed Khan')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'Ahmed Khan' })).toBeInTheDocument()
     })
 
     await user.click(screen.getByRole('button', { name: /edit/i }))
@@ -74,7 +74,7 @@ describe('PatientProfilePage', () => {
     renderProfile(testPatient.id)
 
     await waitFor(() => {
-      expect(screen.getByText('Ahmed Khan')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'Ahmed Khan' })).toBeInTheDocument()
     })
 
     await user.click(screen.getByRole('button', { name: /edit/i }))
@@ -92,7 +92,7 @@ describe('PatientProfilePage', () => {
     renderProfile(testPatient.id)
 
     await waitFor(() => {
-      expect(screen.getByText('Ahmed Khan')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'Ahmed Khan' })).toBeInTheDocument()
     })
 
     await user.click(screen.getByRole('button', { name: /edit/i }))
@@ -112,7 +112,7 @@ describe('PatientProfilePage', () => {
     renderProfile(testPatient.id)
 
     await waitFor(() => {
-      expect(screen.getByText('Ahmed Khan')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'Ahmed Khan' })).toBeInTheDocument()
     })
 
     expect(screen.getByText('Visit History')).toBeInTheDocument()

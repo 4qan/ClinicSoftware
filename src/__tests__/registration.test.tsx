@@ -94,7 +94,7 @@ describe('RegisterPatientPage', () => {
 
   it('patient ID is not editable (shown as read-only preview)', () => {
     renderPage()
-    expect(screen.getByText(/will be assigned on save/i)).toBeInTheDocument()
+    expect(screen.getByText(/assigned automatically when you save/i)).toBeInTheDocument()
     // No input for patient ID
     expect(screen.queryByLabelText(/patient id/i)).not.toBeInTheDocument()
   })
