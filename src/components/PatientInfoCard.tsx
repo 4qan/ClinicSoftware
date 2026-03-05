@@ -123,7 +123,7 @@ export function PatientInfoCard({ patient, onUpdated }: PatientInfoCardProps) {
           <div>
             <label className="block text-base font-medium text-gray-900 mb-1">Gender *</label>
             <div className="flex gap-3 mt-1">
-              {(['male', 'female', 'other'] as const).map((g) => (
+              {(['male', 'female'] as const).map((g) => (
                 <label key={g} className="flex items-center gap-1.5 cursor-pointer">
                   <input
                     type="radio"

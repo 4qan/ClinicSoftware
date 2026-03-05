@@ -164,7 +164,7 @@ export function RegisterPatientPage() {
             Gender <span className="text-red-500">*</span>
           </label>
           <div className="flex gap-4">
-            {(['male', 'female', 'other'] as const).map((g) => (
+            {(['male', 'female'] as const).map((g) => (
               <label key={g} className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"

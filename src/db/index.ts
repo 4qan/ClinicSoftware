@@ -8,7 +8,7 @@ export interface Patient {
   firstNameLower: string
   lastNameLower: string
   age: number
-  gender: 'male' | 'female' | 'other'
+  gender: 'male' | 'female'
   contact?: string
   cnic?: string
   createdAt: string
