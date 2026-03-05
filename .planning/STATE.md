@@ -1,3 +1,17 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+current_plan: 1 of 3
+status: Not Started
+last_updated: "2026-03-05T18:51:19.757Z"
+progress:
+  total_phases: 3
+  completed_phases: 1
+  total_plans: 2
+  completed_plans: 2
+---
+
 # Project State: ClinicSoftware
 
 ## Project Reference
