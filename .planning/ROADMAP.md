@@ -27,9 +27,10 @@
 2. Doctor registers a patient, sees the auto-generated 2026-XXXX ID, and finds them via search.
 3. Patient profile page loads (empty history) and all data survives a browser restart.
 
-**Plans:** 2 (1/2 complete)
+**Plans:** 3 (3/3 complete)
 - Plan 1: Project Setup, PWA Foundation, Data Layer, Authentication - COMPLETE (2026-03-05)
-- Plan 2: Patient Registration, Search, Profile - Pending
+- Plan 2: Patient Registration, Search, Profile - COMPLETE (2026-03-05)
+- Plan 3: UAT Gap Closure - COMPLETE (2026-03-05)
 
 ---
 

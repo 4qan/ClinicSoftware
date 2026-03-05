@@ -95,10 +95,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUND-03 | Phase 1: Foundation and Patient Management | Complete |
 | FOUND-04 | Phase 1: Foundation and Patient Management | Complete |
 | FOUND-05 | Phase 1: Foundation and Patient Management | Complete |
-| PAT-01 | Phase 1: Foundation and Patient Management | Not Started |
-| PAT-02 | Phase 1: Foundation and Patient Management | Not Started |
-| PAT-03 | Phase 1: Foundation and Patient Management | Not Started |
-| PAT-04 | Phase 1: Foundation and Patient Management | Not Started |
+| PAT-01 | Phase 1: Foundation and Patient Management | Complete |
+| PAT-02 | Phase 1: Foundation and Patient Management | Complete |
+| PAT-03 | Phase 1: Foundation and Patient Management | Complete |
+| PAT-04 | Phase 1: Foundation and Patient Management | Complete |
 | ENC-01 | Phase 2: Clinical Workflow | Not Started |
 | ENC-02 | Phase 2: Clinical Workflow | Not Started |
 | ENC-03 | Phase 2: Clinical Workflow | Not Started |
