@@ -17,10 +17,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Patient Management
 
-- [ ] **PAT-01**: User can register a new patient with name, age, gender, contact info, and optional CNIC
-- [ ] **PAT-02**: System auto-generates unique patient ID in 2026-XXXX format (with UUID as internal key)
-- [ ] **PAT-03**: User can search patients by name, ID, or contact in under 1 second
-- [ ] **PAT-04**: User can view a patient profile showing all encounters and prescriptions chronologically
+- [x] **PAT-01**: User can register a new patient with name, age, gender, contact info, and optional CNIC
+- [x] **PAT-02**: System auto-generates unique patient ID in 2026-XXXX format (with UUID as internal key)
+- [x] **PAT-03**: User can search patients by name, ID, or contact in under 1 second
+- [x] **PAT-04**: User can view a patient profile showing all encounters and prescriptions chronologically
 
 ### Encounters
 
