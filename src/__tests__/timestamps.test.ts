@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { withTimestamps, createPatient, updatePatient } from '@/db/timestamps'
-import { db, resetDatabase } from '@/db/index'
+import { resetDatabase } from '@/db/index'
 
 const ISO_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
 

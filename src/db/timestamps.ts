@@ -4,14 +4,14 @@ import type { Patient } from './index'
 export function withTimestamps<T extends Record<string, unknown>>(
   data: T,
   isNew: boolean,
-): T {
+): T & { createdAt: string; updatedAt: string } {
   const now = new Date().toISOString()
 
   if (isNew) {
-    return { ...data, createdAt: now, updatedAt: now }
+    return { ...data, createdAt: now, updatedAt: now } as T & { createdAt: string; updatedAt: string }
   }
 
-  return { ...data, updatedAt: now }
+  return { ...data, updatedAt: now } as T & { createdAt: string; updatedAt: string }
 }
 
 export async function createPatient(
