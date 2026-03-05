@@ -9,11 +9,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Foundation
 
-- [ ] **FOUND-01**: App is installable as PWA from browser (no .exe, works on old Windows Chrome/Edge)
-- [ ] **FOUND-02**: App works 100% offline using IndexedDB as local database
-- [ ] **FOUND-03**: Service worker caches all app assets for offline use
-- [ ] **FOUND-04**: User logs in with a simple password/PIN before accessing any data
-- [ ] **FOUND-05**: All records (patients, encounters, prescriptions) are auto-timestamped for compliance audit trail
+- [x] **FOUND-01**: App is installable as PWA from browser (no .exe, works on old Windows Chrome/Edge)
+- [x] **FOUND-02**: App works 100% offline using IndexedDB as local database
+- [x] **FOUND-03**: Service worker caches all app assets for offline use
+- [x] **FOUND-04**: User logs in with a simple password/PIN before accessing any data
+- [x] **FOUND-05**: All records (patients, encounters, prescriptions) are auto-timestamped for compliance audit trail
 
 ### Patient Management
 
@@ -90,11 +90,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1: Foundation and Patient Management | Not Started |
-| FOUND-02 | Phase 1: Foundation and Patient Management | Not Started |
-| FOUND-03 | Phase 1: Foundation and Patient Management | Not Started |
-| FOUND-04 | Phase 1: Foundation and Patient Management | Not Started |
-| FOUND-05 | Phase 1: Foundation and Patient Management | Not Started |
+| FOUND-01 | Phase 1: Foundation and Patient Management | Complete |
+| FOUND-02 | Phase 1: Foundation and Patient Management | Complete |
+| FOUND-03 | Phase 1: Foundation and Patient Management | Complete |
+| FOUND-04 | Phase 1: Foundation and Patient Management | Complete |
+| FOUND-05 | Phase 1: Foundation and Patient Management | Complete |
 | PAT-01 | Phase 1: Foundation and Patient Management | Not Started |
 | PAT-02 | Phase 1: Foundation and Patient Management | Not Started |
 | PAT-03 | Phase 1: Foundation and Patient Management | Not Started |
