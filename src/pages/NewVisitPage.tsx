@@ -114,7 +114,7 @@ export function NewVisitPage() {
           saltName: med.saltName,
           form: med.form,
           strength: med.strength,
-          dosage: med.dosage,
+          quantity: med.quantity,
           frequency: med.frequency,
           duration: med.duration,
           sortOrder: index,

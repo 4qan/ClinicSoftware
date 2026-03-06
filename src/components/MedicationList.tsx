@@ -47,7 +47,7 @@ export function MedicationList({ medications, onRemove }: MedicationListProps) {
                 <td className="py-3 pr-3 text-sm font-medium text-gray-900">
                   {formatDrugName(med)}
                 </td>
-                <td className="py-3 pr-3 text-sm text-gray-700">{formatDosageDisplay(med.form, med.dosage)}</td>
+                <td className="py-3 pr-3 text-sm text-gray-700">{formatDosageDisplay(med.form, med.quantity)}</td>
                 <td className="py-3 pr-3 text-sm text-gray-700">{med.frequency}</td>
                 <td className="py-3 pr-3 text-sm text-gray-700">{med.duration}</td>
                 <td className="py-3">
@@ -77,7 +77,7 @@ export function MedicationList({ medications, onRemove }: MedicationListProps) {
                 {index + 1}. {formatDrugName(med)}
               </p>
               <p className="text-sm text-gray-600 mt-1">
-                {formatDosageDisplay(med.form, med.dosage)} | {med.frequency} | {med.duration}
+                {formatDosageDisplay(med.form, med.quantity)} | {med.frequency} | {med.duration}
               </p>
             </div>
             <button

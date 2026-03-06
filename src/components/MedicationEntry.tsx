@@ -10,7 +10,7 @@ export interface MedicationFormData {
   saltName: string
   form: string
   strength: string
-  dosage: string
+  quantity: string
   frequency: string
   duration: string
 }
@@ -24,7 +24,7 @@ const emptyForm: MedicationFormData = {
   saltName: '',
   form: '',
   strength: '',
-  dosage: '',
+  quantity: '',
   frequency: '',
   duration: '',
 }
@@ -76,7 +76,7 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
   const isValid =
     form.brandName.trim() !== '' &&
     form.form.trim() !== '' &&
-    form.dosage.trim() !== '' &&
+    form.quantity.trim() !== '' &&
     form.frequency.trim() !== '' &&
     form.duration.trim() !== ''
 
@@ -161,7 +161,7 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
         <ComboBox
           options={MEDICATION_FORMS}
           value={form.form}
-          onChange={(v) => setForm((f) => ({ ...f, form: v, dosage: '' }))}
+          onChange={(v) => setForm((f) => ({ ...f, form: v, quantity: '' }))}
           placeholder="e.g., Tablet"
           label="Form"
         />
@@ -170,8 +170,8 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
       {/* Quantity (filtered by form) */}
       <ComboBox
         options={quantityOptions}
-        value={form.dosage}
-        onChange={(v) => setForm((f) => ({ ...f, dosage: v }))}
+        value={form.quantity}
+        onChange={(v) => setForm((f) => ({ ...f, quantity: v }))}
         placeholder={category === 'topical' ? 'e.g., Thin layer' : 'e.g., 1'}
         label="Qty"
       />

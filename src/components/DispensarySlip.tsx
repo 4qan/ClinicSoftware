@@ -61,7 +61,7 @@ export function DispensarySlip({ visit, medications, patient }: DispensarySlipPr
                   <td className="py-0.5 pr-2 text-gray-600">{med.saltName}</td>
                   <td className="py-0.5 pr-2">{med.strength}</td>
                   {(() => {
-                    const instruction = buildUrduInstruction({ form: med.form, dosage: med.dosage, frequency: med.frequency, duration: med.duration })
+                    const instruction = buildUrduInstruction({ form: med.form, quantity: med.quantity, frequency: med.frequency, duration: med.duration })
                     return (
                       <td className="py-0.5" style={{ minWidth: '120px' }}>
                         <span className="urdu-cell" dir="rtl">{instruction.urdu}</span>

@@ -56,7 +56,7 @@ export interface VisitMedication {
   saltName: string
   form: string
   strength: string
-  dosage: string
+  quantity: string
   frequency: string
   duration: string
   sortOrder: number
@@ -86,6 +86,22 @@ export class ClinicDatabase extends Dexie {
       drugs: 'id, brandNameLower, saltNameLower, isCustom',
       visits: 'id, patientId, createdAt',
       visitMedications: 'id, visitId',
+    })
+
+    this.version(3).stores({
+      patients: 'id, patientId, firstNameLower, lastNameLower, contact, createdAt',
+      settings: 'key',
+      recentPatients: 'id, viewedAt',
+      drugs: 'id, brandNameLower, saltNameLower, isCustom',
+      visits: 'id, patientId, createdAt',
+      visitMedications: 'id, visitId',
+    }).upgrade(tx => {
+      return tx.table('visitMedications').toCollection().modify(med => {
+        if ('dosage' in med && !('quantity' in med)) {
+          med.quantity = med.dosage
+          delete med.dosage
+        }
+      })
     })
   }
 }

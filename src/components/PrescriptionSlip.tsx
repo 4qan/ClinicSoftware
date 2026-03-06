@@ -87,7 +87,7 @@ export function PrescriptionSlip({ visit, medications, patient, clinicInfo }: Pr
                     <td className="py-1 pr-2 text-gray-600">{med.saltName}</td>
                     <td className="py-1 pr-2">{med.strength}</td>
                     {(() => {
-                      const instruction = buildUrduInstruction({ form: med.form, dosage: med.dosage, frequency: med.frequency, duration: med.duration })
+                      const instruction = buildUrduInstruction({ form: med.form, quantity: med.quantity, frequency: med.frequency, duration: med.duration })
                       return (
                         <td className="py-1" style={{ minWidth: '140px' }}>
                           <span className="urdu-cell" dir="rtl">{instruction.urdu}</span>

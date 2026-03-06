@@ -131,7 +131,7 @@ export function VisitCard({ visit, medications, defaultExpanded = false, onDelet
                             <span className="text-gray-500"> ({med.saltName}{med.strength ? ` ${med.strength}` : ''}{med.form ? ` ${med.form}` : ''})</span>
                           )}
                         </td>
-                        <td className="py-1.5 pr-3 text-gray-700">{formatDosageDisplay(med.form, med.dosage)}</td>
+                        <td className="py-1.5 pr-3 text-gray-700">{formatDosageDisplay(med.form, med.quantity)}</td>
                         <td className="py-1.5 pr-3 text-gray-700">{med.frequency}</td>
                         <td className="py-1.5 text-gray-700">{med.duration}</td>
                       </tr>
@@ -150,7 +150,7 @@ export function VisitCard({ visit, medications, defaultExpanded = false, onDelet
                       )}
                     </p>
                     <p className="text-gray-600 text-xs mt-0.5">
-                      {formatDosageDisplay(med.form, med.dosage)} | {med.frequency} | {med.duration}
+                      {formatDosageDisplay(med.form, med.quantity)} | {med.frequency} | {med.duration}
                     </p>
                   </div>
                 ))}

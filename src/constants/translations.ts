@@ -75,7 +75,7 @@ export const columnHeadersUrdu: Record<string, string> = {
 /** Input shape for buildUrduInstruction */
 export interface MedicationForInstruction {
   form: string
-  dosage: string
+  quantity: string
   frequency: string
   duration: string
 }
@@ -211,8 +211,8 @@ function lcFirst(s: string): string {
  *   As needed: "{dosage} {freq} {verb}، ضرورت کے مطابق"
  */
 export function buildUrduInstruction(med: MedicationForInstruction): { urdu: string; english: string } {
-  const dosageU = buildDosageUrdu(med.form, med.dosage)
-  const dosageEn = buildDosageEnglish(med.form, med.dosage)
+  const dosageU = buildDosageUrdu(med.form, med.quantity)
+  const dosageEn = buildDosageEnglish(med.form, med.quantity)
   const frequencyU = toUrdu(med.frequency)
   const durationU = toUrdu(med.duration)
 
