@@ -2,17 +2,31 @@ import { describe, it, expect } from 'vitest'
 import { formatDrugSearchResult, formatDrugSelected } from '@/utils/drugFormatters'
 import type { Drug } from '@/db/index'
 
+const baseDrug = {
+  brandNameLower: '',
+  saltNameLower: '',
+  isCustom: false,
+  isActive: true,
+  createdAt: '2026-01-01',
+  updatedAt: '2026-01-01',
+}
+
 const mockDrug: Drug = {
+  ...baseDrug,
   id: 'drug-1',
   brandName: 'Augmentin',
+  brandNameLower: 'augmentin',
   saltName: 'Amoxicillin/Clavulanate',
+  saltNameLower: 'amoxicillin/clavulanate',
   strength: '625mg',
   form: 'Tablet',
 }
 
 const minimalDrug: Drug = {
+  ...baseDrug,
   id: 'drug-2',
   brandName: 'Panadol',
+  brandNameLower: 'panadol',
   saltName: '',
   strength: '',
   form: '',
@@ -32,9 +46,12 @@ describe('drugFormatters', () => {
 
     it('includes only available details', () => {
       const partial: Drug = {
+        ...baseDrug,
         id: 'drug-3',
         brandName: 'Brufen',
+        brandNameLower: 'brufen',
         saltName: 'Ibuprofen',
+        saltNameLower: 'ibuprofen',
         strength: '',
         form: 'Tablet',
       }
