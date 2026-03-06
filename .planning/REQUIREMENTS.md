@@ -9,7 +9,7 @@ Requirements for v1.1 milestone. Each maps to roadmap phases.
 
 ### Urdu Prescription Printing
 
-- [ ] **URDU-01**: Predefined dosage, frequency, and duration options have Urdu translation mappings (~50 entries)
+- [x] **URDU-01**: Predefined dosage, frequency, and duration options have Urdu translation mappings (~50 entries)
 - [ ] **URDU-02**: Printed prescription slip shows dosage, frequency, and duration in Urdu (Nastaliq script)
 - [ ] **URDU-03**: Nastaliq font (Noto Nastaliq Urdu) is self-hosted and cached by service worker for offline use
 - [ ] **URDU-04**: RTL text renders correctly in prescription print layout with mixed LTR/RTL content (English drug names + Urdu dosage)
@@ -63,7 +63,7 @@ Requirements for v1.1 milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| URDU-01 | 4 (Urdu Foundation) | Pending |
+| URDU-01 | 4 (Urdu Foundation) | Complete |
 | URDU-02 | 5 (Prescription Print Urdu) | Pending |
 | URDU-03 | 4 (Urdu Foundation) | Pending |
 | URDU-04 | 5 (Prescription Print Urdu) | Pending |
