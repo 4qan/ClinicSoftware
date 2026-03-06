@@ -108,6 +108,7 @@ export function NewVisitPage() {
   }
 
   const canSave = selectedPatient !== null && clinicalNotes.trim() !== '' && !saving
+  const isDisabled = !selectedPatient
 
   const breadcrumbs = selectedPatient
     ? [
@@ -208,7 +209,7 @@ export function NewVisitPage() {
         )}
       </CollapsibleSection>
 
-      {/* Visit History */}
+      {/* Visit History - conditionally rendered (no meaningful empty state) */}
       {selectedPatient && (
         <CollapsibleSection
           title="Visit History"
@@ -246,9 +247,9 @@ export function NewVisitPage() {
         </CollapsibleSection>
       )}
 
-      {/* Clinical Notes */}
-      {selectedPatient && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+      {/* Clinical Notes - always visible, disabled without patient */}
+      <fieldset disabled={isDisabled}>
+        <div className={`bg-white border border-gray-200 rounded-lg p-6${isDisabled ? ' opacity-50 pointer-events-none' : ''}`}>
           <h3 className="text-lg font-bold text-gray-900 mb-3">Clinical Notes</h3>
           <textarea
             value={clinicalNotes}
@@ -258,11 +259,11 @@ export function NewVisitPage() {
             style={{ minHeight: '120px' }}
           />
         </div>
-      )}
+      </fieldset>
 
-      {/* Prescription */}
-      {selectedPatient && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+      {/* Prescription - always visible, disabled without patient */}
+      <fieldset disabled={isDisabled}>
+        <div className={`bg-white border border-gray-200 rounded-lg p-6${isDisabled ? ' opacity-50 pointer-events-none' : ''}`}>
           <h3 className="text-lg font-bold text-gray-900 mb-3">Prescription</h3>
           <MedicationEntry onAdd={handleAddMedication} />
           <div className="mt-4">
@@ -279,11 +280,11 @@ export function NewVisitPage() {
             />
           </div>
         </div>
-      )}
+      </fieldset>
 
-      {/* Action Bar */}
-      {selectedPatient && (
-        <div className="flex items-center justify-end gap-3">
+      {/* Action Bar - always visible, disabled without patient */}
+      <fieldset disabled={isDisabled}>
+        <div className={`flex items-center justify-end gap-3${isDisabled ? ' opacity-50 pointer-events-none' : ''}`}>
           <button
             type="button"
             onClick={() => navigate(-1)}
@@ -302,7 +303,7 @@ export function NewVisitPage() {
             {saving ? 'Saving...' : 'Save Visit'}
           </button>
         </div>
-      )}
+      </fieldset>
     </div>
   )
 }
