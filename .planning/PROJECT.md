@@ -22,7 +22,17 @@ The doctor can see a patient, write a prescription with medication autocomplete,
 
 ### Active
 
-(None -- planning next milestone)
+#### Urdu Prescription Support
+- [ ] Predefined dosage/frequency/duration options mapped to Urdu translations
+- [ ] Prescription slip prints with Urdu text (dosage, frequency, duration)
+- [ ] Proper Nastaliq font + RTL layout on printed prescription
+- [ ] Rx Notes field has English/Urdu toggle for RTL input
+- [ ] Rx Notes print in the language they were written in
+
+#### Data Backup & Restore
+- [ ] One-click full database export to JSON file
+- [ ] One-click import/restore from JSON backup
+- [ ] Auto-backup reminder after every N visits
 
 ### Out of Scope
 
@@ -33,6 +43,7 @@ The doctor can see a patient, write a prescription with medication autocomplete,
 - Lab results / imaging -- not needed
 - Drug interaction warnings -- complexity not justified
 - Real-time sync / CRDTs -- single user, single device
+- Cloud sync (Firebase/Supabase) -- deferred to future milestone, local backup covers data safety for now
 
 ## Context
 
@@ -67,5 +78,15 @@ Clinic is in an area with unreliable internet. Doctor uses an old Windows system
 | A5 print via @media print + @page | Browser-native, no print library dependency | Good |
 | Inline patient creation in visit form | Avoids breaking workflow with page navigation | Good |
 
+## Current Milestone: v1.1 Urdu & Backup
+
+**Goal:** Add Urdu language support to printed prescriptions and protect against data loss with backup/restore.
+
+**Target features:**
+- Urdu translation layer for dosage, frequency, duration on prescription prints
+- RTL/Nastaliq font support for prescription printing
+- English/Urdu toggle for Rx Notes input
+- Full database export/import for backup and disaster recovery
+
 ---
-*Last updated: 2026-03-06 after v1.0 milestone*
+*Last updated: 2026-03-06 after v1.1 milestone started*
