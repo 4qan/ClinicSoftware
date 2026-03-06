@@ -86,10 +86,10 @@ export function PrescriptionSlip({ visit, medications, patient, clinicInfo }: Pr
                     <td className="py-1 pr-2 font-medium">{med.brandName}</td>
                     <td className="py-1 pr-2 text-gray-600">{med.saltName}</td>
                     <td className="py-1 pr-2">{med.strength}</td>
-                    <td className="py-1 pr-2 urdu-cell" dir="rtl">{toUrdu(med.form)}</td>
-                    <td className="py-1 pr-2 urdu-cell" dir="rtl">{toUrdu(med.dosage)}</td>
-                    <td className="py-1 pr-2 urdu-cell" dir="rtl">{toUrdu(med.frequency)}</td>
-                    <td className="py-1 urdu-cell" dir="rtl">{toUrdu(med.duration)}</td>
+                    <td className="py-1 pr-2 urdu-cell" dir="rtl" style={{ textAlign: 'left' }}>{toUrdu(med.form)}</td>
+                    <td className="py-1 pr-2 urdu-cell" dir="rtl" style={{ textAlign: 'left' }}>{toUrdu(med.dosage)}</td>
+                    <td className="py-1 pr-2 urdu-cell" dir="rtl" style={{ textAlign: 'left' }}>{toUrdu(med.frequency)}</td>
+                    <td className="py-1 urdu-cell" dir="rtl" style={{ textAlign: 'left' }}>{toUrdu(med.duration)}</td>
                   </tr>
                 ))}
               </tbody>
