@@ -157,6 +157,12 @@ export function VisitCard({ visit, medications, defaultExpanded = false, onDelet
           {/* Actions */}
           <div className="mt-4 flex items-center gap-3 pt-3 border-t border-gray-100">
             <Link
+              to={`/visit/${visit.id}/print`}
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Print
+            </Link>
+            <Link
               to={`/visit/${visit.id}/edit`}
               className="text-sm text-blue-600 hover:text-blue-800 font-medium"
             >
