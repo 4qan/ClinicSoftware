@@ -60,9 +60,9 @@ describe('ClinicDatabase', () => {
     expect(result?.lastName).toBe('Khan')
   })
 
-  it('has patients, settings, and recentPatients tables', async () => {
+  it('has all v2 schema tables', async () => {
     await db.open()
     const tableNames = db.tables.map((t) => t.name).sort()
-    expect(tableNames).toEqual(['patients', 'recentPatients', 'settings'])
+    expect(tableNames).toEqual(['drugs', 'patients', 'recentPatients', 'settings', 'visitMedications', 'visits'])
   })
 })

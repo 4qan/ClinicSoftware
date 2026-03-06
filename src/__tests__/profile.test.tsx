@@ -108,7 +108,7 @@ describe('PatientProfilePage', () => {
     })
   })
 
-  it('empty history shows "No visits yet" message', async () => {
+  it('empty history shows "No visits recorded yet" message', async () => {
     renderProfile(testPatient.id)
 
     await waitFor(() => {
@@ -116,7 +116,10 @@ describe('PatientProfilePage', () => {
     })
 
     expect(screen.getByText('Visit History')).toBeInTheDocument()
-    expect(screen.getByText('No visits yet')).toBeInTheDocument()
+
+    await waitFor(() => {
+      expect(screen.getByText('No visits recorded yet')).toBeInTheDocument()
+    })
   })
 
   it('non-existent patient shows error state', async () => {
