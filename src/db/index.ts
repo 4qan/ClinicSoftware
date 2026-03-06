@@ -25,10 +25,50 @@ export interface RecentPatient {
   viewedAt: string
 }
 
+export interface Drug {
+  id: string
+  brandName: string
+  brandNameLower: string
+  saltName: string
+  saltNameLower: string
+  form: string
+  strength: string
+  isCustom: boolean
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Visit {
+  id: string
+  patientId: string
+  clinicalNotes: string
+  rxNotes: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface VisitMedication {
+  id: string
+  visitId: string
+  drugId?: string
+  brandName: string
+  saltName: string
+  form: string
+  strength: string
+  dosage: string
+  frequency: string
+  duration: string
+  sortOrder: number
+}
+
 export class ClinicDatabase extends Dexie {
   patients!: Table<Patient, string>
   settings!: Table<AppSettings, string>
   recentPatients!: Table<RecentPatient, string>
+  drugs!: Table<Drug, string>
+  visits!: Table<Visit, string>
+  visitMedications!: Table<VisitMedication, string>
 
   constructor() {
     super('ClinicSoftware')
@@ -37,6 +77,15 @@ export class ClinicDatabase extends Dexie {
       patients: 'id, patientId, firstNameLower, lastNameLower, contact, createdAt',
       settings: 'key',
       recentPatients: 'id, viewedAt',
+    })
+
+    this.version(2).stores({
+      patients: 'id, patientId, firstNameLower, lastNameLower, contact, createdAt',
+      settings: 'key',
+      recentPatients: 'id, viewedAt',
+      drugs: 'id, brandNameLower, saltNameLower, isCustom',
+      visits: 'id, patientId, createdAt',
+      visitMedications: 'id, visitId',
     })
   }
 }
