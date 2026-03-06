@@ -4,7 +4,7 @@ milestone: v1.1
 milestone_name: Urdu & Backup
 status: completed
 last_updated: "2026-03-06T17:41:39.677Z"
-last_activity: 2026-03-06 -- Completed plan 05-02 (Natural Language Urdu Instructions Column)
+last_activity: 2026-03-06 -- Completed quick task 5: Research prescription UX patterns and redesign medication assignment flow
 progress:
   total_phases: 6
   completed_phases: 2
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-06)
 Phase: 5 (Prescription Print Urdu)
 Plan: All complete (2/2) + post-execution refinements
 Status: Phase 5 complete, ready for Phase 6
-Last activity: 2026-03-06 -- Post-execution: separated form from dosage, form-aware quantity picker, natural Urdu sentence patterns
+Last activity: 2026-03-06 -- Completed quick task 5: Research prescription UX patterns and redesign medication assignment flow
 
 ## Progress
 | Phase | Name | Status | Plans |
@@ -57,13 +57,13 @@ None.
 
 ### Quick Tasks Completed
 
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 1 | Set up GitHub remote repo and deploy to GitHub Pages | 2026-03-06 | fa0212f | [1-set-up-github-remote-repo-and-deploy-to-](./quick/1-set-up-github-remote-repo-and-deploy-to-/) |
-| 2 | Fix Print CTA alignment | 2026-03-06 | 8de8291 | [2-fix-print-cta-alignment](./quick/2-fix-print-cta-alignment/) |
-| 3 | Show full drug details after selection | 2026-03-06 | 0870962 | [3-show-full-drug-details-after-selection-i](./quick/3-show-full-drug-details-after-selection-i/) |
-| 4 | Add Save & Print CTA to visit pages | 2026-03-06 | 3aee6f0 | [4-add-save-and-print-cta-to-new-visit-page](./quick/4-add-save-and-print-cta-to-new-visit-page/) |
-| 5 | Research prescription UX patterns and redesign recommendations | 2026-03-06 | 0ac3084 | [5-research-prescription-ux-patterns-and-re](./quick/5-research-prescription-ux-patterns-and-re/) |
+| # | Description | Date | Commit | Status | Directory |
+|---|-------------|------|--------|--------|-----------|
+| 1 | Set up GitHub remote repo and deploy to GitHub Pages | 2026-03-06 | fa0212f | | [1-set-up-github-remote-repo-and-deploy-to-](./quick/1-set-up-github-remote-repo-and-deploy-to-/) |
+| 2 | Fix Print CTA alignment | 2026-03-06 | 8de8291 | | [2-fix-print-cta-alignment](./quick/2-fix-print-cta-alignment/) |
+| 3 | Show full drug details after selection | 2026-03-06 | 0870962 | | [3-show-full-drug-details-after-selection-i](./quick/3-show-full-drug-details-after-selection-i/) |
+| 4 | Add Save & Print CTA to visit pages | 2026-03-06 | 3aee6f0 | | [4-add-save-and-print-cta-to-new-visit-page](./quick/4-add-save-and-print-cta-to-new-visit-page/) |
+| 5 | Research prescription UX patterns and redesign recommendations | 2026-03-06 | 0ac3084 | Verified | [5-research-prescription-ux-patterns-and-re](./quick/5-research-prescription-ux-patterns-and-re/) |
 
 ---
 *Last updated: 2026-03-06 - Quick task 5: prescription UX research findings*
