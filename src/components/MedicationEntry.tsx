@@ -1,4 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
+import { ComboBox } from './ComboBox'
+import { useDrugSearch } from '@/hooks/useDrugSearch'
+import { DOSAGE_OPTIONS, FREQUENCY_OPTIONS, DURATION_OPTIONS } from '@/constants/clinical'
+import type { Drug } from '@/db/index'
 
 export interface MedicationFormData {
   drugId?: string
@@ -9,101 +13,6 @@ export interface MedicationFormData {
   dosage: string
   frequency: string
   duration: string
-}
-
-// Placeholder options until Plan 01 delivers clinical constants
-const DOSAGE_OPTIONS = [
-  '1 tablet', '2 tablets', '1/2 tablet',
-  '5ml', '10ml', '15ml',
-  '1 capsule', '2 capsules',
-  '1 sachet', '1 puff', '2 puffs',
-  'Apply thin layer',
-]
-
-const FREQUENCY_OPTIONS = [
-  'OD (Once daily)',
-  'BD (Twice daily)',
-  'TDS (Three times daily)',
-  'QID (Four times daily)',
-  'PRN (As needed)',
-  'HS (At bedtime)',
-  'Stat (Immediately)',
-  'Before meals',
-  'After meals',
-  'Every 6 hours',
-  'Every 8 hours',
-  'Every 12 hours',
-]
-
-const DURATION_OPTIONS = [
-  '1 day', '3 days', '5 days', '7 days', '10 days', '14 days',
-  '3 weeks', '1 month', '2 months', '3 months', '6 months',
-  'Ongoing', 'As needed',
-]
-
-interface SimpleComboBoxProps {
-  options: string[]
-  value: string
-  onChange: (value: string) => void
-  placeholder: string
-  label: string
-}
-
-function SimpleComboBox({ options, value, onChange, placeholder, label }: SimpleComboBoxProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [filtered, setFiltered] = useState<string[]>(options)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (value) {
-      const lower = value.toLowerCase()
-      setFiltered(options.filter((o) => o.toLowerCase().includes(lower)))
-    } else {
-      setFiltered(options)
-    }
-  }, [value, options])
-
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setIsOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
-
-  return (
-    <div className="relative" ref={ref}>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onFocus={() => setIsOpen(true)}
-        placeholder={placeholder}
-        className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        style={{ minHeight: '44px' }}
-      />
-      {isOpen && filtered.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
-          {filtered.map((option) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => {
-                onChange(option)
-                setIsOpen(false)
-              }}
-              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
 }
 
 interface MedicationEntryProps {
@@ -126,8 +35,7 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
   const [showDrugDropdown, setShowDrugDropdown] = useState(false)
   const drugRef = useRef<HTMLDivElement>(null)
 
-  // Placeholder: use simple text input for drug search until useDrugSearch is available
-  // When Plan 01 lands, this will be swapped for the real drug autocomplete
+  const { results: drugResults, isSearching } = useDrugSearch(drugQuery)
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -141,7 +49,20 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
 
   function handleDrugQueryChange(value: string) {
     setDrugQuery(value)
-    setForm((f) => ({ ...f, brandName: value, saltName: '' }))
+    setForm((f) => ({ ...f, brandName: value, saltName: '', form: '', strength: '', drugId: undefined }))
+    setShowDrugDropdown(true)
+  }
+
+  function handleSelectDrug(drug: Drug) {
+    setDrugQuery(drug.brandName)
+    setForm((f) => ({
+      ...f,
+      drugId: drug.id,
+      brandName: drug.brandName,
+      saltName: drug.saltName,
+      form: drug.form,
+      strength: drug.strength,
+    }))
     setShowDrugDropdown(false)
   }
 
@@ -165,23 +86,60 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
     }
   }
 
+  function formatDrugDisplay(drug: Drug): string {
+    const parts = [drug.brandName]
+    const details: string[] = []
+    if (drug.saltName) details.push(drug.saltName)
+    if (drug.strength) details.push(drug.strength)
+    if (drug.form) details.push(drug.form)
+    if (details.length > 0) parts.push(`(${details.join(' ')})`)
+    return parts.join(' ')
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end" onKeyDown={handleKeyDown}>
-      {/* Drug Name */}
-      <div className="md:col-span-1" ref={drugRef}>
+      {/* Drug Name with autocomplete */}
+      <div className="md:col-span-1 relative" ref={drugRef}>
         <label className="block text-sm font-medium text-gray-700 mb-1">Drug Name</label>
         <input
           type="text"
           value={drugQuery}
           onChange={(e) => handleDrugQueryChange(e.target.value)}
+          onFocus={() => drugQuery.trim().length >= 1 && setShowDrugDropdown(true)}
           placeholder="Type drug name..."
           className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           style={{ minHeight: '44px' }}
+          autoComplete="off"
         />
+        {showDrugDropdown && drugQuery.trim().length >= 1 && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+            {isSearching ? (
+              <div className="p-3 text-center text-gray-500 text-sm">Searching...</div>
+            ) : drugResults.length === 0 ? (
+              <div className="p-3 text-center text-gray-400 text-sm">
+                No drugs found. You can type a custom name.
+              </div>
+            ) : (
+              drugResults.map((drug) => (
+                <button
+                  key={drug.id}
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    handleSelectDrug(drug)
+                  }}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                >
+                  {formatDrugDisplay(drug)}
+                </button>
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       {/* Dosage */}
-      <SimpleComboBox
+      <ComboBox
         options={DOSAGE_OPTIONS}
         value={form.dosage}
         onChange={(v) => setForm((f) => ({ ...f, dosage: v }))}
@@ -190,16 +148,16 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
       />
 
       {/* Frequency */}
-      <SimpleComboBox
+      <ComboBox
         options={FREQUENCY_OPTIONS}
         value={form.frequency}
         onChange={(v) => setForm((f) => ({ ...f, frequency: v }))}
-        placeholder="e.g., BD"
+        placeholder="e.g., Twice daily"
         label="Frequency"
       />
 
       {/* Duration */}
-      <SimpleComboBox
+      <ComboBox
         options={DURATION_OPTIONS}
         value={form.duration}
         onChange={(v) => setForm((f) => ({ ...f, duration: v }))}
