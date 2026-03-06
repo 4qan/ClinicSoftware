@@ -56,7 +56,7 @@ beforeEach(async () => {
         saltName: 'Paracetamol',
         form: 'Tablet',
         strength: '500mg',
-        dosage: '1',
+        quantity: '1',
         frequency: 'TDS',
         duration: '5 days',
         sortOrder: 0,

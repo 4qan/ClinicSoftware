@@ -87,7 +87,7 @@ describe('buildDosageEnglish', () => {
 
 describe('buildUrduInstruction', () => {
   it('oral tablet with standard duration produces natural sentence', () => {
-    const result = buildUrduInstruction({ form: 'Tablet', dosage: '1', frequency: 'Twice daily', duration: '7 days' })
+    const result = buildUrduInstruction({ form: 'Tablet', quantity: '1', frequency: 'Twice daily', duration: '7 days' })
     expect(result).toEqual({
       urdu: '1 گولی دن میں دو بار لیں، 7 دن تک',
       english: 'Take 1 tablet, twice daily, for 7 days',
@@ -95,7 +95,7 @@ describe('buildUrduInstruction', () => {
   })
 
   it('topical cream uses لگائیں verb', () => {
-    const result = buildUrduInstruction({ form: 'Cream', dosage: 'Thin layer', frequency: 'Twice daily', duration: '14 days' })
+    const result = buildUrduInstruction({ form: 'Cream', quantity: 'Thin layer', frequency: 'Twice daily', duration: '14 days' })
     expect(result.urdu).toContain('پتلی تہہ')
     expect(result.urdu).toContain('لگائیں')
     expect(result.urdu).toContain('تک')
@@ -104,14 +104,14 @@ describe('buildUrduInstruction', () => {
   })
 
   it('ongoing duration uses continuous verb form', () => {
-    const result = buildUrduInstruction({ form: 'Tablet', dosage: '1', frequency: 'Once daily', duration: 'Ongoing' })
+    const result = buildUrduInstruction({ form: 'Tablet', quantity: '1', frequency: 'Once daily', duration: 'Ongoing' })
     expect(result.urdu).toMatch(/لیتے رہیں$/)
     expect(result.urdu).not.toContain('تک')
     expect(result.english).toBe('Take 1 tablet, once daily, ongoing')
   })
 
   it('drops uses ڈالیں verb', () => {
-    const result = buildUrduInstruction({ form: 'Drops', dosage: '2', frequency: 'Three times daily', duration: '5 days' })
+    const result = buildUrduInstruction({ form: 'Drops', quantity: '2', frequency: 'Three times daily', duration: '5 days' })
     expect(result.urdu).toContain('2 قطرے')
     expect(result.urdu).toContain('ڈالیں')
     expect(result.urdu).toContain('5 دن تک')
@@ -119,27 +119,27 @@ describe('buildUrduInstruction', () => {
   })
 
   it('half tablet produces آدھی گولی', () => {
-    const result = buildUrduInstruction({ form: 'Tablet', dosage: '½', frequency: 'Once daily', duration: '5 days' })
+    const result = buildUrduInstruction({ form: 'Tablet', quantity: '½', frequency: 'Once daily', duration: '5 days' })
     expect(result.urdu).toContain('آدھی گولی')
     expect(result.english).toContain('½ tablet')
   })
 
   it('inhaler uses correct verbs', () => {
-    const result = buildUrduInstruction({ form: 'Inhaler', dosage: '2', frequency: 'Twice daily', duration: '1 month' })
+    const result = buildUrduInstruction({ form: 'Inhaler', quantity: '2', frequency: 'Twice daily', duration: '1 month' })
     expect(result.urdu).toContain('2 سپرے')
     expect(result.urdu).toContain('لیں')
     expect(result.english).toBe('Inhale 2 puffs, twice daily, for 1 month')
   })
 
   it('injection uses لگوائیں verb', () => {
-    const result = buildUrduInstruction({ form: 'Injection', dosage: '1', frequency: 'Once daily', duration: '3 days' })
+    const result = buildUrduInstruction({ form: 'Injection', quantity: '1', frequency: 'Once daily', duration: '3 days' })
     expect(result.urdu).toContain('1 ٹیکا')
     expect(result.urdu).toContain('لگوائیں')
     expect(result.english).toMatch(/^Administer 1 injection/)
   })
 
   it('as needed duration uses standard verb with qualifier', () => {
-    const result = buildUrduInstruction({ form: 'Tablet', dosage: '1', frequency: 'Twice daily', duration: 'As needed' })
+    const result = buildUrduInstruction({ form: 'Tablet', quantity: '1', frequency: 'Twice daily', duration: 'As needed' })
     expect(result.urdu).toContain('لیں')
     expect(result.urdu).toContain('ضرورت کے مطابق')
     expect(result.urdu).not.toContain('تک')
@@ -147,7 +147,7 @@ describe('buildUrduInstruction', () => {
   })
 
   it('custom numeric quantity still constructs sentence', () => {
-    const result = buildUrduInstruction({ form: 'Tablet', dosage: '12', frequency: 'Once daily', duration: '7 days' })
+    const result = buildUrduInstruction({ form: 'Tablet', quantity: '12', frequency: 'Once daily', duration: '7 days' })
     expect(result.urdu).toBe('12 گولیاں دن میں ایک بار لیں، 7 دن تک')
     expect(result.english).toBe('Take 12 tablets, once daily, for 7 days')
   })
