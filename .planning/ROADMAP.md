@@ -200,7 +200,7 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | 1. Foundation and Patient Management | v1.0 | 7/7 | Complete | 2026-03-06 |
 | 2. Clinical Workflow | v1.0 | 4/4 | Complete | 2026-03-06 |
 | 3. Printing and Visit Completion | v1.0 | 3/3 | Complete | 2026-03-06 |
-| 4. Urdu Foundation | v1.1 | 0/? | Not Started | -- |
+| 4. Urdu Foundation | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 5. Prescription Print Urdu | v1.1 | 0/? | Not Started | -- |
 | 6. Rx Notes Urdu Toggle | v1.1 | 0/? | Not Started | -- |
 | 7. Backup Export | v1.1 | 0/? | Not Started | -- |
@@ -208,4 +208,4 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | 9. Auto-Snapshots | v1.1 | 0/? | Not Started | -- |
 
 ---
-*Last updated: 2026-03-06 after v1.1 roadmap creation*
+*Last updated: 2026-03-06 after Phase 4 completion*
