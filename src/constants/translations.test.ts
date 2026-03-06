@@ -8,7 +8,6 @@ import {
 import {
   dosageUrdu,
   frequencyUrdu,
-  durationUrdu,
   formsUrdu,
   toUrdu,
 } from './translations'
