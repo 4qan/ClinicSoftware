@@ -91,13 +91,13 @@ export const columnHeadersUrdu: Record<string, string> = {
   'Strength': 'طاقت',
   'Form': 'شکل',
   'Dosage': 'خوراک',
-  'Freq': 'تعداد',
+  'Freq': 'وقفہ',
   'Duration': 'دورانیہ',
 }
 
 /** Section header Urdu labels for prescription slip */
 export const sectionHeadersUrdu: Record<string, string> = {
-  'Clinical Notes': 'طبی نوٹس',
+  'Clinical Notes': 'طبی تفصیلات',
   'Instructions': 'ہدایات',
 }
 
