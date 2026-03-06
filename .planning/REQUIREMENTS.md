@@ -63,26 +63,26 @@ Requirements for v1.1 milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| URDU-01 | — | Pending |
-| URDU-02 | — | Pending |
-| URDU-03 | — | Pending |
-| URDU-04 | — | Pending |
-| URDU-05 | — | Pending |
-| URDU-06 | — | Pending |
-| URDU-07 | — | Pending |
-| BKUP-01 | — | Pending |
-| BKUP-02 | — | Pending |
-| BKUP-03 | — | Pending |
-| BKUP-04 | — | Pending |
-| BKUP-05 | — | Pending |
-| BKUP-06 | — | Pending |
-| BKUP-07 | — | Pending |
+| URDU-01 | 4 (Urdu Foundation) | Pending |
+| URDU-02 | 5 (Prescription Print Urdu) | Pending |
+| URDU-03 | 4 (Urdu Foundation) | Pending |
+| URDU-04 | 5 (Prescription Print Urdu) | Pending |
+| URDU-05 | 5 (Prescription Print Urdu) | Pending |
+| URDU-06 | 6 (Rx Notes Urdu Toggle) | Pending |
+| URDU-07 | 6 (Rx Notes Urdu Toggle) | Pending |
+| BKUP-01 | 7 (Backup Export) | Pending |
+| BKUP-02 | 8 (Backup Restore) | Pending |
+| BKUP-03 | 7 (Backup Export) | Pending |
+| BKUP-04 | 8 (Backup Restore) | Pending |
+| BKUP-05 | 8 (Backup Restore) | Pending |
+| BKUP-06 | 9 (Auto-Snapshots) | Pending |
+| BKUP-07 | 9 (Auto-Snapshots) | Pending |
 
 **Coverage:**
 - v1.1 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14
+- Mapped to phases: 14
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-06*
-*Last updated: 2026-03-06 after initial definition*
+*Last updated: 2026-03-06 after roadmap phase mapping*
