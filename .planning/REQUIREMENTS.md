@@ -26,7 +26,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **ENC-01**: User can log an encounter for a patient (complaint, examination notes, diagnosis)
 - [x] **ENC-02**: Encounters are automatically dated and timestamped
-- [ ] **ENC-03**: User can view past encounters on the patient profile in reverse chronological order
+- [x] **ENC-03**: User can view past encounters on the patient profile in reverse chronological order
 
 ### Prescriptions
 
