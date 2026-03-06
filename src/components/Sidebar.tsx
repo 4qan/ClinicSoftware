@@ -102,7 +102,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         <button
           onClick={logout}
           title={collapsed ? 'Log Out' : undefined}
-          className={`w-full ${collapsed ? 'flex justify-center' : 'text-left'} px-3 py-3 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors`}
+          className={`w-full flex items-center ${collapsed ? 'justify-center' : ''} px-3 py-3 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors`}
           style={{ minHeight: '44px' }}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

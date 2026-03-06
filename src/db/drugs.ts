@@ -89,7 +89,7 @@ export async function deleteCustomDrug(id: string): Promise<void> {
 }
 
 export async function getCustomDrugs(): Promise<Drug[]> {
-  return db.drugs.where('isCustom').equals(true).toArray()
+  return db.drugs.filter(d => d.isCustom === true).toArray()
 }
 
 export async function getAllDrugs(): Promise<Drug[]> {
