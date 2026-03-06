@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# GSD planning (local only)
+.planning/
+
+# Test artifacts
+dev-dist/
+playwright-report/
+test-results/
