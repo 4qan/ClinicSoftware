@@ -10,15 +10,7 @@ export function PatientsPage() {
   return (
     <div>
       <Breadcrumbs crumbs={[{ label: 'Home', path: '/' }, { label: 'Patients' }]} />
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Patients</h2>
-        <Link
-          to="/register"
-          className="px-4 py-2 text-base font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer transition-colors"
-        >
-          Register New Patient
-        </Link>
-      </div>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">Patients</h2>
 
       {patients.length === 0 ? (
         <div className="text-center py-16">
