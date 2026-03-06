@@ -50,6 +50,12 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **PRINT-03**: Print layouts work correctly in Chrome/Edge print dialog
 - [ ] **PRINT-04**: Both prints are triggered from the prescription view with clear, separate buttons
 
+### Visit Flow
+
+- [ ] **VISIT-01**: Inline patient creation during new visit (no page navigation, expand form below search)
+- [ ] **VISIT-02**: Visit form sections always visible but disabled until patient selected (no layout shift)
+- [ ] **VISIT-03**: Patient search shows "Create [name] as new patient" option when no match found
+
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
@@ -115,10 +121,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PRINT-02 | Phase 3: Printing and Visit Completion | Not Started |
 | PRINT-03 | Phase 3: Printing and Visit Completion | Not Started |
 | PRINT-04 | Phase 3: Printing and Visit Completion | Not Started |
+| VISIT-01 | Phase 3: Printing and Visit Completion | Not Started |
+| VISIT-02 | Phase 3: Printing and Visit Completion | Not Started |
+| VISIT-03 | Phase 3: Printing and Visit Completion | Not Started |
 
 **Coverage:**
-- v1 requirements: 25 total (corrected from original count of 21)
-- Mapped to phases: 25
+- v1 requirements: 28 total
+- Mapped to phases: 28
 - Unmapped: 0
 
 ---

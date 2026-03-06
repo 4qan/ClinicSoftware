@@ -77,11 +77,15 @@
 - PRINT-02: Print separate dispensary slip with medication list only (for dispenser)
 - PRINT-03: Print layouts work correctly in Chrome/Edge print dialog
 - PRINT-04: Both prints triggered from prescription view with clear, separate buttons
+- VISIT-01: Inline patient creation during new visit (no page navigation away from visit form)
+- VISIT-02: Visit form sections always visible (disabled until patient selected), no layout shift
+- VISIT-03: Search results show "Create [name] as new patient" option when no match found
 
 **Success Criteria:**
 1. Doctor clicks "Print Prescription" and gets a correctly formatted small-format slip in the browser print dialog.
 2. Doctor clicks "Print Dispensary Slip" and gets a medication-only list formatted for the dispenser.
 3. Full visit workflow (find patient, log encounter, write Rx, print both slips) completes in under 2 minutes.
+4. Doctor starts a new visit, types an unknown name, creates the patient inline without leaving the page, and continues writing the prescription seamlessly.
 
 **Plans:** 1
 
@@ -96,9 +100,10 @@
 | Encounters | ENC-01 to ENC-03 | 2 | 3/3 | Complete   | 2026-03-06 | RX-01 to RX-05 | 2 | 5 |
 | Drug Database | DRUG-01 to DRUG-04 | 2 | 4 |
 | Printing | PRINT-01 to PRINT-04 | 3 | 4 |
-| **Total** | | | **25** |
+| Visit Flow | VISIT-01 to VISIT-03 | 3 | 3 |
+| **Total** | | | **28** |
 
-**Note:** REQUIREMENTS.md originally stated 21 v1 requirements, but the actual enumerated list contains 25 discrete items. The count has been corrected to 25. All 25 are mapped.
+**Note:** 28 v1 requirements total (3 visit flow requirements added during Phase 2 UAT). All 28 are mapped.
 
 ---
 *Created: 2026-03-05*
