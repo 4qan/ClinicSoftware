@@ -10,6 +10,7 @@ import type { Visit, VisitMedication, Patient } from '@/db/index'
 import type { ClinicInfo } from '@/db/settings'
 
 type PrintMode = 'prescription' | 'dispensary' | null
+type PreviewMode = 'prescription' | 'dispensary'
 
 export function PrintVisitPage() {
   const { id: visitId } = useParams<{ id: string }>()
@@ -22,6 +23,7 @@ export function PrintVisitPage() {
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [printMode, setPrintMode] = useState<PrintMode>(null)
+  const [previewMode, setPreviewMode] = useState<PreviewMode>('prescription')
 
   useEffect(() => {
     async function loadData() {
@@ -95,32 +97,50 @@ export function PrintVisitPage() {
 
   return (
     <div className="max-w-4xl space-y-6">
-      {/* Screen-only: breadcrumbs and buttons */}
+      {/* Screen-only: breadcrumbs, tabs, and print button */}
       <div className="no-print">
         <Breadcrumbs crumbs={breadcrumbs} />
 
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center justify-between gap-4 mb-4">
+          {/* Preview tab toggle */}
+          <div className="flex bg-gray-100 rounded-lg p-0.5">
+            <button
+              type="button"
+              onClick={() => setPreviewMode('prescription')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md cursor-pointer transition-colors ${
+                previewMode === 'prescription'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Prescription
+            </button>
+            <button
+              type="button"
+              onClick={() => setPreviewMode('dispensary')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md cursor-pointer transition-colors ${
+                previewMode === 'dispensary'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Dispensary
+            </button>
+          </div>
+
+          {/* Print button */}
           <button
             type="button"
-            onClick={() => handlePrint('prescription')}
-            className="flex-1 px-6 py-4 text-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer transition-colors"
-            style={{ minHeight: '56px' }}
+            onClick={() => handlePrint(previewMode)}
+            className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer transition-colors"
           >
-            Print Prescription
-          </button>
-          <button
-            type="button"
-            onClick={() => handlePrint('dispensary')}
-            className="flex-1 px-6 py-4 text-lg font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg cursor-pointer transition-colors"
-            style={{ minHeight: '56px' }}
-          >
-            Print Dispensary Slip
+            Print {previewMode === 'prescription' ? 'Prescription' : 'Dispensary Slip'}
           </button>
         </div>
       </div>
 
-      {/* Prescription Slip: always visible on screen as preview, visible in print only when printMode is 'prescription' */}
-      <div className={printMode === 'dispensary' ? 'print-hidden' : ''}>
+      {/* Prescription Slip: shown on screen when previewing, hidden in print when printing dispensary */}
+      <div className={`${previewMode !== 'prescription' ? 'hidden' : ''} ${printMode === 'dispensary' ? 'print-hidden' : ''}`}>
         <PrescriptionSlip
           visit={visit}
           medications={medications}
@@ -129,8 +149,8 @@ export function PrintVisitPage() {
         />
       </div>
 
-      {/* Dispensary Slip: hidden on screen, visible in print only when printMode is 'dispensary' */}
-      <div className={`${printMode !== 'dispensary' ? 'hidden' : ''}`}>
+      {/* Dispensary Slip: shown on screen when previewing, hidden in print when printing prescription */}
+      <div className={`${previewMode !== 'dispensary' ? 'hidden' : ''} ${printMode === 'prescription' ? 'print-hidden' : ''}`}>
         <DispensarySlip
           visit={visit}
           medications={medications}
