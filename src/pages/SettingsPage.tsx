@@ -125,8 +125,14 @@ export function SettingsPage() {
     <div className="max-w-2xl">
       <Breadcrumbs crumbs={[{ label: 'Home', path: '/' }, { label: 'Settings' }]} />
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Settings</h2>
+
+      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Security</h3>
       <RecoveryCodeSection />
       <ChangePassword />
+
+      <hr className="border-gray-200 my-8" />
+
+      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Clinical</h3>
       <DrugManagement />
     </div>
   )
