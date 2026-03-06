@@ -10,10 +10,10 @@ Requirements for v1.1 milestone. Each maps to roadmap phases.
 ### Urdu Prescription Printing
 
 - [x] **URDU-01**: Predefined dosage, frequency, and duration options have Urdu translation mappings (~50 entries)
-- [ ] **URDU-02**: Printed prescription slip shows dosage, frequency, and duration in Urdu (Nastaliq script)
+- [x] **URDU-02**: Printed prescription slip shows dosage, frequency, and duration in Urdu (Nastaliq script)
 - [x] **URDU-03**: Nastaliq font (Noto Nastaliq Urdu) is self-hosted and cached by service worker for offline use
-- [ ] **URDU-04**: RTL text renders correctly in prescription print layout with mixed LTR/RTL content (English drug names + Urdu dosage)
-- [ ] **URDU-05**: Printed prescription column headers display in Urdu (e.g., دوا, خوراک, دورانیہ)
+- [x] **URDU-04**: RTL text renders correctly in prescription print layout with mixed LTR/RTL content (English drug names + Urdu dosage)
+- [x] **URDU-05**: Printed prescription column headers display in Urdu (e.g., دوا, خوراک, دورانیہ)
 - [ ] **URDU-06**: Rx Notes field has English/Urdu toggle that switches text direction and font
 - [ ] **URDU-07**: Rx Notes print in the language they were written in (correct direction and font)
 
@@ -64,10 +64,10 @@ Requirements for v1.1 milestone. Each maps to roadmap phases.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | URDU-01 | 4 (Urdu Foundation) | Complete |
-| URDU-02 | 5 (Prescription Print Urdu) | Pending |
+| URDU-02 | 5 (Prescription Print Urdu) | Complete |
 | URDU-03 | 4 (Urdu Foundation) | Complete |
-| URDU-04 | 5 (Prescription Print Urdu) | Pending |
-| URDU-05 | 5 (Prescription Print Urdu) | Pending |
+| URDU-04 | 5 (Prescription Print Urdu) | Complete |
+| URDU-05 | 5 (Prescription Print Urdu) | Complete |
 | URDU-06 | 6 (Rx Notes Urdu Toggle) | Pending |
 | URDU-07 | 6 (Rx Notes Urdu Toggle) | Pending |
 | BKUP-01 | 7 (Backup Export) | Pending |
@@ -85,4 +85,4 @@ Requirements for v1.1 milestone. Each maps to roadmap phases.
 
 ---
 *Requirements defined: 2026-03-06*
-*Last updated: 2026-03-06 after roadmap phase mapping*
+*Last updated: 2026-03-06 after Phase 5 completion (URDU-02, URDU-04, URDU-05)*

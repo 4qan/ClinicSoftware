@@ -201,11 +201,11 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | 2. Clinical Workflow | v1.0 | 4/4 | Complete | 2026-03-06 |
 | 3. Printing and Visit Completion | v1.0 | 3/3 | Complete | 2026-03-06 |
 | 4. Urdu Foundation | v1.1 | 2/2 | Complete | 2026-03-06 |
-| 5. Prescription Print Urdu | v1.1 | 0/? | Not Started | -- |
+| 5. Prescription Print Urdu | v1.1 | 1/1 | Complete | 2026-03-06 |
 | 6. Rx Notes Urdu Toggle | v1.1 | 0/? | Not Started | -- |
 | 7. Backup Export | v1.1 | 0/? | Not Started | -- |
 | 8. Backup Restore | v1.1 | 0/? | Not Started | -- |
 | 9. Auto-Snapshots | v1.1 | 0/? | Not Started | -- |
 
 ---
-*Last updated: 2026-03-06 after Phase 4 completion*
+*Last updated: 2026-03-06 after Phase 5 completion*
