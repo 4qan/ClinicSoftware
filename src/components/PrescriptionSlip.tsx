@@ -1,6 +1,6 @@
 import type { Visit, VisitMedication, Patient } from '@/db/index'
 import type { ClinicInfo } from '@/db/settings'
-import { toUrdu, columnHeadersUrdu, sectionHeadersUrdu } from '@/constants/translations'
+import { buildUrduInstruction, columnHeadersUrdu, sectionHeadersUrdu } from '@/constants/translations'
 
 interface PrescriptionSlipProps {
   visit: Visit
@@ -71,8 +71,8 @@ export function PrescriptionSlip({ visit, medications, patient, clinicInfo }: Pr
               <thead>
                 <tr className="border-b border-gray-300">
                   <th className="text-left py-1 pr-2 font-semibold text-gray-700" style={{ width: '24px' }}>#</th>
-                  {['Brand Name', 'Salt', 'Strength', 'Form', 'Dosage', 'Freq', 'Duration'].map((col, idx) => (
-                    <th key={col} className={`text-left py-1 ${idx < 6 ? 'pr-2' : ''} font-semibold text-gray-700`}>
+                  {['Brand Name', 'Salt', 'Strength', 'Instructions'].map((col, idx) => (
+                    <th key={col} className={`text-left py-1 ${idx < 3 ? 'pr-2' : ''} font-semibold text-gray-700`}>
                       {col}<br />
                       <span dir="rtl" className="urdu-cell" style={{ fontSize: '9pt', fontWeight: 'normal' }}>{columnHeadersUrdu[col]}</span>
                     </th>
@@ -86,10 +86,22 @@ export function PrescriptionSlip({ visit, medications, patient, clinicInfo }: Pr
                     <td className="py-1 pr-2 font-medium">{med.brandName}</td>
                     <td className="py-1 pr-2 text-gray-600">{med.saltName}</td>
                     <td className="py-1 pr-2">{med.strength}</td>
-                    <td className="py-1 pr-2 urdu-cell" dir="rtl" style={{ textAlign: 'left' }}>{toUrdu(med.form)}</td>
-                    <td className="py-1 pr-2 urdu-cell" dir="rtl" style={{ textAlign: 'left' }}>{toUrdu(med.dosage)}</td>
-                    <td className="py-1 pr-2 urdu-cell" dir="rtl" style={{ textAlign: 'left' }}>{toUrdu(med.frequency)}</td>
-                    <td className="py-1 urdu-cell" dir="rtl" style={{ textAlign: 'left' }}>{toUrdu(med.duration)}</td>
+                    {(() => {
+                      const instruction = buildUrduInstruction({ form: med.form, dosage: med.dosage, frequency: med.frequency, duration: med.duration })
+                      return (
+                        <td className="py-1" style={{ minWidth: '140px' }}>
+                          {instruction ? (
+                            <>
+                              <span className="urdu-cell" dir="rtl">{instruction.urdu}</span>
+                              <br />
+                              <span className="text-xs text-gray-400">{instruction.english}</span>
+                            </>
+                          ) : (
+                            <span className="text-xs">{med.dosage}, {med.frequency}, {med.duration} ({med.form})</span>
+                          )}
+                        </td>
+                      )
+                    })()}
                   </tr>
                 ))}
               </tbody>
