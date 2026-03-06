@@ -32,16 +32,16 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **RX-01**: User can write a prescription linked to an encounter
 - [ ] **RX-02**: User can add medications with dosage, frequency, duration, and optional notes per item
-- [ ] **RX-03**: Medication input provides autocomplete from local drug database (salt name + brand name)
-- [ ] **RX-04**: Autocomplete performs in under 300ms even on older hardware
+- [x] **RX-03**: Medication input provides autocomplete from local drug database (salt name + brand name)
+- [x] **RX-04**: Autocomplete performs in under 300ms even on older hardware
 - [ ] **RX-05**: Prescriptions are immutable once saved (append-only for compliance)
 
 ### Drug Database
 
-- [ ] **DRUG-01**: App ships with pre-seeded local database of common medications (salt names + brand names)
-- [ ] **DRUG-02**: User can add custom medications via a settings screen
-- [ ] **DRUG-03**: User can edit existing custom medications
-- [ ] **DRUG-04**: Custom medications appear in prescription autocomplete alongside pre-seeded ones
+- [x] **DRUG-01**: App ships with pre-seeded local database of common medications (salt names + brand names)
+- [x] **DRUG-02**: User can add custom medications via a settings screen
+- [x] **DRUG-03**: User can edit existing custom medications
+- [x] **DRUG-04**: Custom medications appear in prescription autocomplete alongside pre-seeded ones
 
 ### Printing
 

@@ -60,7 +60,8 @@
 3. Doctor adds a custom medication in settings and it appears in autocomplete on the next prescription.
 4. Saved prescriptions cannot be edited or deleted (immutability verified).
 
-**Plans:** 3
+**Plans:** 3 (1/3 complete)
+- Plan 1: Drug Database: Schema, Seed Data, Settings UI, Autocomplete - COMPLETE (2026-03-06)
 
 ---
 
