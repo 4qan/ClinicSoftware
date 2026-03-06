@@ -4,11 +4,13 @@ import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { MedicationEntry } from '@/components/MedicationEntry'
 import { MedicationList } from '@/components/MedicationList'
-import { getPatient } from '@/db/patients'
+import { PatientRegistrationForm } from '@/components/PatientRegistrationForm'
+import { getPatient, registerPatient } from '@/db/patients'
 import { usePatientSearch } from '@/hooks/usePatientSearch'
 import { createVisit } from '@/db/visits'
 import { getPatientVisits } from '@/db/visits'
 import type { Patient } from '@/db/index'
+import type { PatientInput } from '@/db/patients'
 import type { MedicationFormData } from '@/components/MedicationEntry'
 
 export function NewVisitPage() {
@@ -24,6 +26,7 @@ export function NewVisitPage() {
   const [rxNotes, setRxNotes] = useState('')
   const [medications, setMedications] = useState<MedicationFormData[]>([])
   const [saving, setSaving] = useState(false)
+  const [showInlineRegistration, setShowInlineRegistration] = useState(false)
 
   const [visitHistory, setVisitHistory] = useState<
     Array<{ id: string; date: string; notePreview: string; medCount: number }>
@@ -70,6 +73,22 @@ export function NewVisitPage() {
 
   function handleSelectPatient(patient: Patient) {
     setSelectedPatient(patient)
+    setPatientQuery('')
+    setShowInlineRegistration(false)
+  }
+
+  function parseQueryName(query: string): { firstName: string; lastName: string } {
+    const parts = query.trim().split(/\s+/)
+    return {
+      firstName: parts[0] || '',
+      lastName: parts.slice(1).join(' ') || '',
+    }
+  }
+
+  async function handleInlineRegister(data: PatientInput) {
+    const patient = await registerPatient(data)
+    setSelectedPatient(patient)
+    setShowInlineRegistration(false)
     setPatientQuery('')
   }
 
@@ -159,6 +178,27 @@ export function NewVisitPage() {
               </button>
             )}
           </div>
+        ) : showInlineRegistration ? (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-semibold text-gray-700">Create New Patient</h4>
+              <button
+                type="button"
+                onClick={() => setShowInlineRegistration(false)}
+                className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer"
+              >
+                Back to search
+              </button>
+            </div>
+            <PatientRegistrationForm
+              initialFirstName={parseQueryName(patientQuery).firstName}
+              initialLastName={parseQueryName(patientQuery).lastName}
+              onSubmit={handleInlineRegister}
+              onCancel={() => setShowInlineRegistration(false)}
+              submitLabel="Create & Select"
+              compact
+            />
+          </div>
         ) : (
           <div>
             <div className="relative">
@@ -175,7 +215,13 @@ export function NewVisitPage() {
                   {isPatientSearching ? (
                     <div className="p-3 text-center text-gray-500 text-sm">Searching...</div>
                   ) : patientResults.length === 0 ? (
-                    <div className="p-3 text-center text-gray-500 text-sm">No patients found</div>
+                    <button
+                      type="button"
+                      onClick={() => setShowInlineRegistration(true)}
+                      className="w-full p-3 text-center text-sm text-blue-600 hover:bg-blue-50 cursor-pointer"
+                    >
+                      Create &lsquo;{patientQuery.trim()}&rsquo; as new patient
+                    </button>
                   ) : (
                     patientResults.map((p) => (
                       <button
