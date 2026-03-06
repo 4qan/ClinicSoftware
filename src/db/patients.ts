@@ -23,6 +23,13 @@ export async function generatePatientId(): Promise<string> {
   })
 }
 
+export async function getNextPatientId(): Promise<string> {
+  const setting = await db.settings.get('patientCounter')
+  const nextCounter = setting ? (setting.value as number) + 1 : 1
+  const padded = nextCounter >= 10000 ? String(nextCounter) : String(nextCounter).padStart(4, '0')
+  return `${CURRENT_YEAR}-${padded}`
+}
+
 export async function registerPatient(data: PatientInput): Promise<Patient> {
   return await db.transaction('rw', [db.patients, db.settings, db.recentPatients], async () => {
     const id = crypto.randomUUID()

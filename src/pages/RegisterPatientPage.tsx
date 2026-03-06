@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { registerPatient, searchPatients } from '@/db/patients'
+import { registerPatient, searchPatients, getNextPatientId } from '@/db/patients'
 import type { Patient } from '@/db/index'
 import type { PatientInput } from '@/db/patients'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
@@ -19,6 +19,9 @@ export function RegisterPatientPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [duplicates, setDuplicates] = useState<Patient[]>([])
+  const [previewId, setPreviewId] = useState<string>('')
+
+  useEffect(() => { getNextPatientId().then(setPreviewId) }, [])
 
   // Duplicate check as user types name
   useEffect(() => {
@@ -101,8 +104,8 @@ export function RegisterPatientPage() {
       {/* Patient ID preview */}
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <label className="block text-sm font-medium text-blue-700 mb-1">Patient ID</label>
-        <p className="text-base text-blue-600 font-medium">
-          Assigned automatically when you save
+        <p className="text-lg text-blue-800 font-bold font-mono">
+          {previewId || '...'}
         </p>
       </div>
 
