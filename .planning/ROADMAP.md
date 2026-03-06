@@ -64,6 +64,17 @@ Modify `PrescriptionSlip.tsx` and `DispensarySlip.tsx` to render dosage, frequen
 
 ---
 
+### Phase 05.1: Prescription Entry Cleanup (INSERTED)
+
+**Goal:** Rename misleading `dosage` field to `quantity`, split drug display into search vs. selected variants, and add amber visual indicators for non-standard ComboBox values.
+**Requirements:** RX-CLEANUP-01, RX-CLEANUP-02, RX-CLEANUP-03, RX-CLEANUP-04
+**Depends on:** Phase 5
+**Plans:** 2 plans
+
+Plans:
+- [ ] 05.1-01-PLAN.md -- Rename dosage to quantity across data model, all consumers, and tests with Dexie v3 migration
+- [ ] 05.1-02-PLAN.md -- Split drug display (brand name only after selection) + ComboBox amber indicator for non-standard values
+
 #### Phase 6: Rx Notes Urdu Toggle
 
 **Requirements:** URDU-06, URDU-07
@@ -164,6 +175,7 @@ Implement silent in-app backup snapshots that run automatically and rotate old c
 ```
 Phase 4 (Font + Translations)
   |--- Phase 5 (Prescription Print Urdu)
+  |       |--- Phase 5.1 (Prescription Entry Cleanup)
   |--- Phase 6 (Rx Notes Toggle)
             |--- Phase 7 (Backup Export)
                     |--- Phase 8 (Backup Restore)
@@ -181,6 +193,10 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | URDU-03 | 4 | Nastaliq font setup |
 | URDU-04 | 5 | RTL print layout |
 | URDU-05 | 5 | Urdu column headers |
+| RX-CLEANUP-01 | 5.1 | Drug display split (brand name only after selection) |
+| RX-CLEANUP-02 | 5.1 | Amber indicator for non-standard ComboBox values |
+| RX-CLEANUP-03 | 5.1 | Rename dosage to quantity + Dexie migration |
+| RX-CLEANUP-04 | 5.1 | No blocking validation (indicators informational only) |
 | URDU-06 | 6 | Rx Notes toggle |
 | URDU-07 | 6 | Rx Notes print |
 | BKUP-01 | 7 | Database export |
@@ -191,7 +207,7 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | BKUP-06 | 9 | Auto-snapshots |
 | BKUP-07 | 9 | Snapshot rotation |
 
-**14/14 requirements mapped.**
+**18/18 requirements mapped.**
 
 ## Progress
 
@@ -202,10 +218,11 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | 3. Printing and Visit Completion | v1.0 | 3/3 | Complete | 2026-03-06 |
 | 4. Urdu Foundation | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 5. Prescription Print Urdu | v1.1 | 2/2 | Complete | 2026-03-06 |
+| 5.1 Prescription Entry Cleanup | v1.1 | 0/2 | Not Started | -- |
 | 6. Rx Notes Urdu Toggle | v1.1 | 0/? | Not Started | -- |
 | 7. Backup Export | v1.1 | 0/? | Not Started | -- |
 | 8. Backup Restore | v1.1 | 0/? | Not Started | -- |
 | 9. Auto-Snapshots | v1.1 | 0/? | Not Started | -- |
 
 ---
-*Last updated: 2026-03-06 after Phase 5 completion*
+*Last updated: 2026-03-06 after Phase 5.1 planning*
