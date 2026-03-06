@@ -86,7 +86,9 @@ describe('PrintVisitPage', () => {
       expect(screen.getByRole('button', { name: 'Print Prescription' })).toBeInTheDocument()
     })
 
-    expect(screen.getByRole('button', { name: 'Print Dispensary Slip' })).toBeInTheDocument()
+    // Tab toggle buttons for preview mode
+    expect(screen.getByRole('button', { name: 'Prescription' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Dispensary' })).toBeInTheDocument()
     // Patient name appears in breadcrumbs and slips
     expect(screen.getAllByText(/Ahmed Khan/).length).toBeGreaterThanOrEqual(1)
   })
@@ -132,12 +134,20 @@ describe('PrintVisitPage', () => {
     printSpy.mockRestore()
   })
 
-  it('calls window.print when Print Dispensary Slip is clicked', async () => {
+  it('calls window.print when Dispensary tab selected and print clicked', async () => {
     const user = userEvent.setup()
     const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {})
 
     renderPrintPage(testVisitId)
 
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Dispensary' })).toBeInTheDocument()
+    })
+
+    // Switch to dispensary tab
+    await user.click(screen.getByRole('button', { name: 'Dispensary' }))
+
+    // Print button label should now say "Print Dispensary Slip"
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Print Dispensary Slip' })).toBeInTheDocument()
     })
