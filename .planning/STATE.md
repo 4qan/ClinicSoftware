@@ -63,6 +63,7 @@ None.
 | 2 | Fix Print CTA alignment | 2026-03-06 | 8de8291 | [2-fix-print-cta-alignment](./quick/2-fix-print-cta-alignment/) |
 | 3 | Show full drug details after selection | 2026-03-06 | 0870962 | [3-show-full-drug-details-after-selection-i](./quick/3-show-full-drug-details-after-selection-i/) |
 | 4 | Add Save & Print CTA to visit pages | 2026-03-06 | 3aee6f0 | [4-add-save-and-print-cta-to-new-visit-page](./quick/4-add-save-and-print-cta-to-new-visit-page/) |
+| 5 | Research prescription UX patterns and redesign recommendations | 2026-03-06 | 0ac3084 | [5-research-prescription-ux-patterns-and-re](./quick/5-research-prescription-ux-patterns-and-re/) |
 
 ---
-*Last updated: 2026-03-06 - Phase 5 complete + post-execution refinements (form/dosage separation, natural Urdu patterns)*
+*Last updated: 2026-03-06 - Quick task 5: prescription UX research findings*
