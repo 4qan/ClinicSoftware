@@ -158,7 +158,8 @@ const SEED_DRUGS: SeedEntry[] = [
 function buildDrugRecord(entry: SeedEntry): Drug {
   const now = new Date().toISOString()
   return {
-    id: crypto.randomUUID(),
+    id: `seed-${entry.brandName}-${entry.saltName}-${entry.form}-${entry.strength}`
+      .toLowerCase().replace(/[^a-z0-9-]/g, '_'),
     brandName: entry.brandName,
     brandNameLower: entry.brandName.toLowerCase(),
     saltName: entry.saltName,
@@ -178,7 +179,30 @@ export async function seedDrugDatabase(): Promise<void> {
 
   if (currentVersion >= SEED_VERSION) return
 
-  const drugs = SEED_DRUGS.map(buildDrugRecord)
-  await db.drugs.bulkAdd(drugs)
-  await db.settings.put({ key: 'drugsSeedVersion', value: SEED_VERSION })
+  await db.transaction('rw', db.drugs, db.settings, async () => {
+    const drugs = SEED_DRUGS.map(buildDrugRecord)
+    await db.drugs.bulkPut(drugs)
+    await db.settings.put({ key: 'drugsSeedVersion', value: SEED_VERSION })
+  })
+}
+
+export async function deduplicateExistingDrugs(): Promise<void> {
+  const flag = await db.settings.get('drugsDeduped')
+  if (flag) return
+
+  const all = await db.drugs.toArray()
+  const seen = new Map<string, string>()
+  const toDelete: string[] = []
+
+  for (const d of all) {
+    const key = `${d.brandNameLower}|${d.saltNameLower}|${d.form}|${d.strength}`
+    if (seen.has(key)) {
+      toDelete.push(d.id)
+    } else {
+      seen.set(key, d.id)
+    }
+  }
+
+  if (toDelete.length > 0) await db.drugs.bulkDelete(toDelete)
+  await db.settings.put({ key: 'drugsDeduped', value: true })
 }

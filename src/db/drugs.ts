@@ -20,8 +20,9 @@ export async function searchDrugs(query: string): Promise<Drug[]> {
   const seen = new Set<string>()
   const results: Drug[] = []
   for (const d of [...byBrand, ...bySalt]) {
-    if (!seen.has(d.id)) {
-      seen.add(d.id)
+    const key = `${d.brandNameLower}|${d.saltNameLower}|${d.form}|${d.strength}`
+    if (!seen.has(key)) {
+      seen.add(key)
       results.push(d)
     }
     if (results.length >= 10) break
