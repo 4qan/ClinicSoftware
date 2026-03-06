@@ -20,8 +20,8 @@ export const dosageUrdu: Record<string, string> = {
   '5 drops': '5 قطرے',
   '1 injection': '1 ٹیکا',
   '1 sachet': '1 پیکٹ',
-  'Apply thin layer': 'پتلی تہہ لگائیں',
-  'Apply as directed': 'ہدایت کے مطابق لگائیں',
+  'Apply thin layer': 'پتلی تہہ',
+  'Apply as directed': 'ہدایت کے مطابق',
   '1 puff': '1 سپرے',
   '2 puffs': '2 سپرے',
 }
@@ -61,7 +61,7 @@ export const durationUrdu: Record<string, string> = {
   '3 months': '3 مہینے',
   '6 months': '6 مہینے',
   'Ongoing': 'جاری رکھیں',
-  // 'As needed' is already in frequencyUrdu, same translation applies
+  'As needed': 'ضرورت کے مطابق',
 }
 
 /** Medication form translations (16 entries) */
@@ -117,12 +117,32 @@ const ENGLISH_VERB_PREFIX: Record<string, string> = {
   injection: 'Administer', inhaler: 'Inhale', suppository: 'Insert',
 }
 
-/** Durations that are self-contained phrases (no "کے لیے" suffix) */
-const SELF_CONTAINED_DURATIONS = new Set(['Ongoing', 'As needed'])
+/** Urdu imperative verbs per form category (standard) */
+const URDU_VERB: Record<string, string> = {
+  oral: 'لیں', liquid: 'لیں', topical: 'لگائیں', drops: 'ڈالیں',
+  injection: 'لگوائیں', inhaler: 'لیں', suppository: 'استعمال کریں',
+}
+
+/** Urdu continuous/ongoing verb forms per category */
+const URDU_VERB_ONGOING: Record<string, string> = {
+  oral: 'لیتے رہیں', liquid: 'لیتے رہیں', topical: 'لگاتے رہیں',
+  drops: 'ڈالتے رہیں', injection: 'لگواتے رہیں', inhaler: 'لیتے رہیں',
+  suppository: 'استعمال کرتے رہیں',
+}
+
+/** Lowercase the first character (for mid-sentence English values) */
+function lcFirst(s: string): string {
+  return s.charAt(0).toLowerCase() + s.slice(1)
+}
 
 /**
  * Build a natural Urdu instruction sentence from medication fields.
  * Returns null if any component lacks an Urdu translation (fallback signal).
+ *
+ * Patterns (based on Pakistani medical instruction conventions):
+ *   Standard:  "{dosage} {freq} {verb}، {duration} تک"
+ *   Ongoing:   "{dosage} {freq} {ongoingVerb}"
+ *   As needed: "{dosage} {freq} {verb}، ضرورت کے مطابق"
  */
 export function buildUrduInstruction(med: MedicationForInstruction): { urdu: string; english: string } | null {
   const dosageU = toUrdu(med.dosage)
@@ -134,12 +154,28 @@ export function buildUrduInstruction(med: MedicationForInstruction): { urdu: str
     return null
   }
 
-  const suffix = SELF_CONTAINED_DURATIONS.has(med.duration) ? '' : ' کے لیے'
-  const urdu = `${dosageU} ${frequencyU} ${durationU}${suffix}`
-
   const category = FORM_CATEGORY[med.form] ?? 'oral'
-  const verb = ENGLISH_VERB_PREFIX[category] ?? 'Take'
-  const english = `${verb} ${med.dosage}, ${med.frequency}, ${med.duration}`
+  const verbEn = ENGLISH_VERB_PREFIX[category] ?? 'Take'
+
+  let urdu: string
+  let english: string
+
+  if (med.duration === 'Ongoing') {
+    // Ongoing: use continuous verb form, no duration suffix
+    const ongoingVerb = URDU_VERB_ONGOING[category] ?? 'لیتے رہیں'
+    urdu = `${dosageU} ${frequencyU} ${ongoingVerb}`
+    english = `${verbEn} ${med.dosage}, ${lcFirst(med.frequency)}, ongoing`
+  } else if (med.duration === 'As needed') {
+    // As needed: verb then qualifier
+    const verb = URDU_VERB[category] ?? 'لیں'
+    urdu = `${dosageU} ${frequencyU} ${verb}، ضرورت کے مطابق`
+    english = `${verbEn} ${med.dosage}, ${lcFirst(med.frequency)}, as needed`
+  } else {
+    // Standard: verb after frequency, then "duration تک"
+    const verb = URDU_VERB[category] ?? 'لیں'
+    urdu = `${dosageU} ${frequencyU} ${verb}، ${durationU} تک`
+    english = `${verbEn} ${med.dosage}, ${lcFirst(med.frequency)}, for ${lcFirst(med.duration)}`
+  }
 
   return { urdu, english }
 }

@@ -35,33 +35,39 @@ describe('Translation coverage', () => {
 })
 
 describe('buildUrduInstruction', () => {
-  it('oral tablet with standard duration', () => {
+  it('oral tablet with standard duration produces natural sentence', () => {
     const result = buildUrduInstruction({ form: 'Tablet', dosage: '1 tablet', frequency: 'Twice daily', duration: '7 days' })
     expect(result).toEqual({
-      urdu: '1 گولی دن میں دو بار 7 دن کے لیے',
-      english: 'Take 1 tablet, Twice daily, 7 days',
+      urdu: '1 گولی دن میں دو بار لیں، 7 دن تک',
+      english: 'Take 1 tablet, twice daily, for 7 days',
     })
   })
 
-  it('topical cream', () => {
+  it('topical cream uses لگائیں verb', () => {
     const result = buildUrduInstruction({ form: 'Cream', dosage: 'Apply thin layer', frequency: 'Twice daily', duration: '14 days' })
     expect(result).not.toBeNull()
-    expect(result!.urdu).toContain('پتلی تہہ لگائیں')
-    expect(result!.urdu).toContain('کے لیے')
+    expect(result!.urdu).toContain('پتلی تہہ')
+    expect(result!.urdu).toContain('لگائیں')
+    expect(result!.urdu).toContain('تک')
     expect(result!.english).toMatch(/^Apply/)
+    expect(result!.english).toContain('for 14 days')
   })
 
-  it('ongoing duration omits "کے لیے"', () => {
+  it('ongoing duration uses continuous verb form', () => {
     const result = buildUrduInstruction({ form: 'Tablet', dosage: '1 tablet', frequency: 'Once daily', duration: 'Ongoing' })
     expect(result).not.toBeNull()
-    expect(result!.urdu).toMatch(/جاری رکھیں$/)
-    expect(result!.urdu).not.toContain('کے لیے')
+    expect(result!.urdu).toMatch(/لیتے رہیں$/)
+    expect(result!.urdu).not.toContain('تک')
+    expect(result!.english).toBe('Take 1 tablet, once daily, ongoing')
   })
 
-  it('drops with verb prefix', () => {
+  it('drops uses ڈالیں verb', () => {
     const result = buildUrduInstruction({ form: 'Drops', dosage: '2 drops', frequency: 'Three times daily', duration: '5 days' })
     expect(result).not.toBeNull()
+    expect(result!.urdu).toContain('ڈالیں')
+    expect(result!.urdu).toContain('5 دن تک')
     expect(result!.english).toMatch(/^Instill/)
+    expect(result!.english).toContain('for 5 days')
   })
 
   it('fallback returns null for untranslatable dosage', () => {
@@ -69,9 +75,27 @@ describe('buildUrduInstruction', () => {
     expect(result).toBeNull()
   })
 
-  it('inhaler sentence', () => {
+  it('inhaler uses correct English verb', () => {
     const result = buildUrduInstruction({ form: 'Inhaler', dosage: '2 puffs', frequency: 'Twice daily', duration: '1 month' })
     expect(result).not.toBeNull()
-    expect(result!.english).toMatch(/^Inhale/)
+    expect(result!.urdu).toContain('لیں')
+    expect(result!.urdu).toContain('1 مہینہ تک')
+    expect(result!.english).toBe('Inhale 2 puffs, twice daily, for 1 month')
+  })
+
+  it('injection uses لگوائیں verb', () => {
+    const result = buildUrduInstruction({ form: 'Injection', dosage: '1 injection', frequency: 'Once daily', duration: '3 days' })
+    expect(result).not.toBeNull()
+    expect(result!.urdu).toContain('لگوائیں')
+    expect(result!.english).toMatch(/^Administer/)
+  })
+
+  it('as needed duration uses standard verb with qualifier', () => {
+    const result = buildUrduInstruction({ form: 'Tablet', dosage: '1 tablet', frequency: 'Twice daily', duration: 'As needed' })
+    expect(result).not.toBeNull()
+    expect(result!.urdu).toContain('لیں')
+    expect(result!.urdu).toContain('ضرورت کے مطابق')
+    expect(result!.urdu).not.toContain('تک')
+    expect(result!.english).toBe('Take 1 tablet, twice daily, as needed')
   })
 })
