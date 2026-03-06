@@ -50,4 +50,14 @@ button, a, [role="button"], input[type="radio"], input[type="checkbox"], select 
 
   /* Remove max-width constraint on print page */
   .prescription-slip, .dispensary-slip { max-width: none !important; }
+
+  /* Urdu Nastaliq rendering for prescription cells */
+  .urdu-cell {
+    font-family: 'Noto Nastaliq Urdu Variable', serif;
+    direction: rtl;
+    line-height: 2.2;
+    overflow: visible;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
 }
