@@ -72,8 +72,8 @@ Modify `PrescriptionSlip.tsx` and `DispensarySlip.tsx` to render dosage, frequen
 **Plans:** 2 plans
 
 Plans:
-- [ ] 05.1-01-PLAN.md -- Rename dosage to quantity across data model, all consumers, and tests with Dexie v3 migration
-- [ ] 05.1-02-PLAN.md -- Split drug display (brand name only after selection) + ComboBox amber indicator for non-standard values
+- [x] 05.1-01-PLAN.md -- Rename dosage to quantity across data model, all consumers, and tests with Dexie v3 migration
+- [x] 05.1-02-PLAN.md -- Split drug display (brand name only after selection) + ComboBox amber indicator for non-standard values
 
 #### Phase 6: Rx Notes Urdu Toggle
 
@@ -193,7 +193,8 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | URDU-03 | 4 | Nastaliq font setup |
 | URDU-04 | 5 | RTL print layout |
 | URDU-05 | 5 | Urdu column headers |
-| RX-CLEANUP-01 | 5.1 | 1/2 | In Progress|  | 5.1 | Amber indicator for non-standard ComboBox values |
+| RX-CLEANUP-01 | 5.1 | Drug display split (brand name only after selection) |
+| RX-CLEANUP-02 | 5.1 | Amber indicator for non-standard ComboBox values |
 | RX-CLEANUP-03 | 5.1 | Rename dosage to quantity + Dexie migration |
 | RX-CLEANUP-04 | 5.1 | No blocking validation (indicators informational only) |
 | URDU-06 | 6 | Rx Notes toggle |
@@ -217,11 +218,11 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | 3. Printing and Visit Completion | v1.0 | 3/3 | Complete | 2026-03-06 |
 | 4. Urdu Foundation | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 5. Prescription Print Urdu | v1.1 | 2/2 | Complete | 2026-03-06 |
-| 5.1 Prescription Entry Cleanup | v1.1 | 0/2 | Not Started | -- |
+| 5.1 Prescription Entry Cleanup | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 6. Rx Notes Urdu Toggle | v1.1 | 0/? | Not Started | -- |
 | 7. Backup Export | v1.1 | 0/? | Not Started | -- |
 | 8. Backup Restore | v1.1 | 0/? | Not Started | -- |
 | 9. Auto-Snapshots | v1.1 | 0/? | Not Started | -- |
 
 ---
-*Last updated: 2026-03-06 after Phase 5.1 planning*
+*Last updated: 2026-03-06 after Phase 5.1 completion*

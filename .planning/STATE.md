@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Urdu & Backup
 status: completed
-last_updated: "2026-03-06T19:11:05.101Z"
-last_activity: "2026-03-06 -- Completed 05.1-01: dosage-to-quantity rename"
+last_updated: "2026-03-06T19:21:00.000Z"
+last_activity: "2026-03-06 -- Completed 05.1-02: drug display split + amber indicator"
 progress:
   total_phases: 7
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State: ClinicSoftware
@@ -22,15 +22,15 @@ See: .planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 5.1 (Prescription Entry Cleanup)
-Plan: 1/1 complete
-Status: Phase 5.1 Plan 01 complete
-Last activity: 2026-03-06 -- Completed 05.1-01: dosage-to-quantity rename
+Plan: 2/2 complete
+Status: Phase 5.1 complete
+Last activity: 2026-03-06 -- Completed 05.1-02: drug display split + amber indicator
 
 ## Progress
 | Phase | Name | Status | Plans |
 | 4 | Urdu Foundation (Font + Translations) | Complete | 2/2 |
 | 5 | Prescription Print Urdu | Complete | 2/2 |
-| 5.1 | Prescription Entry Cleanup (INSERTED) | In Progress | 1/? |
+| 5.1 | Prescription Entry Cleanup (INSERTED) | Complete | 2/2 |
 | 6 | Rx Notes Urdu Toggle | Not Started | -- |
 | 7 | Backup Export | Not Started | -- |
 | 8 | Backup Restore | Not Started | -- |
@@ -42,6 +42,7 @@ See: .planning/PROJECT.md Key Decisions table
 - Phase 5: Used .map() over column array for DRY bilingual header rendering; Urdu header font 9pt (prescription) / 8pt (dispensary)
 - Phase 5-02: Form-aware quantity system (form inferred from drug, dosage stores raw quantity). Natural Urdu sentence patterns with form-specific verbs (لیں/لگائیں/ڈالیں/لگوائیں). Duration uses "تک" not "کے لیے". Removed null fallback: always renders Urdu.
 - [Phase 05.1]: Dexie v3 stores identical to v2; only upgrade callback renames dosage->quantity property on existing records
+- [Phase 05.1-02]: Drug formatters extracted to utility. Amber indicator on Frequency/Duration only (not Qty). Border-only indicator, no hint text (avoids layout shift).
 
 ## Accumulated Context
 - v1.0 shipped with 27/27 requirements, 3 phases, 14 plans
@@ -50,7 +51,9 @@ See: .planning/PROJECT.md Key Decisions table
 - Quantity stores raw value (e.g., "1", "5 ml", "Thin layer"); form comes from drug record. buildDosageUrdu/English construct display from form + quantity.
 - Print slips: PrescriptionSlip.tsx (patient-facing) and DispensarySlip.tsx (pharmacist-facing), 5-column layout
 - buildUrduInstruction() constructs natural Urdu sentences with form-specific verbs, never returns null
-- MedicationEntry: form picker shown only for custom drugs, quantity options filter by form category
+- MedicationEntry: form picker shown only for custom drugs, quantity options filter by form category. Drug input shows brand name only after selection; dropdown shows full detail.
+- ComboBox: `showCustomIndicator` prop adds amber border for non-standard values (used on Frequency/Duration)
+- Drug display formatters in `src/utils/drugFormatters.ts`: formatDrugSearchResult, formatDrugSelected
 - Translation tests in `src/constants/__tests__/translations.test.ts` (26 tests) and `src/constants/translations.test.ts` (15 tests)
 - Rx Notes field exists as freeform textarea in NewVisitPage/EditVisitPage
 - IndexedDB is origin-scoped and device-local (no cross-device data sharing)
@@ -72,4 +75,4 @@ None.
 | 5 | Research prescription UX patterns and redesign recommendations | 2026-03-06 | 0ac3084 | Verified | [5-research-prescription-ux-patterns-and-re](./quick/5-research-prescription-ux-patterns-and-re/) |
 
 ---
-*Last updated: 2026-03-06 - Phase 5.1 Plan 01: dosage-to-quantity rename*
+*Last updated: 2026-03-06 - Phase 5.1 Plan 02: drug display split + amber indicator*
