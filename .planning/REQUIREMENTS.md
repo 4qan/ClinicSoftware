@@ -48,13 +48,13 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **PRINT-01**: User can print a prescription slip in small format (non-A4) with patient info, date, and medications
 - [ ] **PRINT-02**: User can print a separate dispensary slip with medication list only (for dispenser)
 - [ ] **PRINT-03**: Print layouts work correctly in Chrome/Edge print dialog
-- [ ] **PRINT-04**: Both prints are triggered from the prescription view with clear, separate buttons
+- [x] **PRINT-04**: Both prints are triggered from the prescription view with clear, separate buttons
 
 ### Visit Flow
 
-- [ ] **VISIT-01**: Inline patient creation during new visit (no page navigation, expand form below search)
-- [ ] **VISIT-02**: Visit form sections always visible but disabled until patient selected (no layout shift)
-- [ ] **VISIT-03**: Patient search shows "Create [name] as new patient" option when no match found
+- [x] **VISIT-01**: Inline patient creation during new visit (no page navigation, expand form below search)
+- [x] **VISIT-02**: Visit form sections always visible but disabled until patient selected (no layout shift)
+- [x] **VISIT-03**: Patient search shows "Create [name] as new patient" option when no match found
 
 ## v2 Requirements
 
