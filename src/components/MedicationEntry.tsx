@@ -54,7 +54,7 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
   }
 
   function handleSelectDrug(drug: Drug) {
-    setDrugQuery(drug.brandName)
+    setDrugQuery(formatDrugDisplay(drug))
     setForm((f) => ({
       ...f,
       drugId: drug.id,
