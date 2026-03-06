@@ -50,8 +50,7 @@ See: .planning/PROJECT.md Key Decisions table
 - IndexedDB is origin-scoped and device-local (no cross-device data sharing)
 
 ### Pending Todos
-1 item: print CTA on new visit page
-See: `.planning/todos/pending/`
+None.
 
 ### Quick Tasks Completed
 
@@ -60,6 +59,7 @@ See: `.planning/todos/pending/`
 | 1 | Set up GitHub remote repo and deploy to GitHub Pages | 2026-03-06 | fa0212f | [1-set-up-github-remote-repo-and-deploy-to-](./quick/1-set-up-github-remote-repo-and-deploy-to-/) |
 | 2 | Fix Print CTA alignment | 2026-03-06 | 8de8291 | [2-fix-print-cta-alignment](./quick/2-fix-print-cta-alignment/) |
 | 3 | Show full drug details after selection | 2026-03-06 | 0870962 | [3-show-full-drug-details-after-selection-i](./quick/3-show-full-drug-details-after-selection-i/) |
+| 4 | Add Save & Print CTA to visit pages | 2026-03-06 | 3aee6f0 | [4-add-save-and-print-cta-to-new-visit-page](./quick/4-add-save-and-print-cta-to-new-visit-page/) |
 
 ---
 *Last updated: 2026-03-06 - Phase 5 complete (Urdu Columns, Bilingual Headers & Section Labels)*
