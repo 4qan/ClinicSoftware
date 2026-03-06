@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import type { Visit, VisitMedication } from '@/db/index'
 import { deleteVisit } from '@/db/visits'
@@ -32,6 +32,19 @@ export function VisitCard({ visit, medications, defaultExpanded = false, onDelet
   const [expanded, setExpanded] = useState(defaultExpanded)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [showPrintDropdown, setShowPrintDropdown] = useState(false)
+  const printDropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!showPrintDropdown) return
+    function handleClickOutside(e: MouseEvent) {
+      if (printDropdownRef.current && !printDropdownRef.current.contains(e.target as Node)) {
+        setShowPrintDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showPrintDropdown])
 
   async function handleDelete() {
     setDeleting(true)
@@ -156,12 +169,43 @@ export function VisitCard({ visit, medications, defaultExpanded = false, onDelet
 
           {/* Actions */}
           <div className="mt-4 flex items-center gap-3 pt-3 border-t border-gray-100">
-            <Link
-              to={`/visit/${visit.id}/print`}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Print
-            </Link>
+            <div className="relative" ref={printDropdownRef}>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowPrintDropdown((prev) => !prev)
+                }}
+                className="text-sm text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
+              >
+                Print
+              </button>
+              {showPrintDropdown && (
+                <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-20 min-w-[160px]">
+                  <Link
+                    to={`/visit/${visit.id}/print?auto=prescription`}
+                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    onClick={() => setShowPrintDropdown(false)}
+                  >
+                    Print Prescription
+                  </Link>
+                  <Link
+                    to={`/visit/${visit.id}/print?auto=dispensary`}
+                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    onClick={() => setShowPrintDropdown(false)}
+                  >
+                    Print Dispensary
+                  </Link>
+                  <Link
+                    to={`/visit/${visit.id}/print`}
+                    className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 border-t border-gray-100"
+                    onClick={() => setShowPrintDropdown(false)}
+                  >
+                    Preview
+                  </Link>
+                </div>
+              )}
+            </div>
             <Link
               to={`/visit/${visit.id}/edit`}
               className="text-sm text-blue-600 hover:text-blue-800 font-medium"

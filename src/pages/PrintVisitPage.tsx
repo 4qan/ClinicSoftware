@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { PrescriptionSlip } from '@/components/PrescriptionSlip'
 import { DispensarySlip } from '@/components/DispensarySlip'
@@ -15,6 +15,7 @@ type PreviewMode = 'prescription' | 'dispensary'
 export function PrintVisitPage() {
   const { id: visitId } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const [visit, setVisit] = useState<Visit | null>(null)
   const [medications, setMedications] = useState<VisitMedication[]>([])
@@ -51,6 +52,17 @@ export function PrintVisitPage() {
 
     loadData()
   }, [visitId])
+
+  // Auto-print when navigated with ?auto=prescription or ?auto=dispensary
+  useEffect(() => {
+    if (loading) return
+    const auto = searchParams.get('auto')
+    if (auto === 'prescription' || auto === 'dispensary') {
+      setPreviewMode(auto)
+      setPrintMode(auto)
+      setTimeout(() => window.print(), 200)
+    }
+  }, [loading, searchParams])
 
   const handleAfterPrint = useCallback(() => {
     setPrintMode(null)
