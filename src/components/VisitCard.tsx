@@ -169,7 +169,7 @@ export function VisitCard({ visit, medications, defaultExpanded = false, onDelet
 
           {/* Actions */}
           <div className="mt-4 flex items-center gap-3 pt-3 border-t border-gray-100">
-            <div className="relative" ref={printDropdownRef}>
+            <div className="relative flex items-center" ref={printDropdownRef}>
               <button
                 type="button"
                 onClick={(e) => {
