@@ -84,6 +84,23 @@ export const formsUrdu: Record<string, string> = {
   'Solution': 'محلول',
 }
 
+/** Column header Urdu labels for medication table */
+export const columnHeadersUrdu: Record<string, string> = {
+  'Brand Name': 'دوا',
+  'Salt': 'نمک',
+  'Strength': 'طاقت',
+  'Form': 'شکل',
+  'Dosage': 'خوراک',
+  'Freq': 'تعداد',
+  'Duration': 'دورانیہ',
+}
+
+/** Section header Urdu labels for prescription slip */
+export const sectionHeadersUrdu: Record<string, string> = {
+  'Clinical Notes': 'طبی نوٹس',
+  'Instructions': 'ہدایات',
+}
+
 /** Unified lookup combining all categories */
 const allTranslations: Record<string, string> = {
   ...dosageUrdu,
