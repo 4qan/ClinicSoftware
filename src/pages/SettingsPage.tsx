@@ -3,6 +3,15 @@ import { ChangePassword } from '@/auth/ChangePassword'
 import { useAuthContext } from '@/auth/AuthProvider'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { DrugManagement } from '@/components/DrugManagement'
+import { ClinicInfoSettings } from '@/components/ClinicInfoSettings'
+
+type SettingsCategory = 'account' | 'medications' | 'clinic'
+
+const TABS: { key: SettingsCategory; label: string }[] = [
+  { key: 'account', label: 'Account' },
+  { key: 'medications', label: 'Medications' },
+  { key: 'clinic', label: 'Clinic Info' },
+]
 
 function RecoveryCodeSection() {
   const { regenerateRecoveryCode, checkRecoveryCodeExists } = useAuthContext()
@@ -121,19 +130,48 @@ function RecoveryCodeSection() {
 }
 
 export function SettingsPage() {
+  const [activeCategory, setActiveCategory] = useState<SettingsCategory>('account')
+
   return (
     <div className="max-w-2xl">
       <Breadcrumbs crumbs={[{ label: 'Home', path: '/' }, { label: 'Settings' }]} />
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Settings</h2>
 
-      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Security</h3>
-      <RecoveryCodeSection />
-      <ChangePassword />
+      {/* Category Tabs */}
+      <div className="flex gap-2 mb-6">
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setActiveCategory(tab.key)}
+            className={`px-4 py-2 text-sm font-medium rounded-full transition-colors cursor-pointer ${
+              activeCategory === tab.key
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-      <hr className="border-gray-200 my-8" />
+      {/* Account Tab */}
+      {activeCategory === 'account' && (
+        <div>
+          <RecoveryCodeSection />
+          <ChangePassword />
+        </div>
+      )}
 
-      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Clinical</h3>
-      <DrugManagement />
+      {/* Medications Tab */}
+      {activeCategory === 'medications' && (
+        <DrugManagement />
+      )}
+
+      {/* Clinic Info Tab */}
+      {activeCategory === 'clinic' && (
+        <ClinicInfoSettings />
+      )}
     </div>
   )
 }
