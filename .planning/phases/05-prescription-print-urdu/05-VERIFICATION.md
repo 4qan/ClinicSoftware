@@ -1,79 +1,115 @@
 ---
-phase: 05
-status: gaps_found
-verified_at: 2026-03-06
-must_haves_verified: 6/6
+phase: 05-prescription-print-urdu
+verified: 2026-03-06T22:40:00Z
+status: passed
+score: 7/7 must-haves verified
+re_verification:
+  previous_status: gaps_found
+  previous_score: 6/6
+  gaps_closed:
+    - "GAP-01: Natural language Urdu instructions instead of columnar layout"
+  gaps_remaining: []
+  regressions: []
 ---
 
-# Phase 05 Verification: Prescription Print Urdu
+# Phase 05: Prescription Print Urdu -- Verification Report
 
-## Must-Haves Verification
+**Phase Goal:** Modify PrescriptionSlip.tsx and DispensarySlip.tsx to render dosage, frequency, and duration in Urdu with correct RTL handling. Add bilingual column headers. Consolidate instruction columns into natural Urdu sentences.
+**Verified:** 2026-03-06T22:40:00Z
+**Status:** passed
+**Re-verification:** Yes, after gap closure (Plan 05-02)
 
-1. **Form, Dosage, Frequency, Duration columns render Urdu text (Nastaliq script) on both print slips**
-   - Status: PASS
-   - Evidence: `PrescriptionSlip.tsx` lines 89-92 wrap Form/Dosage/Frequency/Duration with `toUrdu()` and apply `urdu-cell` class + `dir="rtl"`. `DispensarySlip.tsx` lines 63-66 do the same.
+## Goal Achievement
 
-2. **All 7 medication column headers display bilingual labels (English on top, Urdu below)**
-   - Status: PASS
-   - Evidence: Both slips map over `['Brand Name', 'Salt', 'Strength', 'Form', 'Dosage', 'Freq', 'Duration']` and render `{col}<br /><span dir="rtl" className="urdu-cell">{columnHeadersUrdu[col]}</span>` in each `<th>`. PrescriptionSlip uses 9pt, DispensarySlip uses 8pt for Urdu labels.
+### Observable Truths
 
-3. **RTL text in Urdu cells coexists with LTR English drug names without layout breakage**
-   - Status: PASS
-   - Evidence: Urdu cells use `dir="rtl"` attribute. English cells (brandName, saltName, strength) have no RTL attributes. `urdu-cell` CSS class (from Phase 4) handles Nastaliq font rendering. Structural separation prevents overlap.
+| # | Truth | Status | Evidence |
+|---|-------|--------|----------|
+| 1 | Dosage, frequency, duration render as natural Urdu sentences on both print slips | VERIFIED | `PrescriptionSlip.tsx:90` and `DispensarySlip.tsx:64` call `buildUrduInstruction()` which combines dosage/freq/duration into a single Urdu sentence rendered via `urdu-cell` class + `dir="rtl"`. |
+| 2 | Bilingual column headers on all medication columns (both slips) | VERIFIED | Both slips iterate `['Brand Name', 'Salt', 'Strength', 'Instructions']` and render `{col}<br/><span dir="rtl" className="urdu-cell">{columnHeadersUrdu[col]}</span>`. PrescriptionSlip 9pt, DispensarySlip 8pt. |
+| 3 | RTL Urdu coexists with LTR English without layout breakage | VERIFIED | Urdu cells use `dir="rtl"` + `urdu-cell` class. English cells (brandName, saltName, strength) have no RTL attributes. Structural isolation prevents overlap. |
+| 4 | Section headers (Clinical Notes, Instructions) show bilingual labels | VERIFIED | `PrescriptionSlip.tsx:115,123` renders bilingual labels sourced from `sectionHeadersUrdu` in translations.ts. |
+| 5 | Brand Name, Salt, Strength remain English-only | VERIFIED | `PrescriptionSlip.tsx:86-88` and `DispensarySlip.tsx:60-62` render raw field values without `toUrdu()`. |
+| 6 | Fallback: untranslated values render as English without breakage | VERIFIED | `buildUrduInstruction()` returns `null` when any translation is passthrough (line 133). Components render plain English fallback. Unit test confirms (translations.test.ts:67-69). |
+| 7 | Instruction columns consolidated into natural Urdu sentences (4 cols to 1) | VERIFIED | Both slips use 5-column layout (#, Brand Name, Salt, Strength, Instructions). `buildUrduInstruction()` generates Urdu sentence with form-aware English verb prefix below. Self-contained durations (Ongoing, As needed) omit suffix. |
 
-4. **"Clinical Notes" and "Instructions" section headers on prescription slip show bilingual labels**
-   - Status: PASS
-   - Evidence: `PrescriptionSlip.tsx` line 103 renders `Clinical Notes / <span dir="rtl" className="urdu-cell">{sectionHeadersUrdu['Clinical Notes']}</span>`. Line 111 renders `Instructions / <span dir="rtl" className="urdu-cell">{sectionHeadersUrdu['Instructions']}</span>`. Labels sourced from `sectionHeadersUrdu` in translations.ts.
+**Score:** 7/7 truths verified
 
-5. **Brand Name, Salt, Strength columns remain English-only**
-   - Status: PASS
-   - Evidence: `PrescriptionSlip.tsx` lines 86-88 render `med.brandName`, `med.saltName`, `med.strength` directly without `toUrdu()` or RTL attributes. Same pattern in `DispensarySlip.tsx` lines 60-62.
+### Required Artifacts
 
-6. **Fallback: untranslated values render as original English without visual breakage**
-   - Status: PASS
-   - Evidence: `toUrdu()` returns `allTranslations[value] ?? value` (translations.ts line 117). Test confirms: `toUrdu('SomeCustomValue') === 'SomeCustomValue'` (translations.test.ts line 32).
+| Artifact | Expected | Status | Details |
+|----------|----------|--------|---------|
+| `src/constants/translations.ts` | `buildUrduInstruction()`, `MedicationForInstruction`, `FORM_CATEGORY`, `ENGLISH_VERB_PREFIX`, `columnHeadersUrdu`, `sectionHeadersUrdu` | VERIFIED | 167 lines. All exports present. Passthrough detection, suffix logic, category-aware verb prefix all implemented. |
+| `src/components/PrescriptionSlip.tsx` | 5-column layout with Instructions cell | VERIFIED | 143 lines. Imports and uses `buildUrduInstruction`, `columnHeadersUrdu`, `sectionHeadersUrdu`. IIFE pattern for per-row rendering with fallback. 140px minWidth. |
+| `src/components/DispensarySlip.tsx` | 5-column layout with Instructions cell | VERIFIED | 87 lines. Imports and uses `buildUrduInstruction`, `columnHeadersUrdu`. Same IIFE pattern. 120px minWidth. |
+| `src/constants/__tests__/translations.test.ts` | 6 buildUrduInstruction + 5 coverage tests | VERIFIED | 77 lines. 11 total tests, all passing. |
 
-## Requirements Traceability
+### Key Link Verification
 
-| Requirement | Description | Implementation | Status |
-|-------------|-------------|----------------|--------|
-| URDU-02 | Printed prescription slip shows dosage, frequency, duration in Urdu (Nastaliq script) | `PrescriptionSlip.tsx` wraps dosage/frequency/duration/form cells with `toUrdu()` + `urdu-cell` class. `DispensarySlip.tsx` mirrors this. | PASS |
-| URDU-04 | RTL text renders correctly in prescription print layout with mixed LTR/RTL content | Urdu cells use `dir="rtl"` attribute + `urdu-cell` class. English cells remain default LTR. No shared containers force a single direction. | PASS |
-| URDU-05 | Printed prescription column headers display in Urdu | All 7 medication columns have bilingual headers via `columnHeadersUrdu` lookup. Section headers use `sectionHeadersUrdu`. Both maps defined in `translations.ts`. | PASS |
+| From | To | Via | Status | Details |
+|------|----|-----|--------|---------|
+| PrescriptionSlip.tsx | translations.ts | `import { buildUrduInstruction, columnHeadersUrdu, sectionHeadersUrdu }` | WIRED | Line 3, all three used in render |
+| DispensarySlip.tsx | translations.ts | `import { buildUrduInstruction, columnHeadersUrdu }` | WIRED | Line 2, both used in render |
+| translations.test.ts | translations.ts | `import { toUrdu, buildUrduInstruction }` | WIRED | Line 2, both exercised across 11 tests |
+| buildUrduInstruction | toUrdu | Internal call at lines 128-130 | WIRED | Passthrough detection on lines 133-135 |
 
-## Test Results
+### Requirements Coverage
 
-- Translation coverage tests: 5/5 passed (all predefined clinical options have Urdu translations, fallback works)
-- Failing tests (`login.test.tsx`): Pre-existing, unrelated to phase 05
+| Requirement | Source Plan | Description | Status | Evidence |
+|-------------|------------|-------------|--------|----------|
+| URDU-02 | 05-01, 05-02 | Printed prescription slip shows dosage, frequency, duration in Urdu (Nastaliq script) | SATISFIED | `buildUrduInstruction()` generates Urdu sentences. Both slips render via `urdu-cell`. 18 dosage + 17 frequency + 13 duration translations cover all predefined values. |
+| URDU-04 | 05-01, 05-02 | RTL text renders correctly in prescription print layout with mixed LTR/RTL content | SATISFIED | Urdu cells use `dir="rtl"`. English cells remain default LTR. No shared directional containers. |
+| URDU-05 | 05-01, 05-02 | Printed prescription column headers display in Urdu | SATISFIED | All 4 medication column headers display bilingual labels via `columnHeadersUrdu`. Section headers via `sectionHeadersUrdu`. |
 
-## Human Verification
+No orphaned requirements. REQUIREMENTS.md maps exactly URDU-02, URDU-04, URDU-05 to Phase 5.
 
-The following items require manual testing in Chrome print preview:
+### Anti-Patterns Found
 
-- [ ] Nastaliq Urdu renders in Form/Dosage/Freq/Duration columns on prescription slip
-- [ ] Nastaliq Urdu renders in Form/Dosage/Freq/Duration columns on dispensary slip
-- [ ] Bilingual headers visible on all 7 medication columns (both slips)
-- [ ] English drug names (Brand, Salt, Strength) remain left-aligned, no overlap with RTL text
-- [ ] "Clinical Notes / طبی نوٹس" and "Instructions / ہدایات" render correctly
-- [ ] Custom/freeform medication values fall back to English without breakage
-- [ ] A5 print layout accommodates 6 medications without overflow
+None. No TODOs, FIXMEs, placeholders, empty implementations, or console.log-only handlers in any modified file.
 
-## Gaps
+### Test Results
 
-### GAP-01: Natural language Urdu instructions instead of columnar layout
-- **status:** failed
-- **severity:** enhancement
-- **description:** The current 7-column medication table (Brand Name, Salt, Strength, Form, Dosage, Freq, Duration) is cramped on A5 print. A more natural approach: consolidate Form/Dosage/Freq/Duration into a single "Instructions" column rendered as a natural Urdu sentence (e.g., "1 گولی دن میں 3 بار 10 دنوں کے لیے"). English equivalent alongside. Requires form-aware sentence templates since different medication forms (tablet, cream, drops, injection) need different Urdu sentence structures. Reduces columns from 7 to 4 (Drug, Salt, Strength, Instructions).
-- **files:** src/components/PrescriptionSlip.tsx, src/components/DispensarySlip.tsx, src/constants/translations.ts
+All 11 tests pass (ran via `npx vitest run src/constants/__tests__/translations.test.ts`):
+- 5 translation coverage tests (dosage, frequency, duration, forms, fallback)
+- 6 buildUrduInstruction tests (oral tablet, topical cream, ongoing duration, drops verb, fallback null, inhaler verb)
 
-### GAP-02: Translation corrections
-- **status:** resolved
-- **description:** Freq header was "تعداد" (quantity), corrected to "وقفہ" (interval). Clinical Notes was "طبی نوٹس" (clinical notice), corrected to "طبی تفصیلات" (clinical details). Fixed in commit 2b8f21b.
+### Human Verification Required
 
-### GAP-03: Column alignment
-- **status:** resolved
-- **description:** RTL dir on td elements caused right-alignment mismatching left-aligned headers. Fixed with explicit textAlign: left. Commit 0827063.
+### 1. Natural Urdu sentences in print preview
 
-## Summary
+**Test:** Open a visit with 3+ medications (tablet, cream, drops), click print preview
+**Expected:** Instructions column shows Urdu sentence (e.g., "1 گولی دن میں دو بار 7 دن کے لیے") with smaller English below
+**Why human:** Nastaliq font rendering and RTL layout cannot be verified in JSDOM
 
-6/6 must-haves verified against source code. 3/3 requirement IDs implemented. Two gaps resolved (translation corrections, column alignment). One enhancement gap open: natural language Urdu instructions to replace columnar layout. Status `gaps_found` pending gap closure.
+### 2. 5-column layout readability on A5
+
+**Test:** Create prescription with 6 medications, print preview at A5
+**Expected:** 5 columns with comfortable spacing, no text overflow
+**Why human:** Print layout spacing requires visual inspection
+
+### 3. Fallback for custom dosage
+
+**Test:** Add medication with freeform dosage text, print preview
+**Expected:** Instructions cell shows plain English without broken Urdu
+**Why human:** Edge case rendering needs visual confirmation
+
+### 4. Bilingual section headers
+
+**Test:** Add clinical notes and Rx notes, print preview
+**Expected:** "Clinical Notes / طبی تفصیلات" and "Instructions / ہدایات"
+**Why human:** Mixed-script header alignment
+
+### Gap Closure Summary
+
+**GAP-01 (Natural language Urdu instructions):** CLOSED. `buildUrduInstruction()` consolidates Form/Dosage/Freq/Duration into a single Instructions column. Table reduced from 8 to 5 columns. Implemented in Plan 05-02 (commits 3709990, 2b5a2a0, cbcfb7f, e4c7cff).
+
+**GAP-02 (Translation corrections):** Previously resolved in Plan 05-01.
+
+**GAP-03 (Column alignment):** Previously resolved in Plan 05-01.
+
+All gaps closed. No regressions detected.
+
+---
+
+_Verified: 2026-03-06T22:40:00Z_
+_Verifier: Claude (gsd-verifier)_
