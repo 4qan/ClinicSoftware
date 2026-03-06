@@ -193,8 +193,7 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | URDU-03 | 4 | Nastaliq font setup |
 | URDU-04 | 5 | RTL print layout |
 | URDU-05 | 5 | Urdu column headers |
-| RX-CLEANUP-01 | 5.1 | Drug display split (brand name only after selection) |
-| RX-CLEANUP-02 | 5.1 | Amber indicator for non-standard ComboBox values |
+| RX-CLEANUP-01 | 5.1 | 1/2 | In Progress|  | 5.1 | Amber indicator for non-standard ComboBox values |
 | RX-CLEANUP-03 | 5.1 | Rename dosage to quantity + Dexie migration |
 | RX-CLEANUP-04 | 5.1 | No blocking validation (indicators informational only) |
 | URDU-06 | 6 | Rx Notes toggle |
