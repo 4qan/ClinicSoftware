@@ -30,7 +30,7 @@ function AppContent() {
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/ClinicSoftware">
       <AuthProvider>
         <AppContent />
       </AuthProvider>

@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
 
 export default defineConfig({
+  base: '/ClinicSoftware/',
   plugins: [
     react(),
     tailwindcss(),
@@ -23,7 +24,7 @@ export default defineConfig({
         display: 'standalone',
         theme_color: '#1e40af',
         background_color: '#f9fafb',
-        start_url: '/',
+        start_url: '/ClinicSoftware/',
         icons: [
           {
             src: 'icon-192.png',
