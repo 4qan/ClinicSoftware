@@ -1,5 +1,5 @@
 ---
-status: diagnosed
+status: resolved
 phase: 03-printing-and-visit-completion
 source: [03-01-SUMMARY.md, 03-02-SUMMARY.md]
 started: 2026-03-06T13:10:00Z
@@ -63,7 +63,7 @@ skipped: 0
 ## Gaps
 
 - truth: "Print CTA triggers print directly from visit page/history without navigating to separate print page"
-  status: failed
+  status: resolved
   reason: "User reported: print CTA navigates to separate page instead of printing inline. Wants 2 CTAs or dropdown on visit card that prints directly."
   severity: minor
   test: 5
@@ -77,7 +77,7 @@ skipped: 0
   debug_session: ""
 
 - truth: "Print page shows clean preview with no oversized CTAs, dispensary preview available, and print output contains only slip content"
-  status: failed
+  status: resolved
   reason: "User reported: massive CTAs, no dispensary preview, print output includes left panel and CTAs"
   severity: major
   test: 6
@@ -91,7 +91,7 @@ skipped: 0
   debug_session: ""
 
 - truth: "Print prescription hides all app chrome (navbar, sidebar, header) and shows only the prescription slip"
-  status: failed
+  status: resolved
   reason: "User reported: app chrome is not hidden in print preview"
   severity: blocker
   test: 7
@@ -107,7 +107,7 @@ skipped: 0
   debug_session: ""
 
 - truth: "Print dispensary hides all app chrome (navbar, sidebar, header) and shows only the dispensary slip"
-  status: failed
+  status: resolved
   reason: "User reported: app chrome is not hidden in print preview"
   severity: blocker
   test: 8
