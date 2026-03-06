@@ -70,9 +70,10 @@ describe('buildUrduInstruction', () => {
     expect(result!.english).toContain('for 5 days')
   })
 
-  it('fallback returns null for untranslatable dosage', () => {
+  it('uses original value when no Urdu translation exists', () => {
     const result = buildUrduInstruction({ form: 'Tablet', dosage: 'CustomDose', frequency: 'Once daily', duration: '7 days' })
-    expect(result).toBeNull()
+    expect(result.urdu).toBe('CustomDose دن میں ایک بار لیں، 7 دن تک')
+    expect(result.english).toBe('Take CustomDose, once daily, for 7 days')
   })
 
   it('inhaler uses correct English verb', () => {

@@ -137,22 +137,19 @@ function lcFirst(s: string): string {
 
 /**
  * Build a natural Urdu instruction sentence from medication fields.
- * Returns null if any component lacks an Urdu translation (fallback signal).
+ * Builds a natural Urdu + English instruction sentence.
+ * Uses translated values where available, keeps original for unknown values
+ * (numbers like "12" read the same in both scripts).
  *
  * Patterns (based on Pakistani medical instruction conventions):
  *   Standard:  "{dosage} {freq} {verb}، {duration} تک"
  *   Ongoing:   "{dosage} {freq} {ongoingVerb}"
  *   As needed: "{dosage} {freq} {verb}، ضرورت کے مطابق"
  */
-export function buildUrduInstruction(med: MedicationForInstruction): { urdu: string; english: string } | null {
+export function buildUrduInstruction(med: MedicationForInstruction): { urdu: string; english: string } {
   const dosageU = toUrdu(med.dosage)
   const frequencyU = toUrdu(med.frequency)
   const durationU = toUrdu(med.duration)
-
-  // Passthrough detection: if any translation equals its English input, bail out
-  if (dosageU === med.dosage || frequencyU === med.frequency || durationU === med.duration) {
-    return null
-  }
 
   const category = FORM_CATEGORY[med.form] ?? 'oral'
   const verbEn = ENGLISH_VERB_PREFIX[category] ?? 'Take'
