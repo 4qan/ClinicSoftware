@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider, useAuthContext } from './auth/AuthProvider'
 import { LoginPage } from './auth/LoginPage'
+import { seedDrugDatabase } from './db/seedDrugs'
 import { AppLayout } from './components/AppLayout'
 import { HomePage } from './pages/HomePage'
 import { PatientsPage } from './pages/PatientsPage'
@@ -10,6 +12,12 @@ import { SettingsPage } from './pages/SettingsPage'
 
 function AppContent() {
   const { isAuthenticated } = useAuthContext()
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      seedDrugDatabase().catch(console.error)
+    }
+  }, [isAuthenticated])
 
   if (!isAuthenticated) {
     return <LoginPage />
