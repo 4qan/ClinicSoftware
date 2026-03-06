@@ -87,7 +87,10 @@
 3. Full visit workflow (find patient, log encounter, write Rx, print both slips) completes in under 2 minutes.
 4. Doctor starts a new visit, types an unknown name, creates the patient inline without leaving the page, and continues writing the prescription seamlessly.
 
-**Plans:** 1
+**Plans:** 3/3 complete
+- Plan 1: New Visit Flow with Inline Registration - COMPLETE (2026-03-06)
+- Plan 2: Prescription and Dispensary Printing - COMPLETE (2026-03-06)
+- Plan 4: UAT Print Fixes (Gap Closure) - COMPLETE (2026-03-06)
 
 ---
 
