@@ -9,6 +9,7 @@ import { PatientsPage } from './pages/PatientsPage'
 import { RegisterPatientPage } from './pages/RegisterPatientPage'
 import { PatientProfilePage } from './pages/PatientProfilePage'
 import { SettingsPage } from './pages/SettingsPage'
+import { NewVisitPage } from './pages/NewVisitPage'
 
 function AppContent() {
   const { isAuthenticated } = useAuthContext()
@@ -30,6 +31,7 @@ function AppContent() {
         <Route path="/patients" element={<PatientsPage />} />
         <Route path="/register" element={<RegisterPatientPage />} />
         <Route path="/patient/:id" element={<PatientProfilePage />} />
+        <Route path="/visit/new" element={<NewVisitPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </AppLayout>
