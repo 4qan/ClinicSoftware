@@ -22,9 +22,9 @@ See: .planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 5 (Prescription Print Urdu)
-Plan: All complete (2/2)
+Plan: All complete (2/2) + post-execution refinements
 Status: Phase 5 complete, ready for Phase 6
-Last activity: 2026-03-06 -- Completed plan 05-02 (Natural Language Urdu Instructions Column)
+Last activity: 2026-03-06 -- Post-execution: separated form from dosage, form-aware quantity picker, natural Urdu sentence patterns
 
 ## Progress
 | Phase | Name | Status | Plans |
@@ -39,14 +39,16 @@ Last activity: 2026-03-06 -- Completed plan 05-02 (Natural Language Urdu Instruc
 ## Decisions
 See: .planning/PROJECT.md Key Decisions table
 - Phase 5: Used .map() over column array for DRY bilingual header rendering; Urdu header font 9pt (prescription) / 8pt (dispensary)
-- Phase 5-02: Uniform Urdu sentence template with form-awareness from dosage lookup; passthrough detection as fallback trigger
+- Phase 5-02: Form-aware quantity system (form inferred from drug, dosage stores raw quantity). Natural Urdu sentence patterns with form-specific verbs (لیں/لگائیں/ڈالیں/لگوائیں). Duration uses "تک" not "کے لیے". Removed null fallback: always renders Urdu.
 
 ## Accumulated Context
 - v1.0 shipped with 27/27 requirements, 3 phases, 14 plans
-- Predefined dosage/frequency/duration options in `src/constants/clinical.ts`
-- Print slips: PrescriptionSlip.tsx (patient-facing) and DispensarySlip.tsx (pharmacist-facing)
-- Both print slips now render 5-column layout with natural Urdu instruction sentences via buildUrduInstruction()
-- Translation coverage test in `src/constants/__tests__/translations.test.ts` catches drift
+- `src/constants/clinical.ts`: QUANTITY_OPTIONS (by form category), FORM_TO_CATEGORY map, FREQUENCY_OPTIONS, DURATION_OPTIONS, MEDICATION_FORMS
+- Dosage is now just a quantity (e.g., "1", "5 ml", "Thin layer"); form comes from drug record. buildDosageUrdu/English construct display from form + quantity.
+- Print slips: PrescriptionSlip.tsx (patient-facing) and DispensarySlip.tsx (pharmacist-facing), 5-column layout
+- buildUrduInstruction() constructs natural Urdu sentences with form-specific verbs, never returns null
+- MedicationEntry: form picker shown only for custom drugs, quantity options filter by form category
+- Translation tests in `src/constants/__tests__/translations.test.ts` (26 tests) and `src/constants/translations.test.ts` (15 tests)
 - Rx Notes field exists as freeform textarea in NewVisitPage/EditVisitPage
 - IndexedDB is origin-scoped and device-local (no cross-device data sharing)
 
@@ -63,4 +65,4 @@ None.
 | 4 | Add Save & Print CTA to visit pages | 2026-03-06 | 3aee6f0 | [4-add-save-and-print-cta-to-new-visit-page](./quick/4-add-save-and-print-cta-to-new-visit-page/) |
 
 ---
-*Last updated: 2026-03-06 - Phase 5 complete (Natural Language Urdu Instructions Column)*
+*Last updated: 2026-03-06 - Phase 5 complete + post-execution refinements (form/dosage separation, natural Urdu patterns)*
