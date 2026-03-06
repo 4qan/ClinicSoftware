@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { SearchBar } from './SearchBar'
@@ -7,11 +7,31 @@ interface AppLayoutProps {
   children: ReactNode
 }
 
+const SIDEBAR_KEY = 'sidebarCollapsed'
+
+function getInitialCollapsed(): boolean {
+  try {
+    return localStorage.getItem(SIDEBAR_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
 export function AppLayout({ children }: AppLayoutProps) {
+  const [collapsed, setCollapsed] = useState(getInitialCollapsed)
+
+  function handleToggle() {
+    setCollapsed((prev) => {
+      const next = !prev
+      try { localStorage.setItem(SIDEBAR_KEY, String(next)) } catch { /* ignore */ }
+      return next
+    })
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <main className="flex-1 ml-60">
+      <Sidebar collapsed={collapsed} onToggle={handleToggle} />
+      <main className={`flex-1 transition-all duration-200 ${collapsed ? 'ml-16' : 'ml-60'}`}>
         <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-3">
           <div className="flex items-center gap-4">
             <div className="flex-1">

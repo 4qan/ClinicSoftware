@@ -38,26 +38,53 @@ function isActive(itemPath: string, currentPath: string): boolean {
   return currentPath.startsWith(itemPath)
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  collapsed: boolean
+  onToggle: () => void
+}
+
+export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const location = useLocation()
   const { logout } = useAuthContext()
 
   return (
-    <aside className="fixed top-0 left-0 w-60 h-screen bg-white border-r border-gray-200 flex flex-col z-20">
-      <div className="px-5 py-5">
-        <Link to="/" className="text-xl font-bold text-gray-900 hover:text-blue-700">
-          Clinic Software
-        </Link>
+    <aside
+      className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 flex flex-col z-20 transition-all duration-200 ${
+        collapsed ? 'w-16' : 'w-60'
+      }`}
+    >
+      <div className={`flex items-center ${collapsed ? 'justify-center py-5' : 'justify-between px-5 py-5'}`}>
+        {!collapsed && (
+          <Link to="/" className="text-xl font-bold text-gray-900 hover:text-blue-700">
+            Clinic Software
+          </Link>
+        )}
+        <button
+          type="button"
+          onClick={onToggle}
+          className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors"
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <svg
+            className={`w-5 h-5 transition-transform duration-200 ${collapsed ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+          </svg>
+        </button>
       </div>
 
-      <nav className="flex-1 px-3">
+      <nav className={`flex-1 ${collapsed ? 'px-2' : 'px-3'}`}>
         {navItems.map((item) => {
           const active = isActive(item.path, location.pathname)
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-3 py-3 mb-1 rounded-lg text-base cursor-pointer transition-colors ${
+              title={collapsed ? item.label : undefined}
+              className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-3 py-3 mb-1 rounded-lg text-base cursor-pointer transition-colors ${
                 active
                   ? 'bg-blue-50 text-blue-700 font-semibold border-l-4 border-blue-600'
                   : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
@@ -65,19 +92,23 @@ export function Sidebar() {
               style={{ minHeight: '44px' }}
             >
               {item.icon}
-              {item.label}
+              {!collapsed && item.label}
             </Link>
           )
         })}
       </nav>
 
-      <div className="px-3 pb-5">
+      <div className={`${collapsed ? 'px-2' : 'px-3'} pb-5`}>
         <button
           onClick={logout}
-          className="w-full text-left px-3 py-3 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+          title={collapsed ? 'Log Out' : undefined}
+          className={`w-full ${collapsed ? 'flex justify-center' : 'text-left'} px-3 py-3 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors`}
           style={{ minHeight: '44px' }}
         >
-          Log Out
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          {!collapsed && <span className="ml-2">Log Out</span>}
         </button>
       </div>
     </aside>
