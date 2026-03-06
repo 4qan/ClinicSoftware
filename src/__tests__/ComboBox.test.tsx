@@ -69,23 +69,11 @@ describe('ComboBox showCustomIndicator', () => {
     expect(input).not.toBeDisabled()
   })
 
-  it('shows "Custom value" hint when value is custom and showCustomIndicator is true', () => {
+  it('does not show hint text below input (border-only indicator)', () => {
     render(
       <ComboBox
         options={OPTIONS}
         value="banana"
-        onChange={() => {}}
-        showCustomIndicator
-      />
-    )
-    expect(screen.getByText('Custom value')).toBeInTheDocument()
-  })
-
-  it('does not show "Custom value" hint when value matches an option', () => {
-    render(
-      <ComboBox
-        options={OPTIONS}
-        value="1"
         onChange={() => {}}
         showCustomIndicator
       />

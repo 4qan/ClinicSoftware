@@ -165,7 +165,6 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
         onChange={(v) => setForm((f) => ({ ...f, quantity: v }))}
         placeholder={category === 'topical' ? 'e.g., Thin layer' : 'e.g., 1'}
         label="Qty"
-        showCustomIndicator
       />
 
       {/* Frequency */}
