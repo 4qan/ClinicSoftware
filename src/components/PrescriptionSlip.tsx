@@ -1,5 +1,6 @@
 import type { Visit, VisitMedication, Patient } from '@/db/index'
 import type { ClinicInfo } from '@/db/settings'
+import { toUrdu, columnHeadersUrdu, sectionHeadersUrdu } from '@/constants/translations'
 
 interface PrescriptionSlipProps {
   visit: Visit
@@ -70,13 +71,12 @@ export function PrescriptionSlip({ visit, medications, patient, clinicInfo }: Pr
               <thead>
                 <tr className="border-b border-gray-300">
                   <th className="text-left py-1 pr-2 font-semibold text-gray-700" style={{ width: '24px' }}>#</th>
-                  <th className="text-left py-1 pr-2 font-semibold text-gray-700">Brand Name</th>
-                  <th className="text-left py-1 pr-2 font-semibold text-gray-700">Salt</th>
-                  <th className="text-left py-1 pr-2 font-semibold text-gray-700">Strength</th>
-                  <th className="text-left py-1 pr-2 font-semibold text-gray-700">Form</th>
-                  <th className="text-left py-1 pr-2 font-semibold text-gray-700">Dosage</th>
-                  <th className="text-left py-1 pr-2 font-semibold text-gray-700">Freq</th>
-                  <th className="text-left py-1 font-semibold text-gray-700">Duration</th>
+                  {['Brand Name', 'Salt', 'Strength', 'Form', 'Dosage', 'Freq', 'Duration'].map((col, idx) => (
+                    <th key={col} className={`text-left py-1 ${idx < 6 ? 'pr-2' : ''} font-semibold text-gray-700`}>
+                      {col}<br />
+                      <span dir="rtl" className="urdu-cell" style={{ fontSize: '9pt', fontWeight: 'normal' }}>{columnHeadersUrdu[col]}</span>
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -86,10 +86,10 @@ export function PrescriptionSlip({ visit, medications, patient, clinicInfo }: Pr
                     <td className="py-1 pr-2 font-medium">{med.brandName}</td>
                     <td className="py-1 pr-2 text-gray-600">{med.saltName}</td>
                     <td className="py-1 pr-2">{med.strength}</td>
-                    <td className="py-1 pr-2">{med.form}</td>
-                    <td className="py-1 pr-2">{med.dosage}</td>
-                    <td className="py-1 pr-2">{med.frequency}</td>
-                    <td className="py-1">{med.duration}</td>
+                    <td className="py-1 pr-2 urdu-cell" dir="rtl">{toUrdu(med.form)}</td>
+                    <td className="py-1 pr-2 urdu-cell" dir="rtl">{toUrdu(med.dosage)}</td>
+                    <td className="py-1 pr-2 urdu-cell" dir="rtl">{toUrdu(med.frequency)}</td>
+                    <td className="py-1 urdu-cell" dir="rtl">{toUrdu(med.duration)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -100,7 +100,7 @@ export function PrescriptionSlip({ visit, medications, patient, clinicInfo }: Pr
         {/* Clinical Notes */}
         {visit.clinicalNotes && (
           <div className="mb-3">
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">Clinical Notes</h3>
+            <h3 className="text-sm font-semibold text-gray-700 mb-1">Clinical Notes / <span dir="rtl" className="urdu-cell">{sectionHeadersUrdu['Clinical Notes']}</span></h3>
             <p className="text-sm text-gray-800 whitespace-pre-line">{visit.clinicalNotes}</p>
           </div>
         )}
@@ -108,7 +108,7 @@ export function PrescriptionSlip({ visit, medications, patient, clinicInfo }: Pr
         {/* Rx Notes */}
         {visit.rxNotes && (
           <div className="mb-3">
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">Instructions</h3>
+            <h3 className="text-sm font-semibold text-gray-700 mb-1">Instructions / <span dir="rtl" className="urdu-cell">{sectionHeadersUrdu['Instructions']}</span></h3>
             <p className="text-sm text-gray-800 whitespace-pre-line">{visit.rxNotes}</p>
           </div>
         )}
