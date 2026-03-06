@@ -89,10 +89,59 @@ export const columnHeadersUrdu: Record<string, string> = {
   'Brand Name': 'دوا',
   'Salt': 'نمک',
   'Strength': 'طاقت',
-  'Form': 'شکل',
-  'Dosage': 'خوراک',
-  'Freq': 'وقفہ',
-  'Duration': 'دورانیہ',
+  'Instructions': 'ہدایات',
+}
+
+/** Input shape for buildUrduInstruction */
+export interface MedicationForInstruction {
+  form: string
+  dosage: string
+  frequency: string
+  duration: string
+}
+
+/** Form-to-category classification */
+const FORM_CATEGORY: Record<string, string> = {
+  Tablet: 'oral', Capsule: 'oral', Sachet: 'oral', Powder: 'oral',
+  Syrup: 'liquid', Suspension: 'liquid', Solution: 'liquid',
+  Cream: 'topical', Ointment: 'topical', Gel: 'topical', Patch: 'topical',
+  Drops: 'drops',
+  Injection: 'injection',
+  Inhaler: 'inhaler', Spray: 'inhaler',
+  Suppository: 'suppository',
+}
+
+/** English verb prefix per form category */
+const ENGLISH_VERB_PREFIX: Record<string, string> = {
+  oral: 'Take', liquid: 'Take', topical: 'Apply', drops: 'Instill',
+  injection: 'Administer', inhaler: 'Inhale', suppository: 'Insert',
+}
+
+/** Durations that are self-contained phrases (no "کے لیے" suffix) */
+const SELF_CONTAINED_DURATIONS = new Set(['Ongoing', 'As needed'])
+
+/**
+ * Build a natural Urdu instruction sentence from medication fields.
+ * Returns null if any component lacks an Urdu translation (fallback signal).
+ */
+export function buildUrduInstruction(med: MedicationForInstruction): { urdu: string; english: string } | null {
+  const dosageU = toUrdu(med.dosage)
+  const frequencyU = toUrdu(med.frequency)
+  const durationU = toUrdu(med.duration)
+
+  // Passthrough detection: if any translation equals its English input, bail out
+  if (dosageU === med.dosage || frequencyU === med.frequency || durationU === med.duration) {
+    return null
+  }
+
+  const suffix = SELF_CONTAINED_DURATIONS.has(med.duration) ? '' : ' کے لیے'
+  const urdu = `${dosageU} ${frequencyU} ${durationU}${suffix}`
+
+  const category = FORM_CATEGORY[med.form] ?? 'oral'
+  const verb = ENGLISH_VERB_PREFIX[category] ?? 'Take'
+  const english = `${verb} ${med.dosage}, ${med.frequency}, ${med.duration}`
+
+  return { urdu, english }
 }
 
 /** Section header Urdu labels for prescription slip */
