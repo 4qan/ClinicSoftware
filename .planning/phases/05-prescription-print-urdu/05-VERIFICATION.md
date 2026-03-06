@@ -1,6 +1,6 @@
 ---
 phase: 05
-status: human_needed
+status: gaps_found
 verified_at: 2026-03-06
 must_haves_verified: 6/6
 ---
@@ -58,6 +58,22 @@ The following items require manual testing in Chrome print preview:
 - [ ] Custom/freeform medication values fall back to English without breakage
 - [ ] A5 print layout accommodates 6 medications without overflow
 
+## Gaps
+
+### GAP-01: Natural language Urdu instructions instead of columnar layout
+- **status:** failed
+- **severity:** enhancement
+- **description:** The current 7-column medication table (Brand Name, Salt, Strength, Form, Dosage, Freq, Duration) is cramped on A5 print. A more natural approach: consolidate Form/Dosage/Freq/Duration into a single "Instructions" column rendered as a natural Urdu sentence (e.g., "1 گولی دن میں 3 بار 10 دنوں کے لیے"). English equivalent alongside. Requires form-aware sentence templates since different medication forms (tablet, cream, drops, injection) need different Urdu sentence structures. Reduces columns from 7 to 4 (Drug, Salt, Strength, Instructions).
+- **files:** src/components/PrescriptionSlip.tsx, src/components/DispensarySlip.tsx, src/constants/translations.ts
+
+### GAP-02: Translation corrections
+- **status:** resolved
+- **description:** Freq header was "تعداد" (quantity), corrected to "وقفہ" (interval). Clinical Notes was "طبی نوٹس" (clinical notice), corrected to "طبی تفصیلات" (clinical details). Fixed in commit 2b8f21b.
+
+### GAP-03: Column alignment
+- **status:** resolved
+- **description:** RTL dir on td elements caused right-alignment mismatching left-aligned headers. Fixed with explicit textAlign: left. Commit 0827063.
+
 ## Summary
 
-All 6 must-haves verified against source code. All 3 requirement IDs (URDU-02, URDU-04, URDU-05) are fully implemented. Translation coverage tests pass. Status is `human_needed` because print layout rendering requires manual Chrome print preview verification.
+6/6 must-haves verified against source code. 3/3 requirement IDs implemented. Two gaps resolved (translation corrections, column alignment). One enhancement gap open: natural language Urdu instructions to replace columnar layout. Status `gaps_found` pending gap closure.
