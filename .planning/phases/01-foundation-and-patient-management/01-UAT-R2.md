@@ -1,5 +1,5 @@
 ---
-status: complete
+status: resolved
 phase: 01-foundation-and-patient-management
 source: 06-SUMMARY.md
 started: 2026-03-06T12:00:00Z
@@ -37,9 +37,17 @@ skipped: 0
 ## Gaps
 
 - truth: "Sticky header CTA is the single Register Patient entry point; no duplicate CTAs on individual pages"
-  status: failed
+  status: resolved
   reason: "User reported: now that we have the sticky CTA, there is no need for the separate CTAs on the Home page and the Patients page"
   severity: minor
   test: 1
-  artifacts: []
-  missing: []
+  root_cause: "HomePage lines 10-18 has a standalone Register New Patient button. PatientsPage lines 13-21 has a Register New Patient button in the page header. Both are redundant now that AppLayout sticky header has the persistent CTA."
+  artifacts:
+    - path: "src/pages/HomePage.tsx"
+      issue: "Lines 10-18: standalone Register New Patient Link button"
+    - path: "src/pages/PatientsPage.tsx"
+      issue: "Lines 15-20: Register New Patient button in page header"
+  missing:
+    - "Remove Register New Patient button from HomePage"
+    - "Remove Register New Patient button from PatientsPage header"
+    - "Keep empty-state Register First Patient link in PatientsPage (contextual guidance, not duplicate CTA)"
