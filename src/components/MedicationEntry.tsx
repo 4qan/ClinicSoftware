@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { ComboBox } from './ComboBox'
 import { useDrugSearch } from '@/hooks/useDrugSearch'
-import { DOSAGE_OPTIONS, FREQUENCY_OPTIONS, DURATION_OPTIONS } from '@/constants/clinical'
+import { QUANTITY_OPTIONS, FREQUENCY_OPTIONS, DURATION_OPTIONS, MEDICATION_FORMS, FORM_TO_CATEGORY } from '@/constants/clinical'
 import type { Drug } from '@/db/index'
 
 export interface MedicationFormData {
@@ -66,8 +66,16 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
     setShowDrugDropdown(false)
   }
 
+  // Whether the drug was selected from DB (form is inferred)
+  const hasDbDrug = !!form.drugId
+
+  // Quantity options based on current form
+  const category = FORM_TO_CATEGORY[form.form] ?? 'oral'
+  const quantityOptions = QUANTITY_OPTIONS[category] ?? QUANTITY_OPTIONS.oral
+
   const isValid =
     form.brandName.trim() !== '' &&
+    form.form.trim() !== '' &&
     form.dosage.trim() !== '' &&
     form.frequency.trim() !== '' &&
     form.duration.trim() !== ''
@@ -97,7 +105,7 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end" onKeyDown={handleKeyDown}>
+    <div className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end" onKeyDown={handleKeyDown}>
       {/* Drug Name with autocomplete */}
       <div className="md:col-span-1 relative" ref={drugRef}>
         <label className="block text-sm font-medium text-gray-700 mb-1">Drug Name</label>
@@ -138,13 +146,34 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
         )}
       </div>
 
-      {/* Dosage */}
+      {/* Form - read-only when inferred from drug DB, editable for custom drugs */}
+      {hasDbDrug ? (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Form</label>
+          <div
+            className="w-full px-3 py-2 text-base border border-gray-200 rounded-lg bg-gray-50 text-gray-600"
+            style={{ minHeight: '44px', lineHeight: '24px' }}
+          >
+            {form.form || '—'}
+          </div>
+        </div>
+      ) : (
+        <ComboBox
+          options={MEDICATION_FORMS}
+          value={form.form}
+          onChange={(v) => setForm((f) => ({ ...f, form: v, dosage: '' }))}
+          placeholder="e.g., Tablet"
+          label="Form"
+        />
+      )}
+
+      {/* Quantity (filtered by form) */}
       <ComboBox
-        options={DOSAGE_OPTIONS}
+        options={quantityOptions}
         value={form.dosage}
         onChange={(v) => setForm((f) => ({ ...f, dosage: v }))}
-        placeholder="e.g., 1 tablet"
-        label="Dosage"
+        placeholder={category === 'topical' ? 'e.g., Thin layer' : 'e.g., 1'}
+        label="Qty"
       />
 
       {/* Frequency */}

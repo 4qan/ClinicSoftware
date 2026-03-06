@@ -1,29 +1,28 @@
-export const DOSAGE_OPTIONS: string[] = [
-  // Tablets/Capsules
-  '1/2 tablet',
-  '1 tablet',
-  '2 tablets',
-  '3 tablets',
-  // Liquids
-  '2.5 ml',
-  '5 ml',
-  '10 ml',
-  '15 ml',
-  // Drops
-  '1 drop',
-  '2 drops',
-  '3 drops',
-  '5 drops',
-  // Injections
-  '1 injection',
-  // Sachets/Powders
-  '1 sachet',
-  // Topical
-  'Apply thin layer',
-  'Apply as directed',
-  // Inhalers
-  '1 puff',
-  '2 puffs',
+/** Form-to-category classification */
+export const FORM_TO_CATEGORY: Record<string, string> = {
+  Tablet: 'oral', Capsule: 'oral', Sachet: 'oral', Powder: 'oral',
+  Syrup: 'liquid', Suspension: 'liquid', Solution: 'liquid',
+  Cream: 'topical', Ointment: 'topical', Gel: 'topical', Patch: 'topical',
+  Drops: 'drops',
+  Injection: 'injection',
+  Inhaler: 'inhaler', Spray: 'inhaler',
+  Suppository: 'suppository',
+}
+
+/** Quantity options filtered by form category */
+export const QUANTITY_OPTIONS: Record<string, string[]> = {
+  oral: ['½', '1', '2', '3'],
+  liquid: ['2.5 ml', '5 ml', '10 ml', '15 ml'],
+  drops: ['1', '2', '3', '5'],
+  injection: ['1'],
+  topical: ['Thin layer', 'As directed'],
+  inhaler: ['1', '2'],
+  suppository: ['1'],
+}
+
+/** Flat list of all quantity options (for backwards compat / validation) */
+export const ALL_QUANTITY_OPTIONS: string[] = [
+  ...new Set(Object.values(QUANTITY_OPTIONS).flat()),
 ]
 
 export const FREQUENCY_OPTIONS: string[] = [

@@ -1,30 +1,10 @@
 /**
  * English-to-Urdu translation maps for predefined clinical values.
  * Translations use patient-friendly colloquial Urdu with Western numerals.
- * Consumed by print components via toUrdu() helper.
+ * Consumed by print components via buildUrduInstruction() helper.
  */
 
-/** Dosage translations (18 entries) */
-export const dosageUrdu: Record<string, string> = {
-  '1/2 tablet': 'آدھی گولی',
-  '1 tablet': '1 گولی',
-  '2 tablets': '2 گولیاں',
-  '3 tablets': '3 گولیاں',
-  '2.5 ml': '2.5 ملی لیٹر',
-  '5 ml': '5 ملی لیٹر',
-  '10 ml': '10 ملی لیٹر',
-  '15 ml': '15 ملی لیٹر',
-  '1 drop': '1 قطرہ',
-  '2 drops': '2 قطرے',
-  '3 drops': '3 قطرے',
-  '5 drops': '5 قطرے',
-  '1 injection': '1 ٹیکا',
-  '1 sachet': '1 پیکٹ',
-  'Apply thin layer': 'پتلی تہہ',
-  'Apply as directed': 'ہدایت کے مطابق',
-  '1 puff': '1 سپرے',
-  '2 puffs': '2 سپرے',
-}
+import { FORM_TO_CATEGORY } from './clinical'
 
 /** Frequency translations (17 entries) */
 export const frequencyUrdu: Record<string, string> = {
@@ -100,15 +80,99 @@ export interface MedicationForInstruction {
   duration: string
 }
 
-/** Form-to-category classification */
-const FORM_CATEGORY: Record<string, string> = {
-  Tablet: 'oral', Capsule: 'oral', Sachet: 'oral', Powder: 'oral',
-  Syrup: 'liquid', Suspension: 'liquid', Solution: 'liquid',
-  Cream: 'topical', Ointment: 'topical', Gel: 'topical', Patch: 'topical',
-  Drops: 'drops',
-  Injection: 'injection',
-  Inhaler: 'inhaler', Spray: 'inhaler',
-  Suppository: 'suppository',
+/** Urdu units per form [singular, plural] */
+const FORM_UNIT_URDU: Record<string, [string, string]> = {
+  Tablet: ['گولی', 'گولیاں'],
+  Capsule: ['کیپسول', 'کیپسول'],
+  Sachet: ['پیکٹ', 'پیکٹ'],
+  Powder: ['پاؤڈر', 'پاؤڈر'],
+  Drops: ['قطرہ', 'قطرے'],
+  Injection: ['ٹیکا', 'ٹیکے'],
+  Inhaler: ['سپرے', 'سپرے'],
+  Spray: ['سپرے', 'سپرے'],
+  Suppository: ['بتی', 'بتیاں'],
+}
+
+/** English units per form [singular, plural] */
+const FORM_UNIT_EN: Record<string, [string, string]> = {
+  Tablet: ['tablet', 'tablets'],
+  Capsule: ['capsule', 'capsules'],
+  Sachet: ['sachet', 'sachets'],
+  Powder: ['dose', 'doses'],
+  Drops: ['drop', 'drops'],
+  Injection: ['injection', 'injections'],
+  Inhaler: ['puff', 'puffs'],
+  Spray: ['puff', 'puffs'],
+  Suppository: ['suppository', 'suppositories'],
+}
+
+/** Topical dosage translations (no unit, just description) */
+const TOPICAL_DOSAGE: Record<string, { urdu: string; english: string }> = {
+  'Thin layer': { urdu: 'پتلی تہہ', english: 'thin layer' },
+  'As directed': { urdu: 'ہدایت کے مطابق', english: 'as directed' },
+}
+
+/** Parse quantity, handling ½ fraction */
+function parseQty(q: string): number {
+  if (q === '½') return 0.5
+  return parseFloat(q)
+}
+
+/** Build Urdu dosage string from form + quantity */
+export function buildDosageUrdu(form: string, quantity: string): string {
+  const category = FORM_TO_CATEGORY[form] ?? 'oral'
+
+  if (category === 'topical') {
+    return TOPICAL_DOSAGE[quantity]?.urdu ?? quantity
+  }
+
+  if (category === 'liquid') {
+    const match = quantity.match(/^([\d.]+)\s*ml$/i)
+    if (match) return `${match[1]} ملی لیٹر`
+    return quantity
+  }
+
+  // Count-based forms: quantity + Urdu unit
+  const units = FORM_UNIT_URDU[form]
+  if (units) {
+    const num = parseQty(quantity)
+    if (!isNaN(num)) {
+      // Special case: ½ tablet = آدھی گولی
+      if (quantity === '½' && form === 'Tablet') return 'آدھی گولی'
+      return `${quantity} ${num <= 1 ? units[0] : units[1]}`
+    }
+  }
+
+  return quantity
+}
+
+/** Build English dosage string from form + quantity */
+export function buildDosageEnglish(form: string, quantity: string): string {
+  const category = FORM_TO_CATEGORY[form] ?? 'oral'
+
+  if (category === 'topical') {
+    return TOPICAL_DOSAGE[quantity]?.english ?? quantity
+  }
+
+  if (category === 'liquid') return quantity
+
+  const units = FORM_UNIT_EN[form]
+  if (units) {
+    const num = parseQty(quantity)
+    if (!isNaN(num)) {
+      return `${quantity} ${num <= 1 ? units[0] : units[1]}`
+    }
+  }
+
+  return quantity
+}
+
+/**
+ * Format dosage for display in UI lists (e.g., "1 tablet", "5 ml", "Thin layer").
+ * Combines form + raw quantity into a human-readable label.
+ */
+export function formatDosageDisplay(form: string, quantity: string): string {
+  return buildDosageEnglish(form, quantity)
 }
 
 /** English verb prefix per form category */
@@ -147,31 +211,29 @@ function lcFirst(s: string): string {
  *   As needed: "{dosage} {freq} {verb}، ضرورت کے مطابق"
  */
 export function buildUrduInstruction(med: MedicationForInstruction): { urdu: string; english: string } {
-  const dosageU = toUrdu(med.dosage)
+  const dosageU = buildDosageUrdu(med.form, med.dosage)
+  const dosageEn = buildDosageEnglish(med.form, med.dosage)
   const frequencyU = toUrdu(med.frequency)
   const durationU = toUrdu(med.duration)
 
-  const category = FORM_CATEGORY[med.form] ?? 'oral'
+  const category = FORM_TO_CATEGORY[med.form] ?? 'oral'
   const verbEn = ENGLISH_VERB_PREFIX[category] ?? 'Take'
 
   let urdu: string
   let english: string
 
   if (med.duration === 'Ongoing') {
-    // Ongoing: use continuous verb form, no duration suffix
     const ongoingVerb = URDU_VERB_ONGOING[category] ?? 'لیتے رہیں'
     urdu = `${dosageU} ${frequencyU} ${ongoingVerb}`
-    english = `${verbEn} ${med.dosage}, ${lcFirst(med.frequency)}, ongoing`
+    english = `${verbEn} ${dosageEn}, ${lcFirst(med.frequency)}, ongoing`
   } else if (med.duration === 'As needed') {
-    // As needed: verb then qualifier
     const verb = URDU_VERB[category] ?? 'لیں'
     urdu = `${dosageU} ${frequencyU} ${verb}، ضرورت کے مطابق`
-    english = `${verbEn} ${med.dosage}, ${lcFirst(med.frequency)}, as needed`
+    english = `${verbEn} ${dosageEn}, ${lcFirst(med.frequency)}, as needed`
   } else {
-    // Standard: verb after frequency, then "duration تک"
     const verb = URDU_VERB[category] ?? 'لیں'
     urdu = `${dosageU} ${frequencyU} ${verb}، ${durationU} تک`
-    english = `${verbEn} ${med.dosage}, ${lcFirst(med.frequency)}, for ${lcFirst(med.duration)}`
+    english = `${verbEn} ${dosageEn}, ${lcFirst(med.frequency)}, for ${lcFirst(med.duration)}`
   }
 
   return { urdu, english }
@@ -183,9 +245,8 @@ export const sectionHeadersUrdu: Record<string, string> = {
   'Instructions': 'ہدایات',
 }
 
-/** Unified lookup combining all categories */
+/** Unified lookup for frequency, duration, and forms */
 const allTranslations: Record<string, string> = {
-  ...dosageUrdu,
   ...frequencyUrdu,
   ...durationUrdu,
   ...formsUrdu,
@@ -193,6 +254,8 @@ const allTranslations: Record<string, string> = {
 
 /**
  * Translate a clinical value from English to Urdu.
+ * Used for frequency, duration, and form lookups.
+ * Dosage translation uses buildDosageUrdu(form, quantity) instead.
  * Returns the original string if no translation exists (silent fallback).
  */
 export function toUrdu(value: string): string {

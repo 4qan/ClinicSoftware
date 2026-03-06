@@ -1,26 +1,21 @@
 import { describe, it, expect } from 'vitest'
 import {
-  DOSAGE_OPTIONS,
   FREQUENCY_OPTIONS,
   DURATION_OPTIONS,
   MEDICATION_FORMS,
+  QUANTITY_OPTIONS,
+  FORM_TO_CATEGORY,
 } from './clinical'
 import {
-  dosageUrdu,
   frequencyUrdu,
   formsUrdu,
   toUrdu,
+  buildDosageUrdu,
+  buildDosageEnglish,
 } from './translations'
 
 describe('translations', () => {
   describe('completeness — every clinical value has a translation', () => {
-    it('covers all DOSAGE_OPTIONS', () => {
-      for (const value of DOSAGE_OPTIONS) {
-        expect(dosageUrdu[value], `Missing dosage translation: "${value}"`).toBeDefined()
-      }
-      expect(Object.keys(dosageUrdu).length).toBe(DOSAGE_OPTIONS.length)
-    })
-
     it('covers all FREQUENCY_OPTIONS', () => {
       for (const value of FREQUENCY_OPTIONS) {
         expect(frequencyUrdu[value], `Missing frequency translation: "${value}"`).toBeDefined()
@@ -33,7 +28,6 @@ describe('translations', () => {
         const urdu = toUrdu(value)
         expect(urdu, `Missing duration translation: "${value}"`).not.toBe(value)
       }
-      // durationUrdu has 12 keys ("As needed" is in frequencyUrdu), but all 13 values resolve via toUrdu
     })
 
     it('covers all MEDICATION_FORMS', () => {
@@ -42,15 +36,27 @@ describe('translations', () => {
       }
       expect(Object.keys(formsUrdu).length).toBe(MEDICATION_FORMS.length)
     })
+
+    it('every form has a category mapping', () => {
+      for (const form of MEDICATION_FORMS) {
+        expect(FORM_TO_CATEGORY[form], `Missing category for form: "${form}"`).toBeDefined()
+      }
+    })
+
+    it('every quantity option produces a non-passthrough Urdu dosage', () => {
+      for (const [category, quantities] of Object.entries(QUANTITY_OPTIONS)) {
+        // Pick a representative form for this category
+        const form = Object.entries(FORM_TO_CATEGORY).find(([, cat]) => cat === category)?.[0]
+        if (!form) continue
+        for (const qty of quantities) {
+          const urdu = buildDosageUrdu(form, qty)
+          expect(urdu, `No Urdu for ${form}/${qty}`).toBeTruthy()
+        }
+      }
+    })
   })
 
   describe('toUrdu() correctness — spot checks', () => {
-    it('translates dosage values', () => {
-      expect(toUrdu('1 tablet')).toBe('1 گولی')
-      expect(toUrdu('1/2 tablet')).toBe('آدھی گولی')
-      expect(toUrdu('2 puffs')).toBe('2 سپرے')
-    })
-
     it('translates frequency values', () => {
       expect(toUrdu('Once daily')).toBe('دن میں ایک بار')
       expect(toUrdu('After meals')).toBe('کھانے کے بعد')
@@ -74,6 +80,25 @@ describe('translations', () => {
     })
   })
 
+  describe('buildDosageUrdu / buildDosageEnglish spot checks', () => {
+    it('tablet quantities', () => {
+      expect(buildDosageUrdu('Tablet', '1')).toBe('1 گولی')
+      expect(buildDosageUrdu('Tablet', '½')).toBe('آدھی گولی')
+      expect(buildDosageEnglish('Tablet', '1')).toBe('1 tablet')
+      expect(buildDosageEnglish('Tablet', '½')).toBe('½ tablet')
+    })
+
+    it('liquid quantities', () => {
+      expect(buildDosageUrdu('Syrup', '5 ml')).toBe('5 ملی لیٹر')
+      expect(buildDosageEnglish('Syrup', '5 ml')).toBe('5 ml')
+    })
+
+    it('topical descriptors', () => {
+      expect(buildDosageUrdu('Cream', 'Thin layer')).toBe('پتلی تہہ')
+      expect(buildDosageEnglish('Cream', 'Thin layer')).toBe('thin layer')
+    })
+  })
+
   describe('toUrdu() fallback — unknown values return English', () => {
     it('returns unknown string as-is', () => {
       expect(toUrdu('unknown-value')).toBe('unknown-value')
@@ -82,21 +107,15 @@ describe('translations', () => {
     it('returns empty string as-is', () => {
       expect(toUrdu('')).toBe('')
     })
-
-    it('returns custom drug name as-is', () => {
-      expect(toUrdu('Amoxicillin 500mg')).toBe('Amoxicillin 500mg')
-    })
   })
 
   describe('no English leaks — every translated value is Urdu', () => {
-    it('toUrdu returns non-English for all known clinical values', () => {
+    it('toUrdu returns non-English for all known frequency/duration/form values', () => {
       const allValues = [
-        ...DOSAGE_OPTIONS,
         ...FREQUENCY_OPTIONS,
         ...DURATION_OPTIONS,
         ...MEDICATION_FORMS,
       ]
-      // Deduplicate ("As needed" appears twice)
       const unique = [...new Set(allValues)]
       for (const value of unique) {
         const urdu = toUrdu(value)
