@@ -2,6 +2,7 @@ import { useState, useEffect, type FormEvent } from 'react'
 import { ChangePassword } from '@/auth/ChangePassword'
 import { useAuthContext } from '@/auth/AuthProvider'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
+import { DrugManagement } from '@/components/DrugManagement'
 
 function RecoveryCodeSection() {
   const { regenerateRecoveryCode, checkRecoveryCodeExists } = useAuthContext()
@@ -126,6 +127,7 @@ export function SettingsPage() {
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Settings</h2>
       <RecoveryCodeSection />
       <ChangePassword />
+      <DrugManagement />
     </div>
   )
 }
