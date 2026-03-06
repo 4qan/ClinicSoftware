@@ -49,6 +49,10 @@ See: .planning/PROJECT.md Key Decisions table
 - Rx Notes field exists as freeform textarea in NewVisitPage/EditVisitPage
 - IndexedDB is origin-scoped and device-local (no cross-device data sharing)
 
+### Pending Todos
+3 items: Print CTA alignment, drug selection detail display, print CTA on new visit page
+See: `.planning/todos/pending/`
+
 ### Quick Tasks Completed
 
 | # | Description | Date | Commit | Directory |
