@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Urdu & Backup
 status: completed
-last_updated: "2026-03-06T19:21:00.000Z"
+last_updated: "2026-03-06T19:36:57.724Z"
 last_activity: "2026-03-06 -- Completed 05.1-02: drug display split + amber indicator"
 progress:
   total_phases: 7

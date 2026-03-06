@@ -69,7 +69,7 @@ Modify `PrescriptionSlip.tsx` and `DispensarySlip.tsx` to render dosage, frequen
 **Goal:** Rename misleading `dosage` field to `quantity`, split drug display into search vs. selected variants, and add amber visual indicators for non-standard ComboBox values.
 **Requirements:** RX-CLEANUP-01, RX-CLEANUP-02, RX-CLEANUP-03, RX-CLEANUP-04
 **Depends on:** Phase 5
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 05.1-01-PLAN.md -- Rename dosage to quantity across data model, all consumers, and tests with Dexie v3 migration
