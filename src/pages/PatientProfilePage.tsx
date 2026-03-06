@@ -4,6 +4,7 @@ import { getPatient, addToRecent } from '@/db/patients'
 import type { Patient } from '@/db/index'
 import type { PatientInput } from '@/db/patients'
 import { PatientInfoCard } from '@/components/PatientInfoCard'
+import { VisitHistorySection } from '@/components/VisitHistorySection'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 
 export function PatientProfilePage() {
@@ -65,14 +66,7 @@ export function PatientProfilePage() {
       ]} />
       <PatientInfoCard patient={patient} onUpdated={handleUpdated} />
 
-      {/* Visit History */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Visit History</h3>
-        <div className="text-center py-8">
-          <p className="text-lg text-gray-400">No visits yet</p>
-          <p className="text-sm text-gray-400 mt-1">Visit history will appear here once visits are recorded.</p>
-        </div>
-      </div>
+      <VisitHistorySection patientId={patient.id} />
     </div>
   )
 }
