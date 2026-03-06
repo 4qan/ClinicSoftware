@@ -45,9 +45,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Printing
 
-- [ ] **PRINT-01**: User can print a prescription slip in small format (non-A4) with patient info, date, and medications
-- [ ] **PRINT-02**: User can print a separate dispensary slip with medication list only (for dispenser)
-- [ ] **PRINT-03**: Print layouts work correctly in Chrome/Edge print dialog
+- [x] **PRINT-01**: User can print a prescription slip in small format (non-A4) with patient info, date, and medications
+- [x] **PRINT-02**: User can print a separate dispensary slip with medication list only (for dispenser)
+- [x] **PRINT-03**: Print layouts work correctly in Chrome/Edge print dialog
 - [x] **PRINT-04**: Both prints are triggered from the prescription view with clear, separate buttons
 
 ### Visit Flow

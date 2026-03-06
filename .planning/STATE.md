@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Not Started
-last_updated: "2026-03-06T12:54:34.281Z"
+status: executing
+last_updated: "2026-03-06T13:01:37.897Z"
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 13
-  completed_plans: 12
+  completed_plans: 13
 ---
 
 # Project State: ClinicSoftware
@@ -16,18 +16,17 @@ progress:
 ## Project Reference
 See: .planning/PROJECT.md (updated 2026-03-05)
 **Core value:** The doctor can see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even with no internet.
-**Current focus:** Phase 3 in progress, Plan 01 complete
+**Current focus:** All phases complete. Milestone v1.0 ready.
 
 ## Progress
 | Phase | Name | Status | Plans |
 |-------|------|--------|-------|
 | 1 | Foundation and Patient Management | Complete (2026-03-06) | 7/7 complete |
 | 2 | Clinical Workflow | Complete (2026-03-06) | 4/4 complete |
-| 3 | Printing and Visit Completion | In Progress | 1/2 complete |
+| 3 | Printing and Visit Completion | Complete (2026-03-06) | 2/2 complete |
 
 ## Current Phase
-**Phase 3: Printing and Visit Completion**
-Status: In Progress (Plan 01 complete, Plan 02 remaining)
+All phases complete.
 
 ## Decisions
 - VisitCard first entry auto-expanded, rest collapsed for quick scanning (Phase 2, Plan 3)
@@ -59,11 +58,14 @@ Status: In Progress (Plan 01 complete, Plan 02 remaining)
 - [Phase 03]: Inline registration uses shared PatientRegistrationForm with compact prop
 - [Phase 03]: Settings tabs use pill-style buttons with Account, Medications, Clinic Info categories
 - [Phase 03]: ClinicInfo stored as individual Dexie settings keys, not JSON blob
+- [Phase 03]: PrescriptionSlip always visible on screen as preview, DispensarySlip hidden until print
+- [Phase 03]: printMode state with afterprint event listener for print dialog slip toggling
+- [Phase 03]: @media print with @page A5 portrait and 8mm margins
 
 ## Session
-- **Last completed:** Phase 3, Plan 1 (Visit Flow UX and Settings Redesign)
+- **Last completed:** Phase 3, Plan 2 (Prescription and Dispensary Printing)
 - **Duration:** 4 min
-- **Next:** Phase 3, Plan 2
+- **Next:** Milestone complete
 
 ### Quick Tasks Completed
 
@@ -72,4 +74,4 @@ Status: In Progress (Plan 01 complete, Plan 02 remaining)
 | 1 | Set up GitHub remote repo and deploy to GitHub Pages | 2026-03-06 | fa0212f | [1-set-up-github-remote-repo-and-deploy-to-](./quick/1-set-up-github-remote-repo-and-deploy-to-/) |
 
 ---
-*Last updated: 2026-03-06 - Completed Phase 3, Plan 1: Visit Flow UX and Settings Redesign*
+*Last updated: 2026-03-06 - Completed Phase 3, Plan 2: Prescription and Dispensary Printing*
