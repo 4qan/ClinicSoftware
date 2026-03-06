@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { ComboBox } from './ComboBox'
 import { useDrugSearch } from '@/hooks/useDrugSearch'
 import { QUANTITY_OPTIONS, FREQUENCY_OPTIONS, DURATION_OPTIONS, MEDICATION_FORMS, FORM_TO_CATEGORY } from '@/constants/clinical'
+import { formatDrugSearchResult, formatDrugSelected } from '@/utils/drugFormatters'
 import type { Drug } from '@/db/index'
 
 export interface MedicationFormData {
@@ -54,7 +55,7 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
   }
 
   function handleSelectDrug(drug: Drug) {
-    setDrugQuery(formatDrugDisplay(drug))
+    setDrugQuery(formatDrugSelected(drug))
     setForm((f) => ({
       ...f,
       drugId: drug.id,
@@ -94,16 +95,6 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
     }
   }
 
-  function formatDrugDisplay(drug: Drug): string {
-    const parts = [drug.brandName]
-    const details: string[] = []
-    if (drug.saltName) details.push(drug.saltName)
-    if (drug.strength) details.push(drug.strength)
-    if (drug.form) details.push(drug.form)
-    if (details.length > 0) parts.push(`(${details.join(' ')})`)
-    return parts.join(' ')
-  }
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end" onKeyDown={handleKeyDown}>
       {/* Drug Name with autocomplete */}
@@ -138,7 +129,7 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
                   }}
                   className="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
                 >
-                  {formatDrugDisplay(drug)}
+                  {formatDrugSearchResult(drug)}
                 </button>
               ))
             )}
@@ -174,6 +165,7 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
         onChange={(v) => setForm((f) => ({ ...f, quantity: v }))}
         placeholder={category === 'topical' ? 'e.g., Thin layer' : 'e.g., 1'}
         label="Qty"
+        showCustomIndicator
       />
 
       {/* Frequency */}
@@ -183,6 +175,7 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
         onChange={(v) => setForm((f) => ({ ...f, frequency: v }))}
         placeholder="e.g., Twice daily"
         label="Frequency"
+        showCustomIndicator
       />
 
       {/* Duration */}
@@ -192,6 +185,7 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
         onChange={(v) => setForm((f) => ({ ...f, duration: v }))}
         placeholder="e.g., 5 days"
         label="Duration"
+        showCustomIndicator
       />
 
       {/* Add Button */}

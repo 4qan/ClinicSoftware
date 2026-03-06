@@ -8,6 +8,7 @@ interface ComboBoxProps {
   label?: string
   error?: string
   disabled?: boolean
+  showCustomIndicator?: boolean
 }
 
 export function ComboBox({
@@ -18,6 +19,7 @@ export function ComboBox({
   label,
   error,
   disabled = false,
+  showCustomIndicator = false,
 }: ComboBoxProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [highlightIndex, setHighlightIndex] = useState(-1)
@@ -28,6 +30,9 @@ export function ComboBox({
   const filtered = value
     ? options.filter(opt => opt.toLowerCase().includes(value.toLowerCase()))
     : options
+
+  const isCustomValue = showCustomIndicator && value.trim() !== '' &&
+    !options.some(opt => opt.toLowerCase() === value.toLowerCase())
 
   const close = useCallback(() => {
     setIsOpen(false)
@@ -113,7 +118,9 @@ export function ComboBox({
         className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent ${
           error
             ? 'border-red-500'
-            : 'border-gray-200'
+            : isCustomValue
+              ? 'border-amber-400'
+              : 'border-gray-200'
         } ${disabled ? 'bg-gray-100 text-gray-500' : 'bg-white'}`}
         style={{ minHeight: '44px' }}
         autoComplete="off"
@@ -142,6 +149,10 @@ export function ComboBox({
             </li>
           ))}
         </ul>
+      )}
+
+      {isCustomValue && (
+        <p className="mt-1 text-xs text-amber-600">Custom value</p>
       )}
 
       {error && (
