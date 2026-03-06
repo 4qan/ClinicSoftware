@@ -1,209 +1,235 @@
-# Architecture: Offline-First Clinic PWA
+# Architecture: v1.1 Urdu Prescription Printing & Backup/Restore
 
 Reference: `.planning/PROJECT.md` for requirements and constraints.
 
-## System Overview
+## 1. Translation Mapping Approach
+
+### Where to put English-to-Urdu mappings
+
+Single file: `src/constants/translations.ts`
+
+```ts
+// Record<EnglishString, UrduString> for each category
+export const DOSAGE_URDU: Record<string, string> = {
+  '1/2 tablet':  'آدھی گولی',
+  '1 tablet':    'ایک گولی',
+  '2 tablets':   'دو گولیاں',
+  // ... all DOSAGE_OPTIONS entries
+}
+
+export const FREQUENCY_URDU: Record<string, string> = {
+  'Once daily':   'دن میں ایک بار',
+  'Twice daily':  'دن میں دو بار',
+  // ... all FREQUENCY_OPTIONS entries
+}
+
+export const DURATION_URDU: Record<string, string> = {
+  '5 days':   'پانچ دن',
+  '7 days':   'سات دن',
+  // ... all DURATION_OPTIONS entries
+}
+
+// Single lookup: returns Urdu if mapping exists, English fallback otherwise
+export function toUrdu(
+  category: 'dosage' | 'frequency' | 'duration',
+  english: string
+): string
+```
+
+**Why a flat Record and not a more complex i18n system:** The translation scope is tiny (roughly 50 strings across 3 categories). These are not UI labels; they are clinical data values that appear only on printed output. A full i18n library (react-intl, i18next) would be overhead for zero benefit. A plain lookup map is debuggable, type-safe, and has no runtime dependencies.
+
+**Custom/freeform values:** The ComboBox allows typing custom values not in the predefined lists. Custom values will NOT have Urdu mappings and will print as-is (English). This is the correct behavior: if the doctor types a custom dosage, it's their string and should print verbatim.
+
+### Print-time Translation vs Store-time Translation
+
+**Decision: Print-time translation.**
+
+Rationale:
+
+| Factor | Print-time | Store-time |
+|--------|-----------|------------|
+| DB schema change | None | Would need `dosageUrdu`, `frequencyUrdu`, `durationUrdu` fields |
+| Migration risk | None | Must backfill all existing VisitMedication rows |
+| Data integrity | English remains the source of truth for clinical data | Two sources of truth, can drift |
+| Flexibility | Can change translations without touching stored data | Translation baked into records forever |
+| Performance | Map lookup at render time (negligible, <50 entries) | N/A |
+| Custom values | Fall through to English naturally | Must handle missing translations at write time |
+
+Store-time would require a Dexie schema migration (version 3), backfill logic, and ongoing synchronization between English and Urdu fields. For a feature that only affects printed output, this complexity is not justified.
+
+**Implementation:** `PrescriptionSlip.tsx` and `DispensarySlip.tsx` call `toUrdu()` at render time on `med.dosage`, `med.frequency`, `med.duration`. The DB stores English strings only, exactly as it does today.
+
+## 2. RTL/Mixed-Direction CSS Strategy
+
+### The problem
+
+The prescription table has LTR columns (Brand Name, Salt, Strength, Form) and RTL columns (Dosage, Frequency, Duration in Urdu). This is a mixed-direction table, not a fully RTL page.
+
+### Strategy: Column-level `dir` attributes, not page-level RTL
 
 ```
-+----------------------------------------------------------+
-|                      PWA Shell                           |
-|  (Service Worker + App Manifest + Cache Strategy)        |
-+----------------------------------------------------------+
-|                                                          |
-|  +------------+  +-------------+  +------------------+   |
-|  |   UI Layer |  | App Logic   |  | Data Layer       |   |
-|  |            |->| (Services)  |->|                  |   |
-|  | - Views    |  | - Patient   |  | - IndexedDB      |   |
-|  | - Forms    |  | - Encounter |  | - Sync Engine    |   |
-|  | - Print    |  | - Rx        |  | - Drug Catalog   |   |
-|  +------------+  | - Auth      |  +--------+---------+   |
-|                  | - Drug DB   |           |             |
-|                  +-------------+           |             |
-|                                            | (when online)|
-+----------------------------------------------------------+
-                                             |
-                                    +--------v---------+
-                                    |   Cloud Backend   |
-                                    |  (DB + Auth API)  |
-                                    +------------------+
+Table direction: LTR (unchanged)
+Columns 1-5 (#, Brand, Salt, Strength, Form): LTR, left-aligned
+Columns 6-8 (Dosage, Freq, Duration): RTL, right-aligned, Nastaliq font
 ```
 
-## Components
+Implementation:
+- The `<table>` stays `dir="ltr"` (default).
+- Urdu `<td>` cells get `dir="rtl"` and a CSS class for the Nastaliq font.
+- Column headers for Dosage/Freq/Duration get bilingual labels or Urdu-only labels on print (design decision to make during implementation).
 
-### 1. PWA Shell
+CSS additions to `index.css` inside `@media print`:
 
-**Responsibility**: Make the app installable, cacheable, and loadable offline.
+```css
+.urdu-cell {
+  direction: rtl;
+  unicode-bidi: embed;
+  font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+  text-align: right;
+}
+```
 
-- **Service Worker**: Caches app shell (HTML/CSS/JS) on install. Uses cache-first strategy for static assets, network-first for API calls.
-- **App Manifest**: Name, icons, display mode (`standalone`), theme color.
-- **Cache Strategy**: Pre-cache all app assets on first load. Update via SW lifecycle (install -> activate -> claim).
+**Why not flip the entire table to RTL:** Brand names, salt names, and strengths are English/Latin-script. Flipping the table would misalign those columns and create a confusing reading order. The doctor's patients read Urdu dosage instructions but drug names are always in English.
 
-**Boundary**: Owns network interception and asset caching only. Does not touch application data (that is IndexedDB's job).
+### Rx Notes RTL
 
-### 2. UI Layer
+The `rxNotes` field needs an English/Urdu toggle. When in Urdu mode:
+- The `<textarea>` gets `dir="rtl"` and the Nastaliq font.
+- The stored value includes a direction marker (either a prefix convention or a separate `rxNotesLang` field on Visit).
 
-**Responsibility**: Render screens, capture input, trigger prints.
+**Recommendation:** Add `rxNotesLang: 'en' | 'ur'` to the Visit interface. This is a minor schema addition (Dexie version 3) but avoids fragile string-prefix hacking. The print components read this field to set the correct `dir` on the notes block.
 
-**Views** (one per screen):
+## 3. Font Loading Strategy for Offline PWA
 
-| View | Purpose |
+### Font choice
+
+**Noto Nastaliq Urdu** (Google Fonts). Open source, good Nastaliq rendering, available as `.woff2`.
+
+### Loading approach
+
+1. Download `NotoNastaliqUrdu-Regular.woff2` and `NotoNastaliqUrdu-Bold.woff2` into `public/fonts/`.
+2. Declare `@font-face` in `index.css`:
+
+```css
+@font-face {
+  font-family: 'Noto Nastaliq Urdu';
+  src: url('/ClinicSoftware/fonts/NotoNastaliqUrdu-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+```
+
+3. The Vite PWA workbox config already globs `**/*.woff2`, so the font will be precached by the service worker automatically. No config change needed.
+
+**Why self-hosted, not Google Fonts CDN:** The app is offline-first on unreliable internet. CDN fonts would fail to load on first visit without internet. Self-hosting with SW precaching guarantees the font is available from the very first print.
+
+**File size concern:** Noto Nastaliq Urdu Regular is approximately 600KB as woff2. This is a one-time download, cached by the service worker. Acceptable for a clinic app that stays installed.
+
+## 4. Dexie Export/Import Architecture
+
+### Export (Backup)
+
+```ts
+// src/db/backup.ts
+
+interface BackupPayload {
+  version: number          // DB schema version (currently 2, will be 3)
+  exportedAt: string       // ISO timestamp
+  appVersion: string       // from package.json
+  tables: {
+    patients: Patient[]
+    visits: Visit[]
+    visitMedications: VisitMedication[]
+    drugs: Drug[]
+    settings: AppSettings[]
+    recentPatients: RecentPatient[]
+  }
+}
+
+async function exportDatabase(): Promise<BackupPayload>
+```
+
+Implementation:
+1. Read all rows from each Dexie table via `db.patients.toArray()`, etc.
+2. Build the `BackupPayload` object.
+3. `JSON.stringify` it.
+4. Trigger download via `URL.createObjectURL(new Blob([json]))` + temporary `<a>` element.
+5. Filename: `clinic-backup-YYYY-MM-DD-HHmm.json`
+
+### Import (Restore)
+
+```ts
+async function importDatabase(file: File): Promise<{ success: boolean; error?: string }>
+```
+
+Implementation:
+1. Parse JSON, validate shape and `version` field.
+2. Version compatibility check: if `payload.version > currentSchemaVersion`, reject with "Please update the app first."
+3. **Clear all existing data** (confirm with user first via dialog).
+4. Bulk-insert all tables inside a single Dexie transaction.
+5. If `payload.version < currentSchemaVersion`, run migration transforms on the data before inserting (e.g., add default values for new fields).
+
+### Version migration strategy
+
+The `version` field in the backup enables forward compatibility:
+- v2 backup imported into v3 app: the import function adds default `rxNotesLang: 'en'` to all Visit records before inserting.
+- v3 backup imported into v2 app: rejected ("Please update the app").
+
+### Auto-backup reminder
+
+Store `lastBackupDate` and `visitsSinceBackup` in the `settings` table. After each visit creation, increment the counter. When it crosses a threshold (configurable, default 20), show a non-blocking banner suggesting backup. Reset counter after export.
+
+## 5. Integration Points
+
+### Existing files that need modification
+
+| File | Change | Scope |
+|------|--------|-------|
+| `src/constants/clinical.ts` | No change. Translation map references these values but lives in its own file. | None |
+| `src/components/PrescriptionSlip.tsx` | Import `toUrdu()`, apply to dosage/freq/duration cells. Add `dir="rtl"` + `urdu-cell` class to those `<td>` elements. Add Nastaliq font to Urdu cells. Handle `rxNotesLang` for notes direction. | Medium |
+| `src/components/DispensarySlip.tsx` | Same Urdu cell treatment as PrescriptionSlip. Dispensary slip does NOT need Rx Notes. | Small |
+| `src/components/MedicationEntry.tsx` | No change for Urdu (translation is print-only). | None |
+| `src/db/index.ts` | Add Dexie version 3 schema with `rxNotesLang` on Visit interface. | Small |
+| `src/index.css` | Add `@font-face` for Noto Nastaliq Urdu. Add `.urdu-cell` print styles. | Small |
+| `vite.config.ts` | No change needed (woff2 already in glob pattern). | None |
+| `src/db/settings.ts` | Add `lastBackupDate` and `visitsSinceBackup` helpers. | Small |
+| `src/db/visits.ts` | Add `rxNotesLang` to `CreateVisitData` and `UpdateVisitData`. | Small |
+
+### New files to create
+
+| File | Purpose |
 |------|---------|
-| Login | PIN/password entry |
-| Dashboard | Quick actions: new patient, search, recent encounters |
-| Patient Registration | Form: name, age, gender, contact, CNIC (optional) |
-| Patient Search | Search by name, ID, or contact |
-| Patient Profile | Demographics + encounter history list |
-| Encounter Form | Complaint, examination, diagnosis fields |
-| Prescription Writer | Medication autocomplete, dosage/frequency/duration per line |
-| Print Preview (Rx) | Small-format prescription layout |
-| Print Preview (Dispensary) | Medication-only list for dispenser |
-| Settings | Manage custom medications in drug database |
+| `src/constants/translations.ts` | English-to-Urdu mapping records + `toUrdu()` function |
+| `src/db/backup.ts` | `exportDatabase()` and `importDatabase()` functions |
+| `src/components/BackupRestore.tsx` | UI for export button, import file picker, confirmation dialog |
+| `src/components/RxNotesInput.tsx` | Textarea with English/Urdu toggle (sets `dir`, font, tracks language) |
+| `public/fonts/NotoNastaliqUrdu-Regular.woff2` | Self-hosted font file |
+| `public/fonts/NotoNastaliqUrdu-Bold.woff2` | Self-hosted font file (for headers if needed) |
 
-**Boundary**: UI calls Service layer only. Never touches IndexedDB directly. Never makes network calls.
+### Components/pages that surface the new features
 
-### 3. App Logic (Service Layer)
+- **Visit form page** (wherever it lives): Replace plain `<textarea>` for rxNotes with `<RxNotesInput>`.
+- **Settings page**: Add `<BackupRestore>` section.
+- **App layout / header**: Auto-backup reminder banner (conditional render based on `visitsSinceBackup`).
 
-**Responsibility**: Business rules, validation, ID generation, data orchestration.
+## 6. Suggested Build Order
 
-| Service | Owns |
-|---------|------|
-| AuthService | PIN validation, session state |
-| PatientService | Patient CRUD, ID generation (2026-XXXX), search |
-| EncounterService | Create encounter linked to patient, timestamp |
-| PrescriptionService | Create Rx linked to encounter, medication line items |
-| DrugService | Query drug catalog, add/edit custom medications |
-| PrintService | Compose print-ready data for Rx slip and dispensary slip |
+Dependencies flow top-to-bottom. Each phase depends on the one above.
 
-**Boundary**: Services are the single entry point for all data mutations. They call the Data Layer and return results to the UI. They enforce validation (required fields, ID format, etc.).
+| Phase | What | Why first |
+|-------|------|-----------|
+| **1. Font + CSS** | Download Nastaliq woff2, add `@font-face`, add `.urdu-cell` print styles | Zero-risk foundation. Can verify font renders correctly in isolation. |
+| **2. Translation map** | Create `translations.ts` with all mappings + `toUrdu()` | Pure data + pure function. Independently testable. No component changes yet. |
+| **3. Prescription print Urdu** | Modify `PrescriptionSlip.tsx` to use `toUrdu()` on dosage/freq/duration cells with RTL styling | Core deliverable. Depends on phases 1-2. Can test by printing an existing visit. |
+| **4. Dispensary print Urdu** | Same treatment on `DispensarySlip.tsx` | Near-identical change to phase 3. |
+| **5. Rx Notes toggle** | Dexie v3 migration (add `rxNotesLang`), create `RxNotesInput.tsx`, wire into visit form, update print components | Requires schema migration. Separate from the medication Urdu work so that phases 3-4 can ship independently. |
+| **6. Backup/Restore** | Create `backup.ts`, `BackupRestore.tsx`, wire into Settings | Independent of Urdu work. Can be built in parallel with phases 3-5 if desired. |
+| **7. Auto-backup reminder** | Counter logic in settings, banner component | Depends on phase 6 (needs export to exist). Low priority, polish feature. |
 
-### 4. Data Layer
+### Parallelism opportunities
 
-**Responsibility**: Persistent storage, sync orchestration.
-
-#### 4a. IndexedDB Store
-
-The local source of truth. All reads and writes go here first.
-
-**Object Stores (tables)**:
-
-| Store | Key | Indexes | Notes |
-|-------|-----|---------|-------|
-| `patients` | `id` (2026-XXXX) | name, contact | Auto-increment sequence stored separately |
-| `encounters` | `uuid` | patientId, date | Linked to patient |
-| `prescriptions` | `uuid` | encounterId | Linked to encounter |
-| `prescription_items` | `uuid` | prescriptionId | One row per medication line |
-| `drugs` | `uuid` | saltName, brandName | Pre-loaded + custom entries |
-| `sync_queue` | `uuid` | timestamp, status | Outbound changes pending upload |
-| `meta` | `key` | -- | App config: last sync time, next patient sequence, etc. |
-
-**ID Strategy**: Patients get deterministic `YYYY-XXXX` IDs (from a local counter in `meta`). All other entities use client-generated UUIDs (`crypto.randomUUID()`), avoiding ID collisions during sync.
-
-#### 4b. Sync Engine
-
-**Strategy**: Store-and-forward with timestamp-based conflict detection.
-
-1. Every write to IndexedDB also enqueues a record in `sync_queue` (entity type, entity ID, operation, timestamp).
-2. When online, the Sync Engine processes the queue in order: POST/PUT/DELETE to cloud API.
-3. On success, queue entry marked `synced`. On failure, stays `pending` for retry.
-4. Periodic pull from cloud (on reconnect or interval) fetches changes since `lastSyncTimestamp`.
-5. **Conflict rule**: Last-write-wins by timestamp. Acceptable for single-doctor system (no concurrent editors). If multi-user is ever added, this must be revisited.
-
-```
-Write path:  UI -> Service -> IndexedDB + sync_queue
-Sync path:   sync_queue -> Cloud API (when online)
-Pull path:   Cloud API -> merge into IndexedDB (on reconnect)
-```
-
-**Boundary**: Sync Engine only talks to IndexedDB and the Cloud API. Services do not wait for sync; all operations resolve from local data.
-
-### 5. Cloud Backend
-
-**Responsibility**: Durable backup, potential cross-device access.
-
-Minimal surface:
-
-| Endpoint | Purpose |
-|----------|---------|
-| `POST /auth` | Validate credentials |
-| `GET /sync/pull?since={ts}` | Return records changed after timestamp |
-| `POST /sync/push` | Accept batch of changed records |
-
-**Tech options** (decision pending): Firebase/Firestore, Supabase, or a simple Node API + PostgreSQL. Firebase and Supabase both offer offline SDKs, but rolling a thin sync API keeps the client-side simpler and avoids vendor lock on sync logic.
-
-**Boundary**: Backend is a dumb pipe for storage and retrieval. No business logic lives here. The client is authoritative.
-
-### 6. Drug Catalog
-
-**Responsibility**: Provide medication autocomplete data.
-
-- Pre-loaded JSON seed (common medications: salt name, brand name, default dosage forms).
-- Stored in the `drugs` IndexedDB store on first app load.
-- Custom entries added via Settings, stored in the same store with a `custom: true` flag.
-- Autocomplete searches locally (no network needed).
-
-**Boundary**: Read-only from Prescription Writer's perspective. Write-only from Settings.
-
-## Data Flow
-
-### Typical Visit (Happy Path)
-
-```
-Doctor opens app (cached, loads instantly)
-  -> Login (PIN check against local store)
-  -> Dashboard
-  -> "New Patient" or "Search" existing
-  -> Patient Profile -> "New Encounter"
-  -> Fill encounter form (complaint, exam, diagnosis)
-  -> Add prescription lines (autocomplete from local drug DB)
-  -> Save -> writes to IndexedDB + sync_queue
-  -> Print Rx slip -> browser print dialog (small format CSS)
-  -> Print Dispensary slip -> browser print dialog
-  -> Back to Dashboard
-  -> (Background) Sync Engine pushes queue to cloud when online
-```
-
-### Offline -> Online Transition
-
-```
-App detects connectivity (navigator.onLine + fetch probe)
-  -> Sync Engine activates
-  -> Reads sync_queue (status: pending), ordered by timestamp
-  -> Pushes batch to cloud
-  -> Pulls changes since lastSyncTimestamp
-  -> Merges into IndexedDB (last-write-wins)
-  -> Updates lastSyncTimestamp in meta store
-```
-
-## Build Order
-
-Dependencies flow top-to-bottom. Each phase depends on the one above it.
-
-| Phase | Components | Rationale |
-|-------|-----------|-----------|
-| **1. Foundation** | PWA Shell + IndexedDB schema + Service Worker | Everything depends on the local data layer and offline capability. Build the skeleton first. |
-| **2. Core Data** | PatientService + EncounterService + Drug Catalog seed | Patient registration and encounter logging are the minimum viable loop. Drug catalog needed for phase 3. |
-| **3. Prescriptions** | PrescriptionService + medication autocomplete | Depends on encounter (phase 2) and drug data (phase 2). This is the core value: fast Rx writing. |
-| **4. Print** | PrintService + print CSS layouts (Rx slip + dispensary slip) | Depends on prescription data existing (phase 3). Two layouts: patient-facing Rx, dispenser-facing med list. |
-| **5. Auth + Settings** | AuthService (PIN login) + Drug DB management UI | Lower risk. Can be stubbed during phases 1-4. Settings lets doctor customize drug list. |
-| **6. Sync** | Sync Engine + Cloud Backend + conflict handling | Deliberately last. The app must work fully without this. Sync is a backup/durability layer, not a dependency. |
-
-### Key Dependency Chain
-
-```
-IndexedDB schema -> Services -> UI Views -> Print
-                                         -> Sync (independent of UI)
-Drug Catalog seed -> Autocomplete (in Prescription Writer)
-```
-
-## Tech Stack Candidates (Decision Pending)
-
-| Layer | Options | Notes |
-|-------|---------|-------|
-| UI Framework | Vanilla JS, Preact, SolidJS | Lightweight matters. React is overkill for this scope. |
-| IndexedDB Wrapper | Dexie.js | De facto standard. Cleaner API than raw IndexedDB. Supports versioned migrations. |
-| Service Worker | Workbox | Google's SW toolkit. Handles caching strategies, precaching, SW lifecycle. |
-| Cloud Backend | Supabase, Firebase, custom Node+Postgres | Pending. Supabase gives Postgres + auth + realtime for free tier. |
-| Print | CSS `@media print` + `@page` | No library needed. CSS handles small-format layout. |
+- Phases 1-4 (Urdu printing) and Phase 6 (backup/restore) are fully independent. They can be built by separate work streams or interleaved.
+- Phase 5 (Rx Notes) has a schema migration dependency. If backup/restore (phase 6) ships first, the backup format must account for the upcoming v3 schema. Recommendation: build phase 5 before or alongside phase 6 so the schema version is settled.
 
 ---
-*Produced: 2026-03-05. Feeds into roadmap phase structure.*
+*Produced: 2026-03-06. Feeds into v1.1 implementation plan.*

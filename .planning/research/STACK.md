@@ -1,195 +1,291 @@
-# Stack Recommendation: ClinicSoftware PWA
+# Stack Research: v1.1 Urdu Prescription Printing & Database Backup
 
-> Context: Single-doctor clinic prescription/patient management PWA. Offline-first (unreliable internet, hours-long outages). Runs on old Windows machines with Chrome/Edge. Non-tech-savvy user.
+> Scope: Only new additions for Urdu/Nastaliq font rendering, RTL print layout, and IndexedDB export/import. Existing stack (React 19, Vite, TailwindCSS v4, Dexie 4.3.x, VitePWA) is validated and unchanged.
 
 ## Decision Summary
 
-| Layer | Choice | Version | Confidence |
-|-------|--------|---------|------------|
-| Build Tool | Vite | 7.3.x | High |
-| UI Framework | React | 19.2.x | High |
-| Routing | React Router | 7.13.x | High |
-| Styling | Tailwind CSS | 4.2.x | High |
-| Components | shadcn/ui | latest | High |
-| Local DB | Dexie.js | 4.3.x | High |
-| Service Worker | vite-plugin-pwa (Workbox 7) | 0.21.x | High |
-| Cloud Sync Backend | Supabase (Cloud, Free/Pro) | - | Medium |
-| Printing | react-to-print + CSS @media print | 3.3.x | High |
-| Type Safety | TypeScript | 5.7.x | High |
+| Addition | Choice | Version | New Dependency? |
+|----------|--------|---------|-----------------|
+| Nastaliq Font | Noto Nastaliq Urdu (variable, self-hosted via fontsource) | 5.2.8 | Yes, `@fontsource-variable/noto-nastaliq-urdu` |
+| RTL Layout | CSS `direction` + `unicode-bidi` (no library) | N/A | No |
+| DB Export/Import | `dexie-export-import` | 4.1.4 | Yes |
+| Urdu Translation Map | Plain TypeScript object (dosage/frequency/duration to Urdu) | N/A | No |
+
+Total new runtime deps: 2. No new dev deps.
 
 ---
 
-## Layer-by-Layer Rationale
+## 1. Nastaliq Font for Urdu
 
-### 1. Build Tool: Vite 7.3.x
+### Font Options Evaluated
 
-**Why Vite:** Fastest dev server and build pipeline for SPAs. Native ESM, HMR under 50ms. First-class PWA plugin ecosystem (vite-plugin-pwa). No webpack complexity.
+| Font | Type | Size | License | Web/Print Quality | Verdict |
+|------|------|------|---------|-------------------|---------|
+| **Noto Nastaliq Urdu** (Google) | Variable (wght 400-700) | ~330KB woff2 | OFL 1.1 | Excellent in both. Google's Noto family, well-hinted, consistent cross-browser. Variable font = single file for all weights. | **Use this** |
+| Jameel Noori Nastaleeq | Static | ~5MB TTF (~1.5MB woff2) | Proprietary (Jameel Publications) | Best visual authenticity for Pakistani Urdu readers. The "standard" Nastaliq font in Pakistan. | Cannot use: proprietary license, massive file size, no npm package |
+| Nafees Nastaleeq | Static | ~1.2MB woff2 | Free (CRULP) | Decent rendering, but no variable weights, older hinting. Print quality is acceptable but inferior to Noto. | Backup option if Noto has issues |
+| Alvi Nastaleeq | Static | ~800KB woff2 | Free | Lighter weight but less polished kerning. Some ligature issues in Chrome. | Not recommended |
 
-**Why not Next.js:** This is a single-user offline-first SPA, not a content site. SSR/SSG adds complexity with zero benefit. Next.js PWA support requires workarounds; Vite's is native. The app never needs SEO, server components, or API routes baked into the framework.
+### Decision: Noto Nastaliq Urdu (Variable)
 
-**Why not CRA:** Dead project. Vite is its spiritual successor.
+**Why:** Open source (OFL), ~330KB woff2 (acceptable for offline PWA), actively maintained by Google, variable font (one file covers 400-700 weight range), excellent print rendering, available as an npm package via fontsource.
 
-### 2. UI Framework: React 19.2.x
+**Why not Jameel Noori:** Despite being the culturally preferred font in Pakistan, it's proprietary (no clear web license) and ~5x the file size. For a PWA that needs to cache everything in the service worker, 330KB beats 1.5MB+. If the doctor specifically requests Jameel, revisit, but start with Noto.
 
-**Why React:** Largest ecosystem, most library compatibility, easiest to hire for if needed later. React 19's `use()` hook and server actions are available but optional for this SPA use case.
+### Self-Hosting (Required for Offline-First)
 
-**Why not Vue/Svelte:** Both are viable. React wins on ecosystem breadth (printing libraries, component libraries, IndexedDB hooks). For a solo project this is a wash, but React's library availability tips the scale.
+CDN (Google Fonts) is **not an option**. The clinic has unreliable internet. The font must be bundled in the build output and cached by the service worker.
 
-### 3. Routing: React Router 7.13.x
+**Approach: fontsource npm package**
 
-**Why:** De facto standard for React SPAs. v7 merges Remix capabilities but works perfectly as a simple client-side router. For this app, we only need 4-5 routes (login, patient list, patient profile, new encounter, settings).
+```
+npm i @fontsource-variable/noto-nastaliq-urdu
+```
 
-**Why not TanStack Router:** Newer, type-safe, excellent. But React Router is battle-tested and this app's routing needs are trivial. No benefit to adopting the newer option here.
+Then in the app entry point or the CSS:
+```ts
+// In main.tsx or a dedicated fonts.ts
+import '@fontsource-variable/noto-nastaliq-urdu';
+```
 
-### 4. Styling: Tailwind CSS 4.2.x
+This copies the woff2 file into the build output. Vite handles the asset, and the existing Workbox config (`globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}']`) already caches `.woff2` files. No config changes needed.
 
-**Why:** Utility-first approach is fast for building simple, large-text UIs. No context switching between files. v4.2 has a new high-performance engine (5x faster builds). Perfect for the "big buttons, obvious navigation" requirement.
+**Usage in CSS:**
+```css
+.urdu-text {
+  font-family: 'Noto Nastaliq Urdu Variable', serif;
+}
+```
 
-**Why not plain CSS/CSS Modules:** Tailwind is faster to iterate on for a single developer. The utility approach reduces decision fatigue for spacing, typography, and responsive design.
+The variable font variant uses the family name `Noto Nastaliq Urdu Variable`. If using the static package (`@fontsource/noto-nastaliq-urdu`), the family name is `Noto Nastaliq Urdu`.
 
-### 5. Component Library: shadcn/ui
-
-**Why:** Copy-paste model means zero runtime dependency, full control over components. Built on Radix UI primitives (accessibility baked in). Styled with Tailwind, so it integrates seamlessly. Large buttons, dialogs, comboboxes (for medication autocomplete) are all available out of the box.
-
-**Why not MUI/Ant Design:** Both are heavyweight runtime dependencies. MUI's theming system is overkill. shadcn gives us exactly the components we need with no bundle bloat. The doctor's old Windows machine will thank us.
-
-### 6. Local Database: Dexie.js 4.3.x
-
-**Why Dexie over raw IndexedDB:** IndexedDB's native API is callback-based and painful. Dexie wraps it with a clean promise-based API, supports compound indexes, bulk operations, and has `liveQuery()` for reactive UI updates (critical: when a prescription is saved, the patient profile updates automatically).
-
-**Why Dexie over idb:** `idb` is a thin wrapper (~1KB). Dexie provides querying, schema versioning, migration support, and reactive hooks via `dexie-react-hooks`. For a data-heavy app (patients, encounters, prescriptions, medications), the richer abstraction pays for itself.
-
-**Why not SQLite (wa-sqlite/sql.js):** SQLite-in-browser via WASM is maturing but adds ~1MB+ to the bundle and has more complex setup. Dexie's IndexedDB approach is lighter, better supported across browsers, and sufficient for this data model. SQLite would be worth considering if we needed complex JOINs or full-text search, but our queries are simple (lookup by patient ID, list encounters by date).
-
-**Why not Dexie Cloud:** Dexie Cloud is a commercial SaaS that adds sync + auth. It's convenient but creates vendor lock-in for a critical feature (data sync). For this project, we control sync explicitly via Supabase, keeping the architecture transparent and the cost predictable.
-
-**Companion package:** `dexie-react-hooks` for `useLiveQuery()` in components.
-
-### 7. Service Worker: vite-plugin-pwa + Workbox 7
-
-**Why:** `vite-plugin-pwa` is zero-config PWA integration for Vite. Under the hood it uses Workbox 7 (Google's service worker toolkit, used by 54% of mobile sites). Handles:
-- App shell caching (the HTML/JS/CSS)
-- Offline fallback
-- Cache-first strategies for static assets
-- Manifest generation for PWA installability
-
-**Why not Serwist:** Serwist (v9.2.x) is a solid alternative, but `vite-plugin-pwa` has tighter Vite integration, more documentation, and a larger community. For a straightforward caching strategy, it's the safer pick.
-
-**Caching strategy:**
-- Static assets: CacheFirst (JS, CSS, images, fonts)
-- App shell: StaleWhileRevalidate
-- API calls: NetworkFirst with IndexedDB fallback (handled by our sync layer, not Workbox)
-
-### 8. Cloud Sync Backend: Supabase (Cloud)
-
-**Why Supabase:** PostgreSQL-based, open source, generous free tier (50K MAU, 500MB DB). REST API that works with simple `fetch()`. Row Level Security for data isolation if multi-tenancy ever matters. Pro plan is $25/month if the free tier is outgrown.
-
-**Why Cloud, not self-hosted:** Self-hosting requires DevOps maintenance. For a single-doctor clinic, the managed service is the right tradeoff. Free tier is likely sufficient indefinitely for one user's patient data.
-
-**Why not Firebase/Firestore:** Firebase has better built-in offline sync, but: (a) Firestore's data model (document/collection) is awkward for relational patient data, (b) vendor lock-in to Google, (c) pricing is per-read which can surprise you. Supabase gives us a real PostgreSQL database that we own and can export.
-
-**Why not Dexie Cloud:** Commercial pricing, less control over the backend, and we'd still need a separate auth solution. Supabase gives us DB + Auth + Storage in one.
-
-**Sync architecture (custom, simple):**
-1. All writes go to Dexie (IndexedDB) first. UI is always local-first.
-2. A sync queue records every mutation (create/update) with a timestamp.
-3. When online, a background process pushes queued changes to Supabase via REST.
-4. Conflict resolution: last-write-wins by timestamp (acceptable for single-user).
-5. On app startup (when online), pull latest from Supabase to catch any edge cases.
-
-### 9. Printing: react-to-print 3.3.x + CSS @media print
-
-**Why react-to-print:** Renders a React component to the browser's native print dialog. No drivers, no electron, no thermal printer SDK. The doctor clicks "Print", the browser print dialog opens with the prescription slip pre-rendered. Works on any printer connected to the Windows machine.
-
-**Why CSS @media print:** Controls what shows on the printed page (hide nav, hide buttons, set page size). Combined with custom CSS for small-format paper, this handles the prescription slip and dispensary slip layouts.
-
-**Why not react-thermal-printer:** The project requirements specify a small-format slip, not necessarily a thermal/POS printer. `react-to-print` with CSS page-size rules works with any printer type. If the clinic does use a thermal printer, the browser print dialog still works, just needs the correct paper size configured once in Windows printer settings.
-
-**Approach:**
-- Two print templates as React components: `PrescriptionSlip` and `DispensarySlip`
-- CSS `@page { size: 80mm 200mm; }` (adjust to actual paper size)
-- `react-to-print` triggers `window.print()` scoped to the template component
-
-### 10. TypeScript 5.7.x
-
-**Why:** Catches bugs at write-time, not runtime. Critical for a medical app where a typo in a field name could mean lost patient data. Dexie has excellent TypeScript support for typed table schemas.
+**Why variable over static:** Single file (~330KB) covers all weights vs. separate files per weight. Fewer network requests, simpler caching, smaller total size when using multiple weights.
 
 ---
 
-## What NOT to Use
+## 2. RTL Layout for Urdu in Print
 
-| Technology | Why Not |
-|------------|---------|
-| **Next.js / Remix (full-stack)** | SSR/SSG adds complexity with no benefit for a single-user offline SPA. No SEO needed. |
-| **Electron** | Requires packaging, distribution, updates. A PWA eliminates all of this. |
-| **Redux / Zustand** | Overkill for single-user state. React's built-in `useState`/`useContext` + Dexie's `useLiveQuery` covers all state needs. |
-| **GraphQL** | Two entities (patients, encounters) with simple queries. REST is simpler and sufficient. |
-| **MongoDB Atlas / DynamoDB** | Cloud-only, no offline story. Supabase + Dexie handles both layers. |
-| **Capacitor / Ionic** | Native wrapper not needed. PWA installability via Chrome/Edge is sufficient for a desktop-first app. |
-| **Jest** | Vitest is Vite-native, faster, and API-compatible. Use Vitest for unit/integration tests. |
-| **Prettier** | Biome is faster (Rust-based) and handles both formatting and linting. Single tool instead of Prettier + ESLint. |
+### The Problem
+
+The prescription slip is LTR English. Urdu text (dosage instructions, frequency, duration, rx notes) needs to render RTL within this LTR document. This is mixed-directionality, not a full RTL page.
+
+### CSS Properties Needed
+
+No library required. Three CSS properties handle this:
+
+1. **`direction: rtl`** on Urdu text containers. Sets the base text direction.
+2. **`unicode-bidi: isolate`** on inline Urdu spans within LTR context. Prevents the Urdu text from disrupting surrounding LTR flow. `isolate` is the modern correct value (not `embed` or `bidi-override`).
+3. **`text-align: right`** on block-level Urdu containers (for rx notes paragraphs).
+
+### Implementation Pattern
+
+For the medication table (dosage/frequency/duration cells with Urdu text):
+```css
+/* Applied to individual cells or spans containing Urdu */
+.urdu-text {
+  font-family: 'Noto Nastaliq Urdu Variable', serif;
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+```
+
+For the Rx Notes block (full RTL paragraph):
+```css
+.urdu-block {
+  font-family: 'Noto Nastaliq Urdu Variable', serif;
+  direction: rtl;
+  text-align: right;
+  line-height: 2; /* Nastaliq scripts need extra line-height for descenders/ascenders */
+}
+```
+
+### Print-Specific Considerations
+
+- **`@media print` inherits these styles.** No special print-only RTL rules needed. The same `direction: rtl` that works on screen works in print.
+- **Line height:** Nastaliq script has tall vertical strokes (ascenders on letters like alif, lam). Standard `line-height: 1.5` causes overlapping. Use `line-height: 1.8` to `2.0` for Urdu text blocks.
+- **Font size:** Nastaliq at the same pt size as Latin text appears visually smaller. May need to bump Urdu text 1-2pt larger for readability. Test on actual A5 print.
+- **Table cells:** The table structure stays LTR. Only the *content* of dosage/frequency/duration cells switches to RTL via `unicode-bidi: isolate`. The cell itself and column ordering remain LTR.
+
+### What NOT to Do
+
+- Do NOT set `dir="rtl"` on the `<html>` or `<body>` element. The app is English-primary. Only Urdu text fragments are RTL.
+- Do NOT use a CSS-in-JS RTL transformation library (e.g., `rtlcss`, `stylis-plugin-rtl`). Those are for full RTL apps. We only need targeted RTL on specific text spans.
 
 ---
 
-## Dev Tooling
+## 3. IndexedDB Full Database Export/Import
 
-| Tool | Purpose | Version |
-|------|---------|---------|
-| Vitest | Unit + integration tests | 3.x |
-| Biome | Linting + formatting | 1.9.x |
-| Playwright | E2E tests (if needed later) | 1.50.x |
+### Option A: `dexie-export-import` (Recommended)
+
+```
+npm i dexie-export-import
+```
+
+- **Version:** 4.1.4
+- **Peer dep:** `dexie ^4.0.1` (we have 4.3.x, compatible)
+- **Size:** ~1MB unpacked (tree-shakes well, minimal runtime impact)
+- **License:** Apache 2.0
+
+**What it does:**
+- `exportDB(db)` returns a `Blob` containing the full database (all tables, all rows, schema metadata) as a structured binary format (not raw JSON, but a Blob that can be saved as a file).
+- `importDB(blob)` restores from that Blob, recreating the database with all tables and data.
+- Handles schema versioning: the export includes version info, so imports work even if the schema has evolved.
+- Supports progress callbacks for large databases.
+- Streaming export (doesn't load entire DB into memory at once).
+
+**Usage pattern:**
+```ts
+import { exportDB, importDB } from 'dexie-export-import';
+import { db } from '@/db';
+
+// Export
+const blob = await exportDB(db);
+// Trigger download via <a> tag or File System Access API
+
+// Import
+await db.delete(); // Clear existing
+const newDb = await importDB(blob);
+```
+
+**Why use it over manual:** Handles edge cases (schema versions, binary data, large datasets via streaming, table metadata). Writing a manual `db.table.toArray()` loop for each table works for simple cases but doesn't preserve schema info and can OOM on large datasets.
+
+### Option B: Manual JSON Export (Simpler, Less Robust)
+
+No additional dependency. Iterate all tables, serialize to JSON.
+
+```ts
+// Export
+const backup = {};
+for (const table of db.tables) {
+  backup[table.name] = await table.toArray();
+}
+const json = JSON.stringify(backup);
+// Save as .json file
+
+// Import
+const data = JSON.parse(jsonString);
+await db.transaction('rw', db.tables, async () => {
+  for (const table of db.tables) {
+    await table.clear();
+    await table.bulkAdd(data[table.name]);
+  }
+});
+```
+
+**Tradeoffs vs. dexie-export-import:**
+- Pro: Zero dependency. Full control over format (plain JSON is human-readable, debuggable).
+- Con: No schema metadata preservation. No streaming (loads full DB into memory). Must manually handle table order (foreign key dependencies). No progress callbacks.
+
+### Decision: Use `dexie-export-import`
+
+For a medical records database, robustness matters more than saving one dependency. The package handles schema evolution, streaming, and edge cases that a manual approach would need to reinvent.
+
+**File format note:** The exported Blob is not plain JSON. If we want human-readable backups (for debugging or manual inspection), we could add a secondary "export as JSON" option using the manual approach. But the primary backup/restore should use `dexie-export-import` for reliability.
+
+**File download approach:** Use the standard browser download pattern:
+```ts
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = `clinic-backup-${new Date().toISOString().slice(0,10)}.db`;
+a.click();
+URL.revokeObjectURL(url);
+```
+
+File import: `<input type="file">` to read the Blob back.
 
 ---
 
-## Package Install Command (Starter)
+## 4. Urdu Translation Layer
+
+No npm package needed. This is a static TypeScript map of English dosage/frequency/duration values to their Urdu equivalents.
+
+**Structure:**
+```ts
+// src/data/urdu-translations.ts
+export const urduDosage: Record<string, string> = {
+  '1 tablet': '۱ گولی',
+  '2 tablets': '۲ گولیاں',
+  '1 teaspoon': '۱ چائے کا چمچ',
+  // ...
+};
+
+export const urduFrequency: Record<string, string> = {
+  'Once daily': 'دن میں ایک بار',
+  'Twice daily': 'دن میں دو بار',
+  'Three times daily': 'دن میں تین بار',
+  // ...
+};
+
+export const urduDuration: Record<string, string> = {
+  '3 days': '۳ دن',
+  '5 days': '۵ دن',
+  '7 days': '۷ دن',
+  '1 week': 'ایک ہفتہ',
+  // ...
+};
+```
+
+This approach works because dosage/frequency/duration are selected from predefined dropdown options, not free-text. The Urdu map mirrors those exact options.
+
+---
+
+## 5. What NOT to Add
+
+| Technology | Why It Seems Relevant | Why NOT to Add It |
+|------------|----------------------|-------------------|
+| `rtlcss` / `stylis-plugin-rtl` | RTL CSS transformation | Designed for full-page RTL apps. We only need targeted RTL on Urdu text spans. CSS `direction` + `unicode-bidi` is sufficient. |
+| `react-i18next` / `i18next` | Internationalization | Overkill. We're not translating the UI into Urdu. Only printed prescription fields get Urdu text. A simple TS map is enough. |
+| `intl-messageformat` | ICU message formatting | Same reason. No dynamic pluralization or complex message formatting needed. Static map covers it. |
+| Google Fonts CDN | Font delivery | Breaks offline-first. Self-hosted via fontsource is the correct approach. |
+| `@fontsource/noto-nastaliq-urdu` (static) | Alternative fontsource package | The variable font package (`@fontsource-variable/...`) is smaller for multi-weight usage and more flexible. Use variable. |
+| `react-to-print` | Print triggering | Already evaluated in v1.0 STACK but not used. The app uses `window.print()` directly with CSS `@media print`. No reason to add it now. |
+| `file-saver` | File download helper | The 4-line `URL.createObjectURL` + anchor click pattern does the same thing. No need for a dependency. |
+| `jszip` | Compress backup files | Backup files for a single-doctor clinic will be small (likely <5MB even with years of data). Compression adds complexity without meaningful benefit. |
+| Dexie Cloud | Managed sync service | Out of scope for v1.1. Backup/restore is local file-based, not cloud sync. |
+
+---
+
+## 6. New Dependencies Summary
+
+### Runtime (production)
 
 ```bash
-# Scaffold
-npm create vite@latest clinic-software -- --template react-ts
-
-# Core
-npm i react-router dexie dexie-react-hooks react-to-print
-
-# Styling
-npx shadcn@latest init
-
-# PWA
-npm i -D vite-plugin-pwa
-
-# Cloud sync (when ready)
-npm i @supabase/supabase-js
-
-# Dev tooling
-npm i -D vitest @biomejs/biome
+npm i @fontsource-variable/noto-nastaliq-urdu dexie-export-import
 ```
+
+| Package | Version | Size Impact | Purpose |
+|---------|---------|-------------|---------|
+| `@fontsource-variable/noto-nastaliq-urdu` | 5.2.8 | ~330KB (woff2 font file) | Self-hosted Nastaliq font for Urdu rendering in web and print |
+| `dexie-export-import` | 4.1.4 | Minimal JS (peer dep on existing dexie) | Full database export/import with schema preservation |
+
+### Dev (none)
+
+No new dev dependencies required.
+
+### Config Changes
+
+- **vite.config.ts:** No changes needed. Workbox `globPatterns` already includes `woff2`.
+- **tailwind:** No changes. Urdu styles are applied via inline styles or a small CSS class, not Tailwind utilities.
 
 ---
 
-## Architecture Diagram (Conceptual)
+## 7. Integration Notes
 
-```
-[React UI] --> reads/writes --> [Dexie.js (IndexedDB)]
-                                       |
-                                  [Sync Queue]
-                                       |
-                              (when online) |
-                                       v
-                                  [Supabase REST API]
-                                       |
-                                  [PostgreSQL]
+### Font Loading and Print
 
-[Service Worker (Workbox)] --> caches --> [App Shell + Static Assets]
-[react-to-print] --> triggers --> [Browser Print Dialog] --> [Printer]
-```
+The font import (`import '@fontsource-variable/noto-nastaliq-urdu'`) injects a `@font-face` declaration. This works in both screen and print contexts. No separate print font loading needed.
 
----
+However: Chrome's print preview may flash if the font isn't fully loaded. Since this is a PWA with the font cached by the service worker, it will be loaded from cache on subsequent visits. First install may have a brief FOUT (flash of unstyled text) in print preview.
 
-## Open Questions
+### Dexie Version Compatibility
 
-1. **Paper size:** Exact dimensions of the prescription slip paper needed to configure `@page` CSS. Need to measure the physical paper.
-2. **Drug database source:** Where does the initial medication list come from? Manual entry, or is there a Pakistani drug formulary dataset available?
-3. **Backup frequency:** How often should cloud sync attempt to push? Every write, or batched every N minutes? Recommendation: every write when online, queued when offline.
+`dexie-export-import@4.1.4` declares `dexie ^4.0.1` as a peer dependency. Our `dexie@^4.3.0` satisfies this. The import is an addon that attaches to the existing Dexie instance.
+
+### Existing Print Styles
+
+Current `@media print` in `src/index.css` and `PrescriptionSlip.tsx` use `fontFamily: "'Segoe UI', Arial, sans-serif"`. Urdu text sections will need a font-family override to `'Noto Nastaliq Urdu Variable', serif`. This is a per-element override, not a global change. English text continues using the existing system font stack.
 
 ---
 
-*Research date: 2026-03-05. Versions verified via npm and official release pages.*
+*Research date: 2026-03-06. Versions verified via `npm view`. Font size based on fontsource package contents.*

@@ -1,102 +1,125 @@
-# Research Summary: Clinic Prescription PWA
+# v1.1 Research Summary: Urdu Prescription Printing & Database Backup
 
-Single-doctor, offline-first PWA for patient management and prescription writing. Unreliable internet, old Windows hardware, non-tech-savvy user.
-
----
-
-## 1. Recommended Stack
-
-| Layer | Choice | Why |
-|-------|--------|-----|
-| **Build** | Vite 7.3 + TypeScript 5.7 | Fastest SPA toolchain, native PWA plugin support. No SSR needed. |
-| **UI** | React 19.2 + Tailwind 4.2 + shadcn/ui | Ecosystem breadth wins. shadcn gives full component control with zero runtime cost. |
-| **Routing** | React Router 7.13 | Trivial routing needs (5 routes). Battle-tested. |
-| **Local DB** | Dexie.js 4.3 (IndexedDB) | Promise-based API, schema migrations, reactive queries via `useLiveQuery()`. |
-| **Offline/PWA** | vite-plugin-pwa + Workbox 7 | Zero-config PWA. Cache-first static assets, stale-while-revalidate app shell. |
-| **Cloud Sync** | Supabase (managed) | PostgreSQL, free tier sufficient for single user. REST API for simple push/pull sync. |
-| **Printing** | react-to-print + CSS `@media print` | Browser-native print dialog. No drivers or Electron needed. |
-| **Dev Tools** | Vitest, Biome, Playwright | Vite-native testing, Rust-based lint+format, E2E if needed. |
-
-No Redux/Zustand (React state + Dexie covers it), no Next.js (no SSR benefit), no Electron (PWA is sufficient).
+Synthesis of STACK.md, FEATURES.md, ARCHITECTURE.md, and PITFALLS.md. Consumed by the requirements and roadmap phases.
 
 ---
 
-## 2. Table Stakes Features (v1)
+## 1. Stack Additions
 
-**Must ship or the doctor won't use it:**
+Two new runtime dependencies. No new dev deps. No config changes needed.
 
-1. **Patient registration** with auto-generated unique ID (YYYY-XXXX)
-2. **Patient search** by name, ID, or contact (<1s on local data)
-3. **Patient profile** with chronological encounter history
-4. **Encounter logging** (complaint, examination, diagnosis, auto-timestamped)
-5. **Prescription writing** with medication autocomplete from local drug DB
-6. **Prescription printing** on small-format paper (non-A4 slip)
-7. **Dispensary slip** (medication-only print for the dispenser)
-8. **Local drug database** pre-seeded with common medications
-9. **100% offline operation** (non-negotiable given clinic internet)
-10. **Simple PIN/password login**
-11. **Audit trail** (immutable timestamps on all records)
-12. **PWA installability** (install from browser, no .exe)
-
-**Key differentiators for v1.x:**
-- Sub-2-minute visit workflow (find patient, log encounter, write Rx, print)
-- Cloud sync as background backup when online
-- Prescription templates / favorites for common diagnoses
-- Repeat prescription from history ("prescribe same as last visit")
-
-**Deliberately not building:** appointments, billing, lab integration, multi-doctor, patient portal, AI decision support.
-
----
-
-## 3. Architecture Overview
-
-```
-[React UI] -> [Service Layer] -> [Dexie/IndexedDB] -> [Sync Queue] -> [Supabase]
-[Service Worker] -> caches app shell + static assets
-[react-to-print] -> browser print dialog -> printer
+```bash
+npm i @fontsource-variable/noto-nastaliq-urdu dexie-export-import
 ```
 
-**Layers:**
-- **UI Layer**: 10 views (login, dashboard, patient CRUD, encounter form, Rx writer, print previews, settings). Never touches IndexedDB directly.
-- **Service Layer**: Business logic, validation, ID generation. Single entry point for all data mutations.
-- **Data Layer**: IndexedDB as source of truth. 7 stores: patients, encounters, prescriptions, prescription_items, drugs, sync_queue, meta.
-- **Sync Engine**: Store-and-forward. All writes local-first, queued for cloud push. Last-write-wins conflict resolution (acceptable for single user). Prescriptions are append-only/immutable.
-- **Cloud Backend**: Dumb pipe. Three endpoints: auth, sync/pull, sync/push.
+| Package | Version | Size | Purpose |
+|---------|---------|------|---------|
+| `@fontsource-variable/noto-nastaliq-urdu` | 5.2.8 | ~330KB woff2 | Self-hosted Nastaliq font for Urdu print rendering |
+| `dexie-export-import` | 4.1.4 | Minimal (peers on existing Dexie 4.3.x) | Full DB export/import with schema preservation, streaming |
 
-**Build Order:**
-1. Foundation: PWA shell, IndexedDB schema, service worker, login
-2. Core data: Patient + encounter services, drug catalog seed, audit trail
-3. Prescriptions: Rx writing + medication autocomplete
-4. Print: Rx slip + dispensary slip layouts
-5. Polish: Speed UX, custom medication management
-6. Sync: Cloud backend, sync engine, conflict handling (app must work fully without this)
+Workbox `globPatterns` already includes `woff2`, so the font is auto-precached by the service worker.
 
 ---
 
-## 4. Critical Pitfalls
+## 2. Feature Scope
 
-1. **IndexedDB eviction**: Browsers can silently purge data. Must call `navigator.storage.persist()` at startup, monitor quota, and implement local backup export before cloud sync exists. Phase 1, non-negotiable.
+### Table Stakes
 
-2. **Patient ID collisions**: Local auto-increment (YYYY-XXXX) can collide on re-install or multi-device. Use UUIDs as internal primary keys, treat YYYY-XXXX as a display ID. Store sequence counter redundantly (IndexedDB + localStorage). Architectural decision, expensive to change later.
+| ID | Feature | Track |
+|----|---------|-------|
+| U1 | Urdu translation map (dosage, frequency, duration): ~50 static entries | Urdu |
+| U2 | Urdu text on printed prescription (dosage/freq/duration columns) | Urdu |
+| U3 | Nastaliq font loaded and cached for print | Urdu |
+| U4 | RTL handling in print layout (per-cell, not page-level) | Urdu |
+| U5 | Rx Notes English/Urdu toggle (with `rxNotesLang` schema field) | Urdu |
+| U6 | Rx Notes print in correct direction/font | Urdu |
+| B1 | Full database export to file | Backup |
+| B2 | Full database restore from file | Backup |
+| B3 | Backup reminder after N visits (default 20) | Backup |
+| B4 | Backup metadata (date, app version, schema version, record counts) | Backup |
 
-3. **Print layout fragility**: CSS `@media print` behaves differently across browsers. Use explicit `@page { size: [mm]; margin: 0; }`, never percentages. Must test on actual printer + paper, not just screen preview.
+### Differentiators (nice-to-have)
 
-4. **Service worker update trap**: Aggressive caching can strand the doctor on a stale version. Show "update available" banner, never force-reload mid-session. Include visible version number in settings.
+| ID | Feature | Notes |
+|----|---------|-------|
+| U7 | Bilingual layout (English + Urdu per medication row) | Professional appearance, aids pharmacist |
+| U8 | Urdu clinic header (doctor/clinic name in Urdu) | Builds patient trust |
+| U9 | Urdu column headers on print | Small effort, big perception shift |
+| B5 | Selective restore (choose which tables) | Useful for migrating drug lists to new devices |
 
-5. **Over-engineering**: Single doctor, one device. No CRDTs, no microservices, no real-time sync. Simple REST push/pull with retry. Measure success by "time to complete a prescription."
+### Anti-Features (do NOT build)
+
+- Full Urdu UI (menus, buttons, navigation). Doctor works in English.
+- Urdu keyboard/IME. OS handles this.
+- Custom Urdu translations per doctor. Predefined options cover 95%.
+- Urdu drug name search. Drug names are always English.
+- Multiple font picker. One Nastaliq font is enough.
+- Auto-scheduled backups. PWA can't write to filesystem without user action.
+- Cloud backup. Out of scope for v1.1.
+- Incremental/differential backups. Full export is fast for this data volume.
+- Merge-mode restore. Full replace with auto-backup-first is sufficient for v1.1.
 
 ---
 
-## 5. Open Questions
+## 3. Architecture Decisions
 
-| # | Question | Impact | Needs Answer Before |
-|---|----------|--------|-------------------|
-| 1 | **Exact paper dimensions** for prescription slips | Print CSS `@page` config | Phase 4 (Print) |
-| 2 | **Drug database source**: manual entry or existing Pakistani formulary dataset? | Seed data effort | Phase 2 (Core data) |
-| 3 | **Sync frequency**: push every write or batch on interval? | Sync engine design | Phase 6 (Sync) |
-| 4 | **Multi-device usage**: will the doctor use phone + desktop? | Conflict resolution complexity | Phase 1 (Data model) |
-| 5 | **Backup strategy before cloud sync**: auto-export to file, or manual? | Data safety gap in phases 1-5 | Phase 1 |
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| **Translation approach** | Print-time lookup via `toUrdu()` | No schema migration for Urdu fields. English stays source of truth. Custom freeform values fall through to English. |
+| **Translation storage** | `src/constants/translations.ts`, flat `Record<string, string>` maps | ~50 static entries. i18n library is overkill. |
+| **RTL strategy** | Per-cell `dir="rtl"` + `unicode-bidi: isolate` on Urdu content only | Page stays LTR. Table structure unchanged. LTR columns grouped left, RTL columns grouped right. |
+| **Font delivery** | fontsource variable font, imported in app entry point | Self-hosted for offline. Variable = single file for all weights. SW precaches automatically. |
+| **Rx Notes language** | New `rxNotesLang: 'en' \| 'ur'` field on Visit (Dexie schema v3) | Avoids fragile string-prefix hacking. Print components read this for `dir` and font. |
+| **Backup format** | `dexie-export-import` Blob (primary) | Handles schema evolution, streaming, binary data. More robust than manual JSON for medical records. |
+| **Backup download** | `URL.createObjectURL` + anchor click | No `file-saver` dependency needed. |
+| **Import safety** | Validate-then-replace inside Dexie transaction. Auto-export current DB before import. | All-or-nothing. Doctor can't accidentally lose data. |
 
 ---
 
-*Synthesized from: STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md. Research date: 2026-03-05.*
+## 4. Build Order
+
+Urdu (phases 1-5) and Backup (phase 6) are independent tracks. Constraint: phase 5 (Rx Notes schema v3) should settle before phase 6 so the backup format accounts for the new schema.
+
+| Phase | What | Depends On |
+|-------|------|------------|
+| **1. Font + CSS** | Install fontsource package, add `.urdu-cell` print styles, verify SW caches font | Nothing |
+| **2. Translation map** | Create `translations.ts` with all mappings + `toUrdu()` | Nothing |
+| **3. Prescription print Urdu** | Modify `PrescriptionSlip.tsx`: apply `toUrdu()`, add RTL styling to dosage/freq/duration cells | Phases 1, 2 |
+| **4. Dispensary print Urdu** | Same treatment on `DispensarySlip.tsx` | Phase 3 |
+| **5. Rx Notes toggle** | Dexie v3 migration (`rxNotesLang`), `RxNotesInput.tsx`, wire into visit form + print | Phases 1, 2 |
+| **6. Backup/Restore** | `backup.ts`, `BackupRestore.tsx`, wire into Settings, validation layer | Phase 5 (for schema version) |
+| **7. Auto-backup reminder** | Counter logic in settings, non-blocking banner | Phase 6 |
+
+---
+
+## 5. Critical Pitfalls
+
+Top 5 that must be addressed.
+
+| # | Pitfall | Phase | Mitigation |
+|---|---------|-------|------------|
+| 1 | **Mixed LTR/RTL breaking table layout**: dosage numbers jump sides, punctuation reverses | Phase 3 | Per-cell `dir` attributes. LTR columns left, RTL right. `unicode-bidi: isolate`. Wrap each direction in explicit `<span dir>`. |
+| 2 | **Nastaliq line-height clipping**: Urdu text cut off in table rows | Phase 1 | `line-height: 2.0-2.4` for Nastaliq containers. `overflow: visible` on Urdu cells. Minimum `py-2` padding. Test with worst-case diacritics. |
+| 3 | **Import overwrites data without safety net**: doctor restores old backup, loses months of records | Phase 6 | Auto-export current DB before import. Confirmation dialog with record counts. All-or-nothing Dexie transaction. |
+| 4 | **Schema version mismatch on import**: silent data loss from incompatible backup | Phase 6 | Version in export metadata. Older backup: migration transforms. Newer backup: reject with "update app" message. Validate before deleting. |
+| 5 | **RTL differences in print vs screen**: looks correct on screen, broken on paper | Phase 3 | Do NOT rely on Chrome DevTools print emulation. Test with actual Ctrl+P. Replace `text-left` with `text-start`. Match `!important` specificity. |
+
+---
+
+## 6. What NOT to Do
+
+| Anti-Pattern | Why It Fails |
+|-------------|-------------|
+| Set `dir="rtl"` on `<html>` or the whole prescription slip | Breaks all English content layout. RTL is per-element only. |
+| Use `rtlcss` / `stylis-plugin-rtl` or any RTL CSS library | Designed for full RTL apps. We need targeted RTL on specific spans. |
+| Use `react-i18next` or any i18n framework | 50 static strings don't justify a framework. Plain TS map. |
+| Load font from Google Fonts CDN | Breaks offline-first. Must be self-hosted and SW-cached. |
+| Store Urdu translations in the database | Creates two sources of truth. Translate at print-time from English source. |
+| Delete DB before validating import file | Partial failure = total data loss. Validate first, replace in transaction. |
+| Set `font-feature-settings: "liga" 0` on Urdu text | Disables Nastaliq ligatures, rendering broken isolated characters. |
+| Use `font-display: optional` for the Nastaliq font | Font may not load for print. Use `font-display: swap`. |
+| Strip Unicode control characters (U+200C-U+200F) | Structurally significant for Urdu text rendering (ZWJ, ZWNJ, LRM, RLM). |
+
+---
+
+*Synthesized: 2026-03-06. Source: STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md*
