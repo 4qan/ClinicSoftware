@@ -60,7 +60,7 @@
 3. Doctor adds a custom medication in settings and it appears in autocomplete on the next prescription.
 4. Saved prescriptions cannot be edited or deleted (immutability verified).
 
-**Plans:** 3 (1/3 complete)
+**Plans:** 2/3 plans executed
 - Plan 1: Drug Database: Schema, Seed Data, Settings UI, Autocomplete - COMPLETE (2026-03-06)
 
 ---
@@ -90,8 +90,7 @@
 |----------|-------------|-------|-------|
 | Foundation | FOUND-01 to FOUND-05 | 1 | 5 |
 | Patient Management | PAT-01 to PAT-04 | 1 | 4 |
-| Encounters | ENC-01 to ENC-03 | 2 | 3 |
-| Prescriptions | RX-01 to RX-05 | 2 | 5 |
+| Encounters | ENC-01 to ENC-03 | 2 | 2/3 | In Progress|  | RX-01 to RX-05 | 2 | 5 |
 | Drug Database | DRUG-01 to DRUG-04 | 2 | 4 |
 | Printing | PRINT-01 to PRINT-04 | 3 | 4 |
 | **Total** | | | **25** |

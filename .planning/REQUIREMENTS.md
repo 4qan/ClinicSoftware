@@ -24,14 +24,14 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Encounters
 
-- [ ] **ENC-01**: User can log an encounter for a patient (complaint, examination notes, diagnosis)
-- [ ] **ENC-02**: Encounters are automatically dated and timestamped
+- [x] **ENC-01**: User can log an encounter for a patient (complaint, examination notes, diagnosis)
+- [x] **ENC-02**: Encounters are automatically dated and timestamped
 - [ ] **ENC-03**: User can view past encounters on the patient profile in reverse chronological order
 
 ### Prescriptions
 
-- [ ] **RX-01**: User can write a prescription linked to an encounter
-- [ ] **RX-02**: User can add medications with dosage, frequency, duration, and optional notes per item
+- [x] **RX-01**: User can write a prescription linked to an encounter
+- [x] **RX-02**: User can add medications with dosage, frequency, duration, and optional notes per item
 - [x] **RX-03**: Medication input provides autocomplete from local drug database (salt name + brand name)
 - [x] **RX-04**: Autocomplete performs in under 300ms even on older hardware
 - [ ] **RX-05**: Prescriptions are immutable once saved (append-only for compliance)

@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-last_updated: "2026-03-06T10:37:23Z"
+last_updated: "2026-03-06T10:39:07Z"
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 11
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State: ClinicSoftware
@@ -22,15 +22,18 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 | Phase | Name | Status | Plans |
 |-------|------|--------|-------|
 | 1 | Foundation and Patient Management | Complete (2026-03-06) | 7/7 complete |
-| 2 | Clinical Workflow | In Progress | 1/3 complete |
+| 2 | Clinical Workflow | In Progress | 2/3 complete |
 | 3 | Printing and Visit Completion | Not Started | 1 |
 
 ## Current Phase
 **Phase 2: Clinical Workflow**
 Status: In Progress
-Plan 1/3 complete (Drug Database).
+Plan 2/3 complete (Drug Database, Visit Workflow).
 
 ## Decisions
+- Medications stored as snapshots with sortOrder, not live references to drug records (Phase 2, Plan 2)
+- EditVisitPage as separate component from NewVisitPage for cleaner separation (Phase 2, Plan 2)
+- CollapsibleSection reusable component for expandable card sections (Phase 2, Plan 2)
 - Dexie v2 schema with drugs, visits, visitMedications tables defined upfront (Phase 2, Plan 1)
 - Drug seed uses settings-key versioning (drugsSeedVersion) for idempotent re-seeding (Phase 2, Plan 1)
 - ComboBox pattern: dropdown with free-text input for clinical flexibility (Phase 2, Plan 1)
@@ -51,9 +54,9 @@ Plan 1/3 complete (Drug Database).
 - getNextPatientId() peeks at counter without incrementing, avoiding ID gaps from form views (Phase 1, Plan 6)
 
 ## Session
-- **Last completed:** Phase 2, Plan 1 (Drug Database)
-- **Duration:** 6 min
-- **Next:** Phase 2, Plan 2 (Visit/Prescription Form)
+- **Last completed:** Phase 2, Plan 2 (Visit/Encounter Workflow)
+- **Duration:** 7 min
+- **Next:** Phase 2, Plan 3
 
 ### Quick Tasks Completed
 
@@ -62,4 +65,4 @@ Plan 1/3 complete (Drug Database).
 | 1 | Set up GitHub remote repo and deploy to GitHub Pages | 2026-03-06 | fa0212f | [1-set-up-github-remote-repo-and-deploy-to-](./quick/1-set-up-github-remote-repo-and-deploy-to-/) |
 
 ---
-*Last updated: 2026-03-06 - Completed Phase 2, Plan 1: Drug Database*
+*Last updated: 2026-03-06 - Completed Phase 2, Plan 2: Visit/Encounter Workflow*
