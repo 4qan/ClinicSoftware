@@ -100,11 +100,11 @@ export function NewVisitPage() {
     setMedications((prev) => prev.filter((_, i) => i !== index))
   }
 
-  async function handleSave() {
-    if (!selectedPatient || !clinicalNotes.trim()) return
+  async function saveVisit(): Promise<string | null> {
+    if (!selectedPatient || !clinicalNotes.trim()) return null
     setSaving(true)
     try {
-      await createVisit({
+      const visitId = await createVisit({
         patientId: selectedPatient.id,
         clinicalNotes: clinicalNotes.trim(),
         rxNotes: rxNotes.trim(),
@@ -120,9 +120,24 @@ export function NewVisitPage() {
           sortOrder: index,
         })),
       })
-      navigate(`/patient/${selectedPatient.id}`)
+      return visitId
     } catch {
       setSaving(false)
+      return null
+    }
+  }
+
+  async function handleSave() {
+    const visitId = await saveVisit()
+    if (visitId && selectedPatient) {
+      navigate(`/patient/${selectedPatient.id}`)
+    }
+  }
+
+  async function handleSaveAndPrint() {
+    const visitId = await saveVisit()
+    if (visitId) {
+      navigate(`/visit/${visitId}/print`)
     }
   }
 
@@ -334,7 +349,7 @@ export function NewVisitPage() {
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="px-6 py-2 text-base text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg cursor-pointer"
+            className="px-4 py-2 text-base text-gray-500 hover:text-gray-700 cursor-pointer"
             style={{ minHeight: '44px' }}
           >
             Cancel
@@ -343,10 +358,19 @@ export function NewVisitPage() {
             type="button"
             onClick={handleSave}
             disabled={!canSave}
-            className="px-8 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-lg cursor-pointer transition-colors"
+            className="px-6 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 disabled:text-gray-300 disabled:cursor-not-allowed border border-gray-300 rounded-lg cursor-pointer transition-colors"
             style={{ minHeight: '44px' }}
           >
             {saving ? 'Saving...' : 'Save Visit'}
+          </button>
+          <button
+            type="button"
+            onClick={handleSaveAndPrint}
+            disabled={!canSave}
+            className="px-8 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-lg cursor-pointer transition-colors"
+            style={{ minHeight: '44px' }}
+          >
+            {saving ? 'Saving...' : 'Save & Print'}
           </button>
         </div>
       </fieldset>
