@@ -1,4 +1,5 @@
 import type { Visit, VisitMedication, Patient } from '@/db/index'
+import { toUrdu, columnHeadersUrdu } from '@/constants/translations'
 
 interface DispensarySlipProps {
   visit: Visit
@@ -44,13 +45,12 @@ export function DispensarySlip({ visit, medications, patient }: DispensarySlipPr
             <thead>
               <tr className="border-b border-gray-300">
                 <th className="text-left py-0.5 pr-2 font-semibold text-gray-700" style={{ width: '20px' }}>#</th>
-                <th className="text-left py-0.5 pr-2 font-semibold text-gray-700">Brand Name</th>
-                <th className="text-left py-0.5 pr-2 font-semibold text-gray-700">Salt</th>
-                <th className="text-left py-0.5 pr-2 font-semibold text-gray-700">Strength</th>
-                <th className="text-left py-0.5 pr-2 font-semibold text-gray-700">Form</th>
-                <th className="text-left py-0.5 pr-2 font-semibold text-gray-700">Dosage</th>
-                <th className="text-left py-0.5 pr-2 font-semibold text-gray-700">Freq</th>
-                <th className="text-left py-0.5 font-semibold text-gray-700">Duration</th>
+                {['Brand Name', 'Salt', 'Strength', 'Form', 'Dosage', 'Freq', 'Duration'].map((col, idx) => (
+                  <th key={col} className={`text-left py-0.5 ${idx < 6 ? 'pr-2' : ''} font-semibold text-gray-700`}>
+                    {col}<br />
+                    <span dir="rtl" className="urdu-cell" style={{ fontSize: '8pt', fontWeight: 'normal' }}>{columnHeadersUrdu[col]}</span>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -60,10 +60,10 @@ export function DispensarySlip({ visit, medications, patient }: DispensarySlipPr
                   <td className="py-0.5 pr-2 font-medium">{med.brandName}</td>
                   <td className="py-0.5 pr-2 text-gray-600">{med.saltName}</td>
                   <td className="py-0.5 pr-2">{med.strength}</td>
-                  <td className="py-0.5 pr-2">{med.form}</td>
-                  <td className="py-0.5 pr-2">{med.dosage}</td>
-                  <td className="py-0.5 pr-2">{med.frequency}</td>
-                  <td className="py-0.5">{med.duration}</td>
+                  <td className="py-0.5 pr-2 urdu-cell" dir="rtl">{toUrdu(med.form)}</td>
+                  <td className="py-0.5 pr-2 urdu-cell" dir="rtl">{toUrdu(med.dosage)}</td>
+                  <td className="py-0.5 pr-2 urdu-cell" dir="rtl">{toUrdu(med.frequency)}</td>
+                  <td className="py-0.5 urdu-cell" dir="rtl">{toUrdu(med.duration)}</td>
                 </tr>
               ))}
             </tbody>
