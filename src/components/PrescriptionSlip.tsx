@@ -62,11 +62,13 @@ export function PrescriptionSlip({ visit, medications, patient, clinicInfo }: Pr
           </div>
         </div>
 
-        <hr className="border-gray-300 mb-3" />
+        {(medications.length > 0 || visit.clinicalNotes || visit.rxNotes) && (
+          <hr className="border-gray-300 mb-3" />
+        )}
 
         {/* Medication Table */}
         {medications.length > 0 && (
-          <div className="mb-4">
+          <div className={visit.clinicalNotes || visit.rxNotes ? 'mb-4' : 'mb-1'}>
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="border-b border-gray-300">
@@ -120,7 +122,7 @@ export function PrescriptionSlip({ visit, medications, patient, clinicInfo }: Pr
         )}
 
         {/* Footer */}
-        <hr className="border-gray-300 mt-4 mb-2" />
+        <hr className={`border-gray-300 mb-2 ${visit.clinicalNotes || visit.rxNotes ? 'mt-4' : 'mt-2'}`} />
         <div className="text-xs text-gray-500">
           {clinicInfo.footerText && (
             <p className="mb-1 italic">{clinicInfo.footerText}</p>

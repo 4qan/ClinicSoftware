@@ -101,7 +101,7 @@ export function NewVisitPage() {
   }
 
   async function saveVisit(): Promise<string | null> {
-    if (!selectedPatient || !clinicalNotes.trim()) return null
+    if (!selectedPatient || (!clinicalNotes.trim() && medications.length === 0)) return null
     setSaving(true)
     try {
       const visitId = await createVisit({
@@ -141,7 +141,7 @@ export function NewVisitPage() {
     }
   }
 
-  const canSave = selectedPatient !== null && clinicalNotes.trim() !== '' && !saving
+  const canSave = selectedPatient !== null && (clinicalNotes.trim() !== '' || medications.length > 0) && !saving
   const isDisabled = !selectedPatient
 
   const breadcrumbs = selectedPatient

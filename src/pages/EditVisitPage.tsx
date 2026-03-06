@@ -65,7 +65,7 @@ export function EditVisitPage() {
   }
 
   async function saveVisit(): Promise<boolean> {
-    if (!visitId || !clinicalNotes.trim()) return false
+    if (!visitId || (!clinicalNotes.trim() && medications.length === 0)) return false
     setSaving(true)
     try {
       await updateVisit(visitId, {
@@ -141,7 +141,7 @@ export function EditVisitPage() {
     )
   }
 
-  const canSave = clinicalNotes.trim() !== '' && !saving
+  const canSave = (clinicalNotes.trim() !== '' || medications.length > 0) && !saving
 
   const breadcrumbs = patient
     ? [
