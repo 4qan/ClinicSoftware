@@ -128,6 +128,7 @@ export function NewVisitPage() {
       <CollapsibleSection
         title="Patient"
         defaultOpen={!preselectedPatientId}
+        badge={selectedPatient ? `${selectedPatient.firstName} ${selectedPatient.lastName}` : undefined}
       >
         {selectedPatient ? (
           <div className="flex items-start justify-between">
