@@ -32,7 +32,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar collapsed={collapsed} onToggle={handleToggle} />
       <main className={`flex-1 transition-all duration-200 ${collapsed ? 'ml-16' : 'ml-60'}`}>
-        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-3">
+        <div className="app-header sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-3">
           <div className="flex items-center gap-4">
             <div className="flex-1">
               <SearchBar variant="compact" />

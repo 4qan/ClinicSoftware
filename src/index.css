@@ -21,7 +21,7 @@ button, a, [role="button"], input[type="radio"], input[type="checkbox"], select 
 /* Print styles */
 @media print {
   /* Hide all app chrome */
-  nav, header, .sidebar, .app-header, .no-print { display: none !important; }
+  aside, .app-header, .no-print { display: none !important; }
 
   /* Reset body/html for print */
   body { margin: 0; padding: 0; background: white; }
@@ -45,7 +45,7 @@ button, a, [role="button"], input[type="radio"], input[type="checkbox"], select 
   * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 
   /* Remove layout margin from main content area */
-  main { margin-left: 0 !important; padding: 0 !important; }
+  main { margin-left: 0 !important; padding: 0 !important; width: 100% !important; }
   main > div { padding: 0 !important; }
 
   /* Remove max-width constraint on print page */
