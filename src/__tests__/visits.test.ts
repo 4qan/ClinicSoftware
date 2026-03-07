@@ -19,6 +19,7 @@ describe('Visit CRUD', () => {
       patientId: 'patient-1',
       clinicalNotes: 'Fever and cough',
       rxNotes: 'Take with food',
+      rxNotesLang: 'en',
       medications: [
         {
           brandName: 'Augmentin',
@@ -51,6 +52,7 @@ describe('Visit CRUD', () => {
       patientId: 'patient-1',
       clinicalNotes: 'Follow-up visit',
       rxNotes: '',
+      rxNotesLang: 'en',
       medications: [],
     })
 
@@ -63,6 +65,7 @@ describe('Visit CRUD', () => {
       patientId: 'patient-1',
       clinicalNotes: 'Original notes',
       rxNotes: '',
+      rxNotesLang: 'en',
       medications: [
         {
           brandName: 'DrugA',
@@ -80,6 +83,7 @@ describe('Visit CRUD', () => {
     await updateVisit(visitId, {
       clinicalNotes: 'Updated notes',
       rxNotes: 'New rx notes',
+      rxNotesLang: 'en',
       medications: [
         {
           brandName: 'DrugB',
@@ -117,6 +121,7 @@ describe('Visit CRUD', () => {
       patientId: 'patient-1',
       clinicalNotes: 'To be deleted',
       rxNotes: '',
+      rxNotesLang: 'en',
       medications: [
         {
           brandName: 'DrugA',
@@ -150,6 +155,7 @@ describe('Visit CRUD', () => {
       patientId: 'patient-1',
       clinicalNotes: 'First visit',
       rxNotes: '',
+      rxNotesLang: 'en',
       medications: [],
     })
 
@@ -160,6 +166,7 @@ describe('Visit CRUD', () => {
       patientId: 'patient-1',
       clinicalNotes: 'Second visit',
       rxNotes: '',
+      rxNotesLang: 'en',
       medications: [],
     })
 
@@ -174,6 +181,7 @@ describe('Visit CRUD', () => {
       patientId: 'patient-1',
       clinicalNotes: 'Patient 1 visit',
       rxNotes: '',
+      rxNotesLang: 'en',
       medications: [],
     })
 
@@ -181,6 +189,7 @@ describe('Visit CRUD', () => {
       patientId: 'patient-2',
       clinicalNotes: 'Patient 2 visit',
       rxNotes: '',
+      rxNotesLang: 'en',
       medications: [],
     })
 
@@ -194,6 +203,7 @@ describe('Visit CRUD', () => {
       patientId: 'patient-1',
       clinicalNotes: 'Visit notes',
       rxNotes: '',
+      rxNotesLang: 'en',
       medications: [
         {
           brandName: 'DrugA',

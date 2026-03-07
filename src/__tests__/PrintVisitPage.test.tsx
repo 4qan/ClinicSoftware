@@ -50,6 +50,7 @@ beforeEach(async () => {
     patientId: testPatient.id,
     clinicalNotes: 'Complaint: Fever\nDiagnosis: Viral',
     rxNotes: 'Take with food',
+    rxNotesLang: 'en',
     medications: [
       {
         brandName: 'Panadol',
