@@ -94,7 +94,7 @@ npm run test:e2e      # E2E tests (Playwright)
 - [x] Urdu foundation (Nastaliq font + translation maps)
 - [x] Bilingual prescription printing (English + Urdu)
 - [x] Prescription entry cleanup (field naming, drug display, custom value indicators)
-- [ ] Rx Notes English/Urdu toggle
+- [x] Rx Notes English/Urdu toggle with sticky language preference
 - [ ] One-click database export (JSON backup)
 - [ ] Database restore from backup file
 - [ ] Auto-backup snapshots (silent, rotating)
