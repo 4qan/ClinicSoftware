@@ -4,8 +4,10 @@ import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { MedicationEntry } from '@/components/MedicationEntry'
 import { MedicationList } from '@/components/MedicationList'
+import { RxNotesField } from '@/components/RxNotesField'
 import { getPatient } from '@/db/patients'
 import { getVisit, updateVisit, deleteVisit } from '@/db/visits'
+import { db } from '@/db/index'
 import type { Patient } from '@/db/index'
 import type { MedicationFormData } from '@/components/MedicationEntry'
 
@@ -16,6 +18,7 @@ export function EditVisitPage() {
   const [patient, setPatient] = useState<Patient | null>(null)
   const [clinicalNotes, setClinicalNotes] = useState('')
   const [rxNotes, setRxNotes] = useState('')
+  const [rxNotesLang, setRxNotesLang] = useState<'en' | 'ur'>('en')
   const [medications, setMedications] = useState<MedicationFormData[]>([])
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
@@ -38,6 +41,7 @@ export function EditVisitPage() {
 
       setClinicalNotes(result.visit.clinicalNotes)
       setRxNotes(result.visit.rxNotes)
+      setRxNotesLang(result.visit.rxNotesLang ?? 'en')
       setMedications(
         result.medications.map((m) => ({
           drugId: m.drugId,
@@ -71,6 +75,7 @@ export function EditVisitPage() {
       await updateVisit(visitId, {
         clinicalNotes: clinicalNotes.trim(),
         rxNotes: rxNotes.trim(),
+        rxNotesLang,
         medications: medications.map((med, index) => ({
           drugId: med.drugId,
           brandName: med.brandName,
@@ -83,6 +88,7 @@ export function EditVisitPage() {
           sortOrder: index,
         })),
       })
+      await db.settings.put({ key: 'rxNotesDefaultLang', value: rxNotesLang })
       return true
     } catch {
       setSaving(false)
@@ -199,16 +205,7 @@ export function EditVisitPage() {
         <div className="mt-4">
           <MedicationList medications={medications} onRemove={handleRemoveMedication} />
         </div>
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Rx Notes</label>
-          <textarea
-            value={rxNotes}
-            onChange={(e) => setRxNotes(e.target.value)}
-            placeholder="Additional prescription notes..."
-            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
-            style={{ minHeight: '60px' }}
-          />
-        </div>
+        <RxNotesField value={rxNotes} onChange={setRxNotes} lang={rxNotesLang} onLangChange={setRxNotesLang} />
       </div>
 
       {/* Action Bar */}

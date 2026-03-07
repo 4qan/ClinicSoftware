@@ -4,11 +4,13 @@ import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { MedicationEntry } from '@/components/MedicationEntry'
 import { MedicationList } from '@/components/MedicationList'
+import { RxNotesField } from '@/components/RxNotesField'
 import { PatientRegistrationForm } from '@/components/PatientRegistrationForm'
 import { getPatient, registerPatient } from '@/db/patients'
 import { usePatientSearch } from '@/hooks/usePatientSearch'
 import { createVisit } from '@/db/visits'
 import { getPatientVisits } from '@/db/visits'
+import { db } from '@/db/index'
 import type { Patient } from '@/db/index'
 import type { PatientInput } from '@/db/patients'
 import type { MedicationFormData } from '@/components/MedicationEntry'
@@ -24,6 +26,7 @@ export function NewVisitPage() {
 
   const [clinicalNotes, setClinicalNotes] = useState('')
   const [rxNotes, setRxNotes] = useState('')
+  const [rxNotesLang, setRxNotesLang] = useState<'en' | 'ur'>('en')
   const [medications, setMedications] = useState<MedicationFormData[]>([])
   const [saving, setSaving] = useState(false)
   const [showInlineRegistration, setShowInlineRegistration] = useState(false)
@@ -40,6 +43,15 @@ export function NewVisitPage() {
       })
     }
   }, [preselectedPatientId])
+
+  // Load sticky language preference
+  useEffect(() => {
+    db.settings.get('rxNotesDefaultLang').then((setting) => {
+      if (setting && (setting.value === 'en' || setting.value === 'ur')) {
+        setRxNotesLang(setting.value)
+      }
+    })
+  }, [])
 
   // Load visit history when patient changes
   const loadVisitHistory = useCallback(async () => {
@@ -108,6 +120,7 @@ export function NewVisitPage() {
         patientId: selectedPatient.id,
         clinicalNotes: clinicalNotes.trim(),
         rxNotes: rxNotes.trim(),
+        rxNotesLang,
         medications: medications.map((med, index) => ({
           drugId: med.drugId,
           brandName: med.brandName,
@@ -120,6 +133,7 @@ export function NewVisitPage() {
           sortOrder: index,
         })),
       })
+      await db.settings.put({ key: 'rxNotesDefaultLang', value: rxNotesLang })
       return visitId
     } catch {
       setSaving(false)
@@ -330,16 +344,7 @@ export function NewVisitPage() {
           <div className="mt-4">
             <MedicationList medications={medications} onRemove={handleRemoveMedication} />
           </div>
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Rx Notes</label>
-            <textarea
-              value={rxNotes}
-              onChange={(e) => setRxNotes(e.target.value)}
-              placeholder="Additional prescription notes..."
-              className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
-              style={{ minHeight: '60px' }}
-            />
-          </div>
+          <RxNotesField value={rxNotes} onChange={setRxNotes} lang={rxNotesLang} onLangChange={setRxNotesLang} />
         </div>
       </fieldset>
 
