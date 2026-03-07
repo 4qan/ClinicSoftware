@@ -116,8 +116,18 @@ export function PrescriptionSlip({ visit, medications, patient, clinicInfo }: Pr
         {/* Rx Notes */}
         {visit.rxNotes && (
           <div className="mb-3">
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">Instructions / <span dir="rtl" className="urdu-cell">{sectionHeadersUrdu['Instructions']}</span></h3>
-            <p className="text-sm text-gray-800 whitespace-pre-line">{visit.rxNotes}</p>
+            <h3 className="text-sm font-semibold text-gray-700 mb-1">
+              Instructions / <span dir="rtl" className="urdu-cell">{sectionHeadersUrdu['Instructions']}</span>
+            </h3>
+            <p
+              className={`text-sm whitespace-pre-line ${
+                (visit.rxNotesLang ?? 'en') === 'ur' ? 'urdu-cell' : 'text-gray-800'
+              }`}
+              dir={(visit.rxNotesLang ?? 'en') === 'ur' ? 'rtl' : 'ltr'}
+              style={(visit.rxNotesLang ?? 'en') === 'ur' ? { unicodeBidi: 'isolate' } : undefined}
+            >
+              {visit.rxNotes}
+            </p>
           </div>
         )}
 
