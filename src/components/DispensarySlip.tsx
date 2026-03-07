@@ -1,5 +1,4 @@
 import type { Visit, VisitMedication, Patient } from '@/db/index'
-import { buildUrduInstruction, columnHeadersUrdu } from '@/constants/translations'
 
 interface DispensarySlipProps {
   visit: Visit
@@ -45,10 +44,9 @@ export function DispensarySlip({ visit, medications, patient }: DispensarySlipPr
             <thead>
               <tr className="border-b border-gray-300">
                 <th className="text-left py-0.5 pr-2 font-semibold text-gray-700" style={{ width: '20px' }}>#</th>
-                {['Brand Name', 'Salt', 'Strength', 'Instructions'].map((col, idx) => (
-                  <th key={col} className={`text-left py-0.5 ${idx < 3 ? 'pr-2' : ''} font-semibold text-gray-700`}>
-                    {col}<br />
-                    <span dir="rtl" className="urdu-cell" style={{ fontSize: '8pt', fontWeight: 'normal' }}>{columnHeadersUrdu[col]}</span>
+                {['Brand Name', 'Salt', 'Strength', 'Form', 'Qty', 'Frequency', 'Duration'].map((col, idx, arr) => (
+                  <th key={col} className={`text-left py-0.5 ${idx < arr.length - 1 ? 'pr-2' : ''} font-semibold text-gray-700`}>
+                    {col}
                   </th>
                 ))}
               </tr>
@@ -60,16 +58,10 @@ export function DispensarySlip({ visit, medications, patient }: DispensarySlipPr
                   <td className="py-0.5 pr-2 font-medium">{med.brandName}</td>
                   <td className="py-0.5 pr-2 text-gray-600">{med.saltName}</td>
                   <td className="py-0.5 pr-2">{med.strength}</td>
-                  {(() => {
-                    const instruction = buildUrduInstruction({ form: med.form, quantity: med.quantity, frequency: med.frequency, duration: med.duration })
-                    return (
-                      <td className="py-0.5" style={{ minWidth: '120px' }}>
-                        <span className="urdu-cell" dir="rtl">{instruction.urdu}</span>
-                        <br />
-                        <span className="text-xs text-gray-400">{instruction.english}</span>
-                      </td>
-                    )
-                  })()}
+                  <td className="py-0.5 pr-2">{med.form}</td>
+                  <td className="py-0.5 pr-2">{med.quantity}</td>
+                  <td className="py-0.5 pr-2">{med.frequency}</td>
+                  <td className="py-0.5">{med.duration}</td>
                 </tr>
               ))}
             </tbody>
