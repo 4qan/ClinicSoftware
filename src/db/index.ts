@@ -44,6 +44,7 @@ export interface Visit {
   patientId: string
   clinicalNotes: string
   rxNotes: string
+  rxNotesLang?: 'en' | 'ur'
   createdAt: string
   updatedAt: string
 }
@@ -100,6 +101,21 @@ export class ClinicDatabase extends Dexie {
         if ('dosage' in med && !('quantity' in med)) {
           med.quantity = med.dosage
           delete med.dosage
+        }
+      })
+    })
+
+    this.version(4).stores({
+      patients: 'id, patientId, firstNameLower, lastNameLower, contact, createdAt',
+      settings: 'key',
+      recentPatients: 'id, viewedAt',
+      drugs: 'id, brandNameLower, saltNameLower, isCustom',
+      visits: 'id, patientId, createdAt',
+      visitMedications: 'id, visitId',
+    }).upgrade(tx => {
+      return tx.table('visits').toCollection().modify(visit => {
+        if (!visit.rxNotesLang) {
+          visit.rxNotesLang = 'en'
         }
       })
     })

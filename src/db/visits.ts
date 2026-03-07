@@ -5,12 +5,14 @@ export interface CreateVisitData {
   patientId: string
   clinicalNotes: string
   rxNotes: string
+  rxNotesLang: 'en' | 'ur'
   medications: Omit<VisitMedication, 'id' | 'visitId'>[]
 }
 
 export interface UpdateVisitData {
   clinicalNotes: string
   rxNotes: string
+  rxNotesLang: 'en' | 'ur'
   medications: Omit<VisitMedication, 'id' | 'visitId'>[]
 }
 
@@ -24,6 +26,7 @@ export async function createVisit(data: CreateVisitData): Promise<string> {
       patientId: data.patientId,
       clinicalNotes: data.clinicalNotes,
       rxNotes: data.rxNotes,
+      rxNotesLang: data.rxNotesLang,
       createdAt: now,
       updatedAt: now,
     }
@@ -50,6 +53,7 @@ export async function updateVisit(visitId: string, data: UpdateVisitData): Promi
     await db.visits.update(visitId, {
       clinicalNotes: data.clinicalNotes,
       rxNotes: data.rxNotes,
+      rxNotesLang: data.rxNotesLang,
       updatedAt: now,
     })
 
