@@ -108,11 +108,11 @@ Plans:
 **Requirements:** BKUP-01, BKUP-03
 **Depends on:** Phase 6 (schema v4 must settle first)
 **Track:** Backup
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 07-01-PLAN.md -- Toast notification system + backup utility (exportDatabase, downloadBackup) + version config
-- [ ] 07-02-PLAN.md -- DataSettings component (Data tab in Settings) + export flow wiring + visual verification
+- [x] 07-01-PLAN.md -- Toast notification system + backup utility (exportDatabase, downloadBackup) + version config
+- [x] 07-02-PLAN.md -- DataSettings component (Data tab in Settings) + export flow wiring + visual verification
 
 **Scope:**
 - Create reusable toast notification system (success auto-dismiss, error manual dismiss, top-right)
@@ -207,7 +207,7 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | RX-CLEANUP-03 | 5.1 | Rename dosage to quantity + Dexie migration |
 | RX-CLEANUP-04 | 5.1 | No blocking validation (indicators informational only) |
 | URDU-06 | 6 | 2/2 | Complete   | 2026-03-07 | 6 | Rx Notes print |
-| BKUP-01 | 7 | 1/2 | In Progress|  | 8 | Database restore |
+| BKUP-01 | 7 | 2/2 | Complete   | 2026-03-10 | 8 | Database restore |
 | BKUP-03 | 7 | Backup metadata |
 | BKUP-04 | 8 | Restore validation |
 | BKUP-05 | 8 | Auto-safety-backup |
@@ -227,9 +227,9 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | 5. Prescription Print Urdu | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 5.1 Prescription Entry Cleanup | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 6. Rx Notes Urdu Toggle | v1.1 | 2/2 | Complete | 2026-03-07 |
-| 7. Backup Export | v1.1 | 0/2 | Not Started | -- |
+| 7. Backup Export | v1.1 | 2/2 | Complete | 2026-03-10 |
 | 8. Backup Restore | v1.1 | 0/? | Not Started | -- |
 | 9. Auto-Snapshots | v1.1 | 0/? | Not Started | -- |
 
 ---
-*Last updated: 2026-03-10 after Phase 7 planning*
+*Last updated: 2026-03-10 after Phase 7 completion*

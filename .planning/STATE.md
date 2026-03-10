@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Urdu & Backup
 status: in-progress
-last_updated: "2026-03-10T17:58:30Z"
-last_activity: "2026-03-10 -- Completed 07-01: Backup infrastructure (toast + backup utility)"
+last_updated: "2026-03-10T18:23:35.891Z"
+last_activity: "2026-03-10 -- Completed 07-02: Backup export UI (DataSettings + Settings Data tab)"
 progress:
   total_phases: 7
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State: ClinicSoftware
@@ -22,9 +22,9 @@ See: .planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 7 (Backup Export)
-Plan: 1/2 complete
-Status: In progress
-Last activity: 2026-03-10 -- Completed 07-01: Backup infrastructure (toast + backup utility)
+Plan: 2/2 complete
+Status: Phase complete
+Last activity: 2026-03-10 -- Completed 07-02: Backup export UI (DataSettings + Settings Data tab)
 
 ## Progress
 | Phase | Name | Status | Plans |
@@ -32,7 +32,7 @@ Last activity: 2026-03-10 -- Completed 07-01: Backup infrastructure (toast + bac
 | 5 | Prescription Print Urdu | Complete | 2/2 |
 | 5.1 | Prescription Entry Cleanup (INSERTED) | Complete | 2/2 |
 | 6 | Rx Notes Urdu Toggle | Complete | 2/2 |
-| 7 | Backup Export | In Progress | 1/2 |
+| 7 | Backup Export | Complete | 2/2 |
 | 8 | Backup Restore | Not Started | -- |
 | 9 | Auto-Snapshots | Not Started | -- |
 |-------|------|--------|-------|
@@ -46,6 +46,7 @@ See: .planning/PROJECT.md Key Decisions table
 - [Phase 06-01]: Segmented En/Urdu toggle on Rx Notes. Dexie v4 migration adds rxNotesLang. Sticky preference via settings table. Text preserved on toggle.
 - [Phase 06-02]: Conditional Nastaliq/RTL print styling for Urdu rx notes on PrescriptionSlip. Hover tooltip on language toggle for keyboard shortcut hint (user-requested instead of dismissable hint).
 - [Phase 07-01]: Toast notifications via createPortal (success/info auto-dismiss 5s, error manual close). __APP_VERSION__ via Vite define. exportDatabase iterates db.tables, downloadBackup triggers anchor click download.
+- [Phase 07-02]: DataSettings component in Settings Data tab (4th tab). Export button triggers exportDatabase + downloadBackup with progress bar. Last backup timestamp persisted via db.settings key-value store.
 
 ## Accumulated Context
 - v1.0 shipped with 27/27 requirements, 3 phases, 14 plans
@@ -63,6 +64,8 @@ See: .planning/PROJECT.md Key Decisions table
 - Toast system: ToastProvider wraps AppContent in App.tsx, useToast() hook for app-wide access
 - Backup utility: `src/utils/backup.ts` exports exportDatabase(), downloadBackup(), BackupFile, BackupMetadata types
 - App version 1.1.0, injected as __APP_VERSION__ build-time constant
+- DataSettings component: `src/components/DataSettings.tsx` with export button, progress bar, last backup display
+- Settings tab extension pattern: add to SettingsCategory union + TABS array + conditional render
 
 ### Roadmap Evolution
 - Phase 5.1 inserted after Phase 5: Prescription Entry Cleanup (URGENT)
@@ -81,4 +84,4 @@ None.
 | 5 | Research prescription UX patterns and redesign recommendations | 2026-03-06 | 0ac3084 | Verified | [5-research-prescription-ux-patterns-and-re](./quick/5-research-prescription-ux-patterns-and-re/) |
 
 ---
-*Last updated: 2026-03-10 - Phase 7 Plan 01: Backup infrastructure*
+*Last updated: 2026-03-10 - Phase 7 Plan 02: Backup export UI*
