@@ -33,6 +33,11 @@ Built for a clinic in an area with unreliable internet, used by a non-tech-savvy
 - Works without internet after first load
 - Nastaliq font cached for offline Urdu rendering
 
+### Data Backup
+- One-click full database export to JSON from Settings > Data tab
+- Backup includes metadata (app version, schema version, record counts, export date)
+- Toast notifications for success/error feedback
+
 ### Security
 - Local PIN/password authentication (PBKDF2, 100k iterations)
 - No cloud, no server, no data transmission
@@ -95,7 +100,7 @@ npm run test:e2e      # E2E tests (Playwright)
 - [x] Bilingual prescription printing (English + Urdu)
 - [x] Prescription entry cleanup (field naming, drug display, custom value indicators)
 - [x] Rx Notes English/Urdu toggle with sticky language preference
-- [ ] One-click database export (JSON backup)
+- [x] One-click database export (JSON backup with metadata)
 - [ ] Database restore from backup file
 - [ ] Auto-backup snapshots (silent, rotating)
 
