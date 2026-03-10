@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider, useAuthContext } from './auth/AuthProvider'
+import { ToastProvider } from './components/ToastProvider'
 import { LoginPage } from './auth/LoginPage'
 import { seedDrugDatabase, deduplicateExistingDrugs } from './db/seedDrugs'
 import { AppLayout } from './components/AppLayout'
@@ -48,7 +49,9 @@ function App() {
   return (
     <BrowserRouter basename="/ClinicSoftware">
       <AuthProvider>
-        <AppContent />
+        <ToastProvider>
+          <AppContent />
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   )

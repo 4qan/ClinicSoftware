@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, act } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { render, screen, act, fireEvent } from '@testing-library/react'
 import { ToastProvider, useToast } from '@/components/ToastProvider'
 
 function TestConsumer() {
@@ -37,29 +36,26 @@ describe('Toast notification system', () => {
     vi.useRealTimers()
   })
 
-  it('renders a success toast when showToast is called', async () => {
+  it('renders a success toast when showToast is called', () => {
     renderWithToast()
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
 
-    await user.click(screen.getByText('Show Success'))
+    fireEvent.click(screen.getByText('Show Success'))
 
     expect(screen.getByText('Operation succeeded')).toBeInTheDocument()
   })
 
-  it('renders an error toast when showToast is called', async () => {
+  it('renders an error toast when showToast is called', () => {
     renderWithToast()
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
 
-    await user.click(screen.getByText('Show Error'))
+    fireEvent.click(screen.getByText('Show Error'))
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument()
   })
 
-  it('success toast auto-dismisses after ~5s', async () => {
+  it('success toast auto-dismisses after ~5s', () => {
     renderWithToast()
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
 
-    await user.click(screen.getByText('Show Success'))
+    fireEvent.click(screen.getByText('Show Success'))
     expect(screen.getByText('Operation succeeded')).toBeInTheDocument()
 
     act(() => {
@@ -69,11 +65,10 @@ describe('Toast notification system', () => {
     expect(screen.queryByText('Operation succeeded')).not.toBeInTheDocument()
   })
 
-  it('error toast does NOT auto-dismiss', async () => {
+  it('error toast does NOT auto-dismiss', () => {
     renderWithToast()
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
 
-    await user.click(screen.getByText('Show Error'))
+    fireEvent.click(screen.getByText('Show Error'))
     expect(screen.getByText('Something went wrong')).toBeInTheDocument()
 
     act(() => {
@@ -83,35 +78,32 @@ describe('Toast notification system', () => {
     expect(screen.getByText('Something went wrong')).toBeInTheDocument()
   })
 
-  it('error toast can be dismissed by clicking close button', async () => {
+  it('error toast can be dismissed by clicking close button', () => {
     renderWithToast()
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
 
-    await user.click(screen.getByText('Show Error'))
+    fireEvent.click(screen.getByText('Show Error'))
     expect(screen.getByText('Something went wrong')).toBeInTheDocument()
 
     const closeButton = screen.getByRole('button', { name: /close/i })
-    await user.click(closeButton)
+    fireEvent.click(closeButton)
 
     expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument()
   })
 
-  it('multiple toasts stack', async () => {
+  it('multiple toasts stack', () => {
     renderWithToast()
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
 
-    await user.click(screen.getByText('Show Success'))
-    await user.click(screen.getByText('Show Error'))
+    fireEvent.click(screen.getByText('Show Success'))
+    fireEvent.click(screen.getByText('Show Error'))
 
     expect(screen.getByText('Operation succeeded')).toBeInTheDocument()
     expect(screen.getByText('Something went wrong')).toBeInTheDocument()
   })
 
-  it('info toast auto-dismisses after ~5s', async () => {
+  it('info toast auto-dismisses after ~5s', () => {
     renderWithToast()
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
 
-    await user.click(screen.getByText('Show Info'))
+    fireEvent.click(screen.getByText('Show Info'))
     expect(screen.getByText('Just so you know')).toBeInTheDocument()
 
     act(() => {
@@ -127,7 +119,6 @@ describe('Toast notification system', () => {
       return null
     }
 
-    // Suppress React error boundary noise
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
     expect(() => render(<Orphan />)).toThrow()
     spy.mockRestore()
