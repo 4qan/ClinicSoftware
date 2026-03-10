@@ -1,10 +1,11 @@
 {
   "name": "clinic-software",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "kill-dev": "lsof -ti:5175 | xargs kill -9 2>/dev/null; echo 'Done'",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
