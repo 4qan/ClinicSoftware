@@ -108,7 +108,7 @@ Plans:
 **Requirements:** BKUP-01, BKUP-03
 **Depends on:** Phase 6 (schema v4 must settle first)
 **Track:** Backup
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 07-01-PLAN.md -- Toast notification system + backup utility (exportDatabase, downloadBackup) + version config
@@ -207,8 +207,7 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | RX-CLEANUP-03 | 5.1 | Rename dosage to quantity + Dexie migration |
 | RX-CLEANUP-04 | 5.1 | No blocking validation (indicators informational only) |
 | URDU-06 | 6 | 2/2 | Complete   | 2026-03-07 | 6 | Rx Notes print |
-| BKUP-01 | 7 | Database export |
-| BKUP-02 | 8 | Database restore |
+| BKUP-01 | 7 | 1/2 | In Progress|  | 8 | Database restore |
 | BKUP-03 | 7 | Backup metadata |
 | BKUP-04 | 8 | Restore validation |
 | BKUP-05 | 8 | Auto-safety-backup |
