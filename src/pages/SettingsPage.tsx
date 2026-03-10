@@ -4,13 +4,15 @@ import { useAuthContext } from '@/auth/AuthProvider'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { DrugManagement } from '@/components/DrugManagement'
 import { ClinicInfoSettings } from '@/components/ClinicInfoSettings'
+import { DataSettings } from '@/components/DataSettings'
 
-type SettingsCategory = 'account' | 'medications' | 'clinic'
+type SettingsCategory = 'account' | 'medications' | 'clinic' | 'data'
 
 const TABS: { key: SettingsCategory; label: string }[] = [
   { key: 'account', label: 'Account' },
   { key: 'medications', label: 'Medications' },
   { key: 'clinic', label: 'Clinic Info' },
+  { key: 'data', label: 'Data' },
 ]
 
 function RecoveryCodeSection() {
@@ -171,6 +173,11 @@ export function SettingsPage() {
       {/* Clinic Info Tab */}
       {activeCategory === 'clinic' && (
         <ClinicInfoSettings />
+      )}
+
+      {/* Data Tab */}
+      {activeCategory === 'data' && (
+        <DataSettings />
       )}
     </div>
   )
