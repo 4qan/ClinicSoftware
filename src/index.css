@@ -26,8 +26,7 @@ button, a, [role="button"], input[type="radio"], input[type="checkbox"], select 
   /* Reset body/html for print */
   body { margin: 0; padding: 0; background: white; }
 
-  /* Page setup for A5 */
-  @page { size: A5 portrait; margin: 8mm; }
+  /* @page size/margin injected dynamically by PrintVisitPage before window.print() */
 
   /* Hide screen-only elements */
   .screen-only { display: none !important; }
@@ -35,7 +34,7 @@ button, a, [role="button"], input[type="radio"], input[type="checkbox"], select 
   /* Show print-only elements */
   .print-only { display: block !important; }
 
-  /* Hide elements marked for print hiding */
+  /* Legacy: may be removed after Phase 10 verification */
   .print-hidden { display: none !important; }
 
   /* Prevent breaking inside medication rows */

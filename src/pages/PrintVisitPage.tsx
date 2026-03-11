@@ -6,11 +6,29 @@ import { DispensarySlip } from '@/components/DispensarySlip'
 import { getVisit } from '@/db/visits'
 import { getPatient } from '@/db/patients'
 import { getClinicInfo } from '@/db/settings'
+import { getPrintSettings, PAPER_SIZES, calcMargin } from '@/db/printSettings'
 import type { Visit, VisitMedication, Patient } from '@/db/index'
 import type { ClinicInfo } from '@/db/settings'
+import type { PrintSettings, PaperSize } from '@/db/printSettings'
 
 type PrintMode = 'prescription' | 'dispensary' | null
 type PreviewMode = 'prescription' | 'dispensary'
+
+function injectPageStyle(size: PaperSize, margin: number): void {
+  const existing = document.getElementById('print-page-style')
+  if (existing) existing.remove()
+  const { width, height } = PAPER_SIZES[size]
+  const style = document.createElement('style')
+  style.id = 'print-page-style'
+  style.media = 'print'
+  style.textContent = `@page { size: ${width}mm ${height}mm portrait; margin: ${margin}mm; }`
+  document.head.appendChild(style)
+}
+
+function removePageStyle(): void {
+  const existing = document.getElementById('print-page-style')
+  if (existing) existing.remove()
+}
 
 export function PrintVisitPage() {
   const { id: visitId } = useParams<{ id: string }>()
@@ -21,6 +39,7 @@ export function PrintVisitPage() {
   const [medications, setMedications] = useState<VisitMedication[]>([])
   const [patient, setPatient] = useState<Patient | null>(null)
   const [clinicInfo, setClinicInfo] = useState<ClinicInfo | null>(null)
+  const [printSettings, setPrintSettings] = useState<PrintSettings | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [printMode, setPrintMode] = useState<PrintMode>(null)
@@ -40,13 +59,15 @@ export function PrintVisitPage() {
       setVisit(result.visit)
       setMedications(result.medications)
 
-      const [p, ci] = await Promise.all([
+      const [p, ci, ps] = await Promise.all([
         getPatient(result.visit.patientId),
         getClinicInfo(),
+        getPrintSettings(),
       ])
 
       if (p) setPatient(p)
       setClinicInfo(ci)
+      setPrintSettings(ps)
       setLoading(false)
     }
 
@@ -60,12 +81,17 @@ export function PrintVisitPage() {
     if (auto === 'prescription' || auto === 'dispensary') {
       setPreviewMode(auto)
       setPrintMode(auto)
+      if (printSettings) {
+        const size = auto === 'prescription' ? printSettings.prescriptionSize : printSettings.dispensarySize
+        injectPageStyle(size, calcMargin(size))
+      }
       setTimeout(() => window.print(), 200)
     }
-  }, [loading, searchParams])
+  }, [loading, searchParams, printSettings])
 
   const handleAfterPrint = useCallback(() => {
     setPrintMode(null)
+    removePageStyle()
   }, [])
 
   useEffect(() => {
@@ -74,6 +100,10 @@ export function PrintVisitPage() {
   }, [handleAfterPrint])
 
   function handlePrint(mode: PrintMode) {
+    if (printSettings && mode) {
+      const size = mode === 'prescription' ? printSettings.prescriptionSize : printSettings.dispensarySize
+      injectPageStyle(size, calcMargin(size))
+    }
     setPrintMode(mode)
     setTimeout(() => window.print(), 100)
   }
@@ -106,6 +136,13 @@ export function PrintVisitPage() {
     { label: `${patient.firstName} ${patient.lastName}`, path: `/patient/${patient.id}` },
     { label: 'Print Prescription' },
   ]
+
+  const activeSize: PaperSize = printSettings
+    ? (previewMode === 'prescription' ? printSettings.prescriptionSize : printSettings.dispensarySize)
+    : 'A5'
+
+  const showPrescription = printMode !== null ? printMode === 'prescription' : previewMode === 'prescription'
+  const showDispensary = printMode !== null ? printMode === 'dispensary' : previewMode === 'dispensary'
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -140,35 +177,40 @@ export function PrintVisitPage() {
             </button>
           </div>
 
-          {/* Print button */}
-          <button
-            type="button"
-            onClick={() => handlePrint(previewMode)}
-            className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer transition-colors"
-          >
-            Print {previewMode === 'prescription' ? 'Prescription' : 'Dispensary Slip'}
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Paper size badge */}
+            <span className="text-xs text-gray-500 bg-gray-100 border border-gray-200 rounded px-2 py-1">
+              Paper: {PAPER_SIZES[activeSize].label}
+            </span>
+
+            {/* Print button */}
+            <button
+              type="button"
+              onClick={() => handlePrint(previewMode)}
+              className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer transition-colors"
+            >
+              Print {previewMode === 'prescription' ? 'Prescription' : 'Dispensary Slip'}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Prescription Slip: shown on screen when previewing, hidden in print when printing dispensary */}
-      <div className={`${previewMode !== 'prescription' ? 'hidden' : ''} ${printMode === 'dispensary' ? 'print-hidden' : ''}`}>
+      {/* Conditional rendering: only the active slip exists in DOM during print */}
+      {showPrescription && (
         <PrescriptionSlip
           visit={visit}
           medications={medications}
           patient={patient}
           clinicInfo={clinicInfo}
         />
-      </div>
-
-      {/* Dispensary Slip: shown on screen when previewing, hidden in print when printing prescription */}
-      <div className={`${previewMode !== 'dispensary' ? 'hidden' : ''} ${printMode === 'prescription' ? 'print-hidden' : ''}`}>
+      )}
+      {showDispensary && (
         <DispensarySlip
           visit={visit}
           medications={medications}
           patient={patient}
         />
-      </div>
+      )}
     </div>
   )
 }
