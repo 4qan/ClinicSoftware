@@ -2,14 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Print Customization
-status: active
-last_updated: "2026-03-11"
-last_activity: "2026-03-11 -- Milestone v1.2 started"
+status: planning
+stopped_at: Completed 10-02-PLAN.md
+last_updated: "2026-03-11T17:49:01.420Z"
+last_activity: 2026-03-11 -- Roadmap created for v1.2
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_phases: 2
+  completed_phases: 1
+  total_plans: 2
+  completed_plans: 2
+  percent: 0
 ---
 
 # Project State: ClinicSoftware
@@ -17,32 +19,57 @@ progress:
 ## Project Reference
 See: .planning/PROJECT.md (updated 2026-03-11)
 **Core value:** The doctor can see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even with no internet.
-**Current focus:** Defining requirements for v1.2
+**Current focus:** Phase 10 - Print Infrastructure & Settings
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-11 — Milestone v1.2 started
+Phase: 10 of 11 (Print Infrastructure & Settings)
+Plan: --
+Status: Ready to plan
+Last activity: 2026-03-11 -- Roadmap created for v1.2
+
+Progress: [░░░░░░░░░░] 0%
+
+## Performance Metrics
+
+**Velocity:**
+- Total plans completed: 0 (v1.2)
+- Average duration: --
+- Total execution time: --
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| - | - | - | - |
+
+*Updated after each plan completion*
+| Phase 10 P01 | 12 | 2 tasks | 5 files |
+| Phase 10 P02 | 25 | 2 tasks | 3 files |
 
 ## Accumulated Context
-- v1.0 shipped with 27/27 requirements, 3 phases, 14 plans
-- v1.1 shipped with 17/17 active requirements, 7 phases, 14 plans
-- Dexie schema at v4 (v3: dosage->quantity, v4: rxNotesLang)
-- Separate snapshot DB (ClinicSoftwareSnapshots) at v1
-- App version 1.1.0
-- 9,761 LOC TypeScript/React
 
-### Quick Tasks Completed
+### Decisions
+- v1.0 + v1.1 decisions logged in PROJECT.md Key Decisions table
+- No new v1.2 decisions yet
+- [Phase 10]: calcMargin uses proportional area ratio vs A5 baseline (8mm), clamped to [4, 10]mm
+- [Phase 10]: Auto-save on dropdown change with no Save button for print settings
+- [Phase 10]: A5 is default paper size for both slips when no DB key exists
+- [Phase 10]: style.media='print' on injected style element to scope @page to print media
+- [Phase 10]: fireEvent.click replaces userEvent.click for tab interactions after DispensarySlip mounts due to jsdom @page CSS crash
 
-| # | Description | Date | Commit | Status | Directory |
-|---|-------------|------|--------|--------|-----------|
-| 1 | Set up GitHub remote repo and deploy to GitHub Pages | 2026-03-06 | fa0212f | | [1-set-up-github-remote-repo-and-deploy-to-](./quick/1-set-up-github-remote-repo-and-deploy-to-/) |
-| 2 | Fix Print CTA alignment | 2026-03-06 | 8de8291 | | [2-fix-print-cta-alignment](./quick/2-fix-print-cta-alignment/) |
-| 3 | Show full drug details after selection | 2026-03-06 | 0870962 | | [3-show-full-drug-details-after-selection-i](./quick/3-show-full-drug-details-after-selection-i/) |
-| 4 | Add Save & Print CTA to visit pages | 2026-03-06 | 3aee6f0 | | [4-add-save-and-print-cta-to-new-visit-page](./quick/4-add-save-and-print-cta-to-new-visit-page/) |
-| 5 | Research prescription UX patterns and redesign recommendations | 2026-03-06 | 0ac3084 | Verified | [5-research-prescription-ux-patterns-and-re](./quick/5-research-prescription-ux-patterns-and-re/) |
+### Pending Todos
+None yet.
+
+### Blockers/Concerns
+- Nastaliq line-height scales non-linearly across paper sizes (needs empirical testing in Phase 11)
+- A6 dispensary slip may be too narrow for 7-column medication table (flagged by research)
+- Chrome print dialog can override CSS @page margins (document limitation in UI)
+
+## Session Continuity
+Last session: 2026-03-11T17:49:01.418Z
+Stopped at: Completed 10-02-PLAN.md
+Resume file: None
 
 ---
-*Last updated: 2026-03-11 -- Milestone v1.2 started*
+*Last updated: 2026-03-11 -- Roadmap created*
