@@ -4,6 +4,7 @@ import { AuthProvider, useAuthContext } from './auth/AuthProvider'
 import { ToastProvider } from './components/ToastProvider'
 import { LoginPage } from './auth/LoginPage'
 import { seedDrugDatabase, deduplicateExistingDrugs } from './db/seedDrugs'
+import { checkAndCreateSnapshot } from './utils/snapshots'
 import { AppLayout } from './components/AppLayout'
 import { HomePage } from './pages/HomePage'
 import { PatientsPage } from './pages/PatientsPage'
@@ -22,6 +23,8 @@ function AppContent() {
       seedDrugDatabase()
         .then(() => deduplicateExistingDrugs())
         .catch(console.error)
+
+      checkAndCreateSnapshot().catch(console.error)
     }
   }, [isAuthenticated])
 

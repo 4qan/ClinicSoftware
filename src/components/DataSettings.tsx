@@ -7,6 +7,8 @@ import {
   restoreDatabase,
 } from '@/utils/backup'
 import type { BackupFile } from '@/utils/backup'
+import { listSnapshots, formatTimeAgo } from '@/utils/snapshots'
+import type { Snapshot } from '@/utils/snapshots'
 import { useToast } from '@/components/ToastProvider'
 
 function formatBackupDate(isoDate: string): string {
@@ -23,7 +25,10 @@ function formatBackupDate(isoDate: string): string {
 export function DataSettings() {
   const [isExporting, setIsExporting] = useState(false)
   const [lastBackup, setLastBackup] = useState<string | null>(null)
+  const [autoBackupDate, setAutoBackupDate] = useState<string | null>(null)
+  const [snapshots, setSnapshots] = useState<Snapshot[]>([])
   const [pendingBackup, setPendingBackup] = useState<BackupFile | null>(null)
+  const [pendingSnapshot, setPendingSnapshot] = useState<Snapshot | null>(null)
   const [restoreError, setRestoreError] = useState<string | null>(null)
   const [isRestoring, setIsRestoring] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -35,6 +40,14 @@ export function DataSettings() {
         setLastBackup(entry.value as string)
       }
     })
+
+    db.settings.get('lastAutoSnapshotDate').then((entry) => {
+      if (entry) {
+        setAutoBackupDate(entry.value as string)
+      }
+    })
+
+    listSnapshots().then(setSnapshots)
   }, [])
 
   async function handleExport() {
@@ -45,7 +58,9 @@ export function DataSettings() {
 
       const now = new Date().toISOString()
       await db.settings.put({ key: 'lastBackupDate', value: now })
+      await db.settings.put({ key: 'lastAutoSnapshotDate', value: now })
       setLastBackup(now)
+      setAutoBackupDate(now)
 
       const patients = backup.metadata.tables.patients ?? 0
       const visits = backup.metadata.tables.visits ?? 0
@@ -60,6 +75,9 @@ export function DataSettings() {
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+
+    // Clear any pending snapshot when selecting a file
+    setPendingSnapshot(null)
 
     try {
       const text = await file.text()
@@ -136,8 +154,57 @@ export function DataSettings() {
     }
   }
 
+  async function handleSnapshotRestore() {
+    if (!pendingSnapshot) return
+
+    setIsRestoring(true)
+    try {
+      // Read current auth hash before restore
+      const currentAuthEntry = await db.settings.get('auth')
+      const currentHash = currentAuthEntry
+        ? (currentAuthEntry.value as { hash: string })?.hash
+        : null
+
+      await restoreDatabase(pendingSnapshot.data)
+
+      // Read new auth hash after restore
+      const newAuthEntry = await db.settings.get('auth')
+      const newHash = newAuthEntry
+        ? (newAuthEntry.value as { hash: string })?.hash
+        : null
+
+      // Smart re-login: clear session if auth hash changed or was removed
+      if (currentHash !== newHash) {
+        localStorage.removeItem('clinic_auth_session')
+      }
+
+      // Reset auto-snapshot timer after restore
+      const now = new Date().toISOString()
+      await db.settings.put({ key: 'lastAutoSnapshotDate', value: now })
+
+      showToast('success', `Data restored from ${formatBackupDate(pendingSnapshot.createdAt)} auto-backup`)
+      setPendingSnapshot(null)
+
+      setTimeout(() => {
+        window.location.reload()
+      }, 400)
+    } catch {
+      showToast('error', 'Restore failed. Your previous data is unchanged. Please try again.')
+      setPendingSnapshot(null)
+    } finally {
+      setIsRestoring(false)
+    }
+  }
+
+  function handleSelectSnapshot(snapshot: Snapshot) {
+    setPendingSnapshot(snapshot)
+    setPendingBackup(null)
+    setRestoreError(null)
+  }
+
   function handleCancel() {
     setPendingBackup(null)
+    setPendingSnapshot(null)
     setRestoreError(null)
   }
 
@@ -165,6 +232,9 @@ export function DataSettings() {
 
       <p className="mt-3 text-sm text-gray-500">
         Last backup: {lastBackup ? formatBackupDate(lastBackup) : 'Never'}
+      </p>
+      <p className="text-sm text-gray-500">
+        Auto-backup: {autoBackupDate ? formatTimeAgo(autoBackupDate) : 'Never'}
       </p>
 
       {/* Restore Section */}
@@ -223,9 +293,56 @@ export function DataSettings() {
           </div>
         )}
 
+        {pendingSnapshot && (
+          <div className="mt-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-sm text-gray-800">
+              Auto-backup from <span className="font-medium">{formatBackupDate(pendingSnapshot.createdAt)}</span>
+            </p>
+            <p className="text-sm text-amber-700 mt-1 font-medium">
+              This will replace all your current data.
+            </p>
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-lg border border-gray-300 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSnapshotRestore}
+                disabled={isRestoring}
+                className="px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-lg cursor-pointer"
+              >
+                Restore
+              </button>
+            </div>
+          </div>
+        )}
+
         {isRestoring && (
           <div className="mt-3 h-2 w-full bg-gray-200 rounded-full overflow-hidden">
             <div className="h-full bg-red-500 rounded-full animate-pulse w-full" />
+          </div>
+        )}
+
+        {snapshots.length > 0 && (
+          <div className="mt-4">
+            <h5 className="text-sm font-medium text-gray-700 mb-2">Or restore from auto-backup</h5>
+            <div className="space-y-1.5">
+              {snapshots.map((snapshot) => (
+                <button
+                  key={snapshot.id}
+                  type="button"
+                  onClick={() => handleSelectSnapshot(snapshot)}
+                  disabled={isRestoring}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-700 bg-gray-50 hover:bg-gray-100 disabled:opacity-50 rounded-lg border border-gray-200 cursor-pointer"
+                >
+                  {formatBackupDate(snapshot.createdAt)}
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
