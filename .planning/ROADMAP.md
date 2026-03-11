@@ -167,11 +167,11 @@ Plans:
 **Requirements:** BKUP-06, BKUP-07
 **Depends on:** Phase 7
 **Track:** Backup
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 09-01-PLAN.md -- Snapshot data layer (separate Dexie DB, create/rotate/list, timer check, formatTimeAgo) via TDD
-- [ ] 09-02-PLAN.md -- App integration (fire-and-forget on load) + DataSettings UI (auto-backup status, snapshot list, snapshot restore)
+- [x] 09-01-PLAN.md -- Snapshot data layer (separate Dexie DB, create/rotate/list, timer check, formatTimeAgo) via TDD
+- [x] 09-02-PLAN.md -- App integration (fire-and-forget on load) + DataSettings UI (auto-backup status, snapshot list, snapshot restore)
 
 **Scope:**
 - Store snapshots in a separate Dexie database ('ClinicSoftwareSnapshots')
@@ -222,8 +222,7 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | BKUP-03 | 7 | Backup metadata |
 | BKUP-04 | 8 | Restore validation |
 | BKUP-05 | 8 | Auto-safety-backup (DROPPED per user decision) |
-| BKUP-06 | 9 | Auto-snapshots |
-| BKUP-07 | 9 | Snapshot rotation |
+| BKUP-06 | 9 | 2/2 | Complete   | 2026-03-11 | 9 | Snapshot rotation |
 
 **18/18 requirements mapped.**
 
@@ -240,7 +239,7 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | 6. Rx Notes Urdu Toggle | v1.1 | 2/2 | Complete | 2026-03-07 |
 | 7. Backup Export | v1.1 | 2/2 | Complete | 2026-03-10 |
 | 8. Backup Restore | v1.1 | 2/2 | Complete | 2026-03-11 |
-| 9. Auto-Snapshots | v1.1 | 1/2 | In Progress | -- |
+| 9. Auto-Snapshots | v1.1 | 2/2 | Complete | 2026-03-11 |
 
 ---
-*Last updated: 2026-03-11 after Phase 9 Plan 01 completion*
+*Last updated: 2026-03-11 after Phase 9 Plan 02 completion (v1.1 milestone complete)*

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Urdu & Backup
-status: in-progress
-last_updated: "2026-03-11T06:53:00Z"
-last_activity: "2026-03-11 -- Completed 09-01: Snapshot data layer with TDD"
+status: complete
+last_updated: "2026-03-11T07:20:00Z"
+last_activity: "2026-03-11 -- Completed 09-02: Snapshot UI integration (v1.1 milestone complete)"
 progress:
   total_phases: 7
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 14
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Project State: ClinicSoftware
@@ -22,9 +22,9 @@ See: .planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 9 (Auto-Snapshots)
-Plan: 1/2 complete
-Status: In Progress
-Last activity: 2026-03-11 -- Completed 09-01: Snapshot data layer with TDD
+Plan: 2/2 complete
+Status: Complete
+Last activity: 2026-03-11 -- Completed 09-02: Snapshot UI integration (v1.1 milestone complete)
 
 ## Progress
 | Phase | Name | Status | Plans |
@@ -34,7 +34,7 @@ Last activity: 2026-03-11 -- Completed 09-01: Snapshot data layer with TDD
 | 6 | Rx Notes Urdu Toggle | Complete | 2/2 |
 | 7 | Backup Export | Complete | 2/2 |
 | 8 | Backup Restore | Complete | 2/2 |
-| 9 | Auto-Snapshots | In Progress | 1/2 |
+| 9 | Auto-Snapshots | Complete | 2/2 |
 |-------|------|--------|-------|
 
 ## Decisions
@@ -50,6 +50,7 @@ See: .planning/PROJECT.md Key Decisions table
 - [Phase 08]: [Phase 08-01]: ValidationResult discriminated union (invalid_format/newer_schema). restoreDatabase uses Dexie transaction: clear all tables then bulkPut from backup. downloadBackup filename includes HH-MM (local time).
 - [Phase 08-02]: Restore UI in DataSettings: file picker with hidden input, inline confirmation (amber box) with backup date, red destructive Restore button. Smart re-login compares auth hash pre/post restore, clears localStorage session if changed. File input resets after every operation.
 - [Phase 09-01]: Separate Dexie instance 'ClinicSoftwareSnapshots' for snapshot isolation. checkAndCreateSnapshot: 24h timer, hard cap 5, silent error. rotateSnapshots keeps 3, deletes oldest by createdAt. formatTimeAgo uses Intl.RelativeTimeFormat with numeric:'auto'.
+- [Phase 09-02]: Auto-snapshot fire-and-forget in App.tsx useEffect (parallel with seedDrugDatabase). DataSettings shows "Auto-backup: X ago" status, lists up to 3 snapshots in unified restore section, snapshot restore uses same amber confirmation + smart re-login as file restore. Manual export resets auto-snapshot timer.
 
 ## Accumulated Context
 - v1.0 shipped with 27/27 requirements, 3 phases, 14 plans
@@ -74,6 +75,8 @@ See: .planning/PROJECT.md Key Decisions table
 - Settings tab extension pattern: add to SettingsCategory union + TABS array + conditional render
 - Snapshot utility: `src/utils/snapshots.ts` exports snapshotDb, checkAndCreateSnapshot, createSnapshot, rotateSnapshots, listSnapshots, getSnapshot, formatTimeAgo, resetSnapshotDatabase, Snapshot type
 - Snapshot DB is separate Dexie instance ('ClinicSoftwareSnapshots'), survives main DB restore operations
+- DataSettings: auto-backup status line + snapshot list in unified restore section (file + snapshot restore share same UI pattern)
+- Auto-snapshot fires on app load via checkAndCreateSnapshot() in App.tsx (fire-and-forget, parallel with seedDrugDatabase)
 
 ### Roadmap Evolution
 - Phase 5.1 inserted after Phase 5: Prescription Entry Cleanup (URGENT)
@@ -92,4 +95,4 @@ None.
 | 5 | Research prescription UX patterns and redesign recommendations | 2026-03-06 | 0ac3084 | Verified | [5-research-prescription-ux-patterns-and-re](./quick/5-research-prescription-ux-patterns-and-re/) |
 
 ---
-*Last updated: 2026-03-11 - Phase 9 Plan 01: Snapshot data layer with TDD*
+*Last updated: 2026-03-11 - Phase 9 Plan 02: Snapshot UI integration (v1.1 Urdu & Backup milestone complete)*
