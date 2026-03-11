@@ -5,14 +5,16 @@ import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { DrugManagement } from '@/components/DrugManagement'
 import { ClinicInfoSettings } from '@/components/ClinicInfoSettings'
 import { DataSettings } from '@/components/DataSettings'
+import { PrintSettings } from '@/components/PrintSettings'
 
-type SettingsCategory = 'account' | 'medications' | 'clinic' | 'data'
+type SettingsCategory = 'account' | 'medications' | 'clinic' | 'data' | 'print'
 
 const TABS: { key: SettingsCategory; label: string }[] = [
   { key: 'account', label: 'Account' },
   { key: 'medications', label: 'Medications' },
   { key: 'clinic', label: 'Clinic Info' },
   { key: 'data', label: 'Data' },
+  { key: 'print', label: 'Print' },
 ]
 
 function RecoveryCodeSection() {
@@ -178,6 +180,11 @@ export function SettingsPage() {
       {/* Data Tab */}
       {activeCategory === 'data' && (
         <DataSettings />
+      )}
+
+      {/* Print Tab */}
+      {activeCategory === 'print' && (
+        <PrintSettings />
       )}
     </div>
   )
