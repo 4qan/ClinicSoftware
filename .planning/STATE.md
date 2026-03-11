@@ -4,12 +4,12 @@ milestone: v1.1
 milestone_name: Urdu & Backup
 status: executing
 last_updated: "2026-03-11T04:47:46.696Z"
-last_activity: "2026-03-11 -- Completed 08-01: Backup validation & restore logic"
+last_activity: "2026-03-11 -- Completed 08-02: Restore UI with file picker and smart re-login"
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 12
-  completed_plans: 11
+  completed_plans: 12
 ---
 
 # Project State: ClinicSoftware
@@ -22,9 +22,9 @@ See: .planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 8 (Backup Restore)
-Plan: 1/2 complete
-Status: In progress
-Last activity: 2026-03-11 -- Completed 08-01: Backup validation & restore logic
+Plan: 2/2 complete
+Status: Complete
+Last activity: 2026-03-11 -- Completed 08-02: Restore UI with file picker and smart re-login
 
 ## Progress
 | Phase | Name | Status | Plans |
@@ -33,7 +33,7 @@ Last activity: 2026-03-11 -- Completed 08-01: Backup validation & restore logic
 | 5.1 | Prescription Entry Cleanup (INSERTED) | Complete | 2/2 |
 | 6 | Rx Notes Urdu Toggle | Complete | 2/2 |
 | 7 | Backup Export | Complete | 2/2 |
-| 8 | Backup Restore | In Progress | 1/2 |
+| 8 | Backup Restore | Complete | 2/2 |
 | 9 | Auto-Snapshots | Not Started | -- |
 |-------|------|--------|-------|
 
@@ -48,6 +48,7 @@ See: .planning/PROJECT.md Key Decisions table
 - [Phase 07-01]: Toast notifications via createPortal (success/info auto-dismiss 5s, error manual close). __APP_VERSION__ via Vite define. exportDatabase iterates db.tables, downloadBackup triggers anchor click download.
 - [Phase 07-02]: DataSettings component in Settings Data tab (4th tab). Export button triggers exportDatabase + downloadBackup with progress bar. Last backup timestamp persisted via db.settings key-value store.
 - [Phase 08]: [Phase 08-01]: ValidationResult discriminated union (invalid_format/newer_schema). restoreDatabase uses Dexie transaction: clear all tables then bulkPut from backup. downloadBackup filename includes HH-MM (local time).
+- [Phase 08-02]: Restore UI in DataSettings: file picker with hidden input, inline confirmation (amber box) with backup date, red destructive Restore button. Smart re-login compares auth hash pre/post restore, clears localStorage session if changed. File input resets after every operation.
 
 ## Accumulated Context
 - v1.0 shipped with 27/27 requirements, 3 phases, 14 plans
@@ -88,4 +89,4 @@ None.
 | 5 | Research prescription UX patterns and redesign recommendations | 2026-03-06 | 0ac3084 | Verified | [5-research-prescription-ux-patterns-and-re](./quick/5-research-prescription-ux-patterns-and-re/) |
 
 ---
-*Last updated: 2026-03-11 - Phase 8 Plan 01: Backup validation & restore logic*
+*Last updated: 2026-03-11 - Phase 8 Plan 02: Restore UI with file picker and smart re-login*
