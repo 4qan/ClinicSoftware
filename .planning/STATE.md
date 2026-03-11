@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Urdu & Backup
-status: archived
+milestone: v1.2
+milestone_name: Print Customization
+status: active
 last_updated: "2026-03-11"
-last_activity: "2026-03-11 -- Milestone v1.1 archived"
+last_activity: "2026-03-11 -- Milestone v1.2 started"
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 14
-  completed_plans: 14
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State: ClinicSoftware
@@ -17,11 +17,14 @@ progress:
 ## Project Reference
 See: .planning/PROJECT.md (updated 2026-03-11)
 **Core value:** The doctor can see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even with no internet.
-**Current focus:** Planning next milestone
+**Current focus:** Defining requirements for v1.2
 
 ## Current Position
 
-Milestone v1.1 archived. Ready for `/gsd:new-milestone`.
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-11 — Milestone v1.2 started
 
 ## Accumulated Context
 - v1.0 shipped with 27/27 requirements, 3 phases, 14 plans
@@ -42,4 +45,4 @@ Milestone v1.1 archived. Ready for `/gsd:new-milestone`.
 | 5 | Research prescription UX patterns and redesign recommendations | 2026-03-06 | 0ac3084 | Verified | [5-research-prescription-ux-patterns-and-re](./quick/5-research-prescription-ux-patterns-and-re/) |
 
 ---
-*Last updated: 2026-03-11 -- v1.1 milestone archived*
+*Last updated: 2026-03-11 -- Milestone v1.2 started*
