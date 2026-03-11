@@ -1,11 +1,32 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { db } from '@/db/index'
-import { exportDatabase, downloadBackup } from '@/utils/backup'
+import {
+  exportDatabase,
+  downloadBackup,
+  validateBackupFile,
+  restoreDatabase,
+} from '@/utils/backup'
+import type { BackupFile } from '@/utils/backup'
 import { useToast } from '@/components/ToastProvider'
+
+function formatBackupDate(isoDate: string): string {
+  return new Date(isoDate).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  })
+}
 
 export function DataSettings() {
   const [isExporting, setIsExporting] = useState(false)
   const [lastBackup, setLastBackup] = useState<string | null>(null)
+  const [pendingBackup, setPendingBackup] = useState<BackupFile | null>(null)
+  const [restoreError, setRestoreError] = useState<string | null>(null)
+  const [isRestoring, setIsRestoring] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const { showToast } = useToast()
 
   useEffect(() => {
@@ -36,16 +57,88 @@ export function DataSettings() {
     }
   }
 
-  function formatLastBackup(): string {
-    if (!lastBackup) return 'Never'
-    return new Date(lastBackup).toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    })
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      const text = await file.text()
+      let parsed: unknown
+      try {
+        parsed = JSON.parse(text)
+      } catch {
+        setRestoreError('This file is not a valid backup. Please select a ClinicSoftware backup file.')
+        showToast('error', 'This file is not a valid backup. Please select a ClinicSoftware backup file.')
+        setPendingBackup(null)
+        if (fileInputRef.current) fileInputRef.current.value = ''
+        return
+      }
+
+      const result = validateBackupFile(parsed)
+
+      if (!result.valid) {
+        if (result.error === 'newer_schema') {
+          setRestoreError('This backup is from a newer version. Please update the app first.')
+          showToast('error', 'This backup is from a newer version. Please update the app first.')
+        } else {
+          setRestoreError('This file is not a valid backup. Please select a ClinicSoftware backup file.')
+          showToast('error', 'This file is not a valid backup. Please select a ClinicSoftware backup file.')
+        }
+        setPendingBackup(null)
+      } else {
+        setPendingBackup(parsed as BackupFile)
+        setRestoreError(null)
+      }
+    } catch {
+      setRestoreError('This file is not a valid backup. Please select a ClinicSoftware backup file.')
+      showToast('error', 'This file is not a valid backup. Please select a ClinicSoftware backup file.')
+      setPendingBackup(null)
+    }
+
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  async function handleRestore() {
+    if (!pendingBackup) return
+
+    setIsRestoring(true)
+    try {
+      // Read current auth hash before restore
+      const currentAuthEntry = await db.settings.get('auth')
+      const currentHash = currentAuthEntry
+        ? (currentAuthEntry.value as { hash: string })?.hash
+        : null
+
+      await restoreDatabase(pendingBackup)
+
+      // Read new auth hash after restore
+      const newAuthEntry = await db.settings.get('auth')
+      const newHash = newAuthEntry
+        ? (newAuthEntry.value as { hash: string })?.hash
+        : null
+
+      // Smart re-login: clear session if auth hash changed or was removed
+      if (currentHash !== newHash) {
+        localStorage.removeItem('clinic_auth_session')
+      }
+
+      showToast('success', `Data restored from ${formatBackupDate(pendingBackup.metadata.exportDate)} backup`)
+      setPendingBackup(null)
+
+      setTimeout(() => {
+        window.location.reload()
+      }, 400)
+    } catch {
+      showToast('error', 'Restore failed. Your previous data is unchanged. Please try again.')
+      setPendingBackup(null)
+    } finally {
+      setIsRestoring(false)
+    }
+  }
+
+  function handleCancel() {
+    setPendingBackup(null)
+    setRestoreError(null)
   }
 
   return (
@@ -71,8 +164,71 @@ export function DataSettings() {
       )}
 
       <p className="mt-3 text-sm text-gray-500">
-        Last backup: {formatLastBackup()}
+        Last backup: {lastBackup ? formatBackupDate(lastBackup) : 'Never'}
       </p>
+
+      {/* Restore Section */}
+      <div className="border-t border-gray-200 mt-5 pt-5">
+        <h4 className="text-base font-semibold text-gray-900 mb-1">Restore from Backup</h4>
+        <p className="text-sm text-gray-600 mb-3">
+          Select a backup file to restore your clinic data.
+        </p>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
+
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isRestoring}
+          className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 rounded-lg cursor-pointer border border-gray-300"
+        >
+          Select Backup File
+        </button>
+
+        {restoreError && (
+          <p className="mt-2 text-sm text-red-600">{restoreError}</p>
+        )}
+
+        {pendingBackup && (
+          <div className="mt-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-sm text-gray-800">
+              Backup from <span className="font-medium">{formatBackupDate(pendingBackup.metadata.exportDate)}</span>
+            </p>
+            <p className="text-sm text-amber-700 mt-1 font-medium">
+              This will replace all your current data.
+            </p>
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-lg border border-gray-300 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleRestore}
+                disabled={isRestoring}
+                className="px-3 py-1.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-lg cursor-pointer"
+              >
+                Restore
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isRestoring && (
+          <div className="mt-3 h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-full bg-red-500 rounded-full animate-pulse w-full" />
+          </div>
+        )}
+      </div>
     </div>
   )
 }
