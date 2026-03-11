@@ -20,9 +20,9 @@ Requirements for v1.1 milestone. Each maps to roadmap phases.
 ### Data Backup & Restore
 
 - [x] **BKUP-01**: User can export full database to a downloadable file from Settings
-- [ ] **BKUP-02**: User can restore full database from a backup file via Settings
+- [x] **BKUP-02**: User can restore full database from a backup file via Settings
 - [x] **BKUP-03**: Backup file includes metadata (export date, app version, schema version, record counts)
-- [ ] **BKUP-04**: Restore validates backup file and shows metadata before overwriting
+- [x] **BKUP-04**: Restore validates backup file and shows metadata before overwriting
 - [ ] **BKUP-05**: Auto-safety-backup is created before any restore operation (prevents accidental data loss)
 - [ ] **BKUP-06**: App auto-saves in-app backup snapshots every 24 hours (silent, no user interaction)
 - [ ] **BKUP-07**: In-app snapshots auto-rotate, keeping only the last 3
@@ -71,9 +71,9 @@ Requirements for v1.1 milestone. Each maps to roadmap phases.
 | URDU-06 | 6 (Rx Notes Urdu Toggle) | Complete |
 | URDU-07 | 6 (Rx Notes Urdu Toggle) | Complete |
 | BKUP-01 | 7 (Backup Export) | Complete |
-| BKUP-02 | 8 (Backup Restore) | Pending |
+| BKUP-02 | 8 (Backup Restore) | Complete |
 | BKUP-03 | 7 (Backup Export) | Complete |
-| BKUP-04 | 8 (Backup Restore) | Pending |
+| BKUP-04 | 8 (Backup Restore) | Complete |
 | BKUP-05 | 8 (Backup Restore) | Pending |
 | BKUP-06 | 9 (Auto-Snapshots) | Pending |
 | BKUP-07 | 9 (Auto-Snapshots) | Pending |

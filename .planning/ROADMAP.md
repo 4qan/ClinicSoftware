@@ -132,27 +132,32 @@ Plans:
 
 #### Phase 8: Backup Restore
 
-**Requirements:** BKUP-02, BKUP-04, BKUP-05
+**Goal:** Database restore from backup file with validation, inline confirmation, and smart re-login.
+**Requirements:** BKUP-02, BKUP-04
 **Depends on:** Phase 7
 **Track:** Backup
+**Plans:** 2 plans
 
-Build the database restore functionality with validation and safety measures.
+Plans:
+- [ ] 08-01-PLAN.md -- Data layer: validateBackupFile + restoreDatabase + datetime filename update
+- [ ] 08-02-PLAN.md -- Restore UI in DataSettings (file picker, inline confirmation, error handling, smart re-login) + visual verification
 
 **Scope:**
-- Create `restoreDatabase()` in `backup.ts` using `dexie-export-import`
-- File picker UI in Settings for selecting backup file
-- Validation: parse file, check format, extract metadata, verify schema version compatibility
-- Pre-restore confirmation dialog with backup date, record counts, schema version, overwrite warning
-- Auto-safety-backup: silently export current DB before restore
-- Schema version handling: reject newer schema with "update app" message, handle older via migration
-- All-or-nothing restore inside Dexie transaction
+- Add `validateBackupFile()` and `restoreDatabase()` to `backup.ts` using Dexie transaction for atomicity
+- Update `downloadBackup()` filename to include time (YYYY-MM-DD-HH-MM)
+- File picker UI in Settings Data tab (below export, same card)
+- Inline confirmation with backup date only (no technical details per user decision)
+- Error handling: invalid file message, newer schema message, restore failure message
+- Smart re-login: compare auth hash before/after restore, force logout if changed
+- Page reload after successful restore
+- BKUP-05 (auto-safety-backup) deliberately dropped per user decision
 
 **Success criteria:**
 1. User can select a backup file and restore the full database from Settings
-2. Metadata preview (date, record counts, version) is shown before restore proceeds
-3. Invalid or incompatible files are rejected with a clear error message
-4. A safety backup of the current database is automatically downloaded before restore executes
-5. After restore, all data matches the backup file contents
+2. Backup date is shown before restore proceeds (no technical details)
+3. Invalid or incompatible files are rejected with clear, non-technical error messages
+4. After restore, all data matches the backup file contents
+5. Smart re-login forces logout if auth credentials changed
 
 ---
 
@@ -206,11 +211,13 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | RX-CLEANUP-02 | 5.1 | Amber indicator for non-standard ComboBox values |
 | RX-CLEANUP-03 | 5.1 | Rename dosage to quantity + Dexie migration |
 | RX-CLEANUP-04 | 5.1 | No blocking validation (indicators informational only) |
-| URDU-06 | 6 | 2/2 | Complete   | 2026-03-07 | 6 | Rx Notes print |
-| BKUP-01 | 7 | 2/2 | Complete   | 2026-03-10 | 8 | Database restore |
+| URDU-06 | 6 | Rx Notes Urdu toggle |
+| URDU-07 | 6 | Rx Notes print language |
+| BKUP-01 | 7 | Database export |
+| BKUP-02 | 8 | Database restore |
 | BKUP-03 | 7 | Backup metadata |
 | BKUP-04 | 8 | Restore validation |
-| BKUP-05 | 8 | Auto-safety-backup |
+| BKUP-05 | 8 | Auto-safety-backup (DROPPED per user decision) |
 | BKUP-06 | 9 | Auto-snapshots |
 | BKUP-07 | 9 | Snapshot rotation |
 
@@ -228,8 +235,8 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | 5.1 Prescription Entry Cleanup | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 6. Rx Notes Urdu Toggle | v1.1 | 2/2 | Complete | 2026-03-07 |
 | 7. Backup Export | v1.1 | 2/2 | Complete | 2026-03-10 |
-| 8. Backup Restore | v1.1 | 0/? | Not Started | -- |
+| 8. Backup Restore | v1.1 | 0/2 | Not Started | -- |
 | 9. Auto-Snapshots | v1.1 | 0/? | Not Started | -- |
 
 ---
-*Last updated: 2026-03-10 after Phase 7 completion*
+*Last updated: 2026-03-11 after Phase 8 planning*

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Urdu & Backup
-status: completed
-last_updated: "2026-03-10T18:28:21.907Z"
-last_activity: "2026-03-10 -- Completed 07-02: Backup export UI (DataSettings + Settings Data tab)"
+status: executing
+last_updated: "2026-03-11T04:47:46.696Z"
+last_activity: "2026-03-11 -- Completed 08-01: Backup validation & restore logic"
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 12
+  completed_plans: 11
 ---
 
 # Project State: ClinicSoftware
@@ -21,10 +21,10 @@ See: .planning/PROJECT.md (updated 2026-03-06)
 
 ## Current Position
 
-Phase: 7 (Backup Export)
-Plan: 2/2 complete
-Status: Phase complete
-Last activity: 2026-03-10 -- Completed 07-02: Backup export UI (DataSettings + Settings Data tab)
+Phase: 8 (Backup Restore)
+Plan: 1/2 complete
+Status: In progress
+Last activity: 2026-03-11 -- Completed 08-01: Backup validation & restore logic
 
 ## Progress
 | Phase | Name | Status | Plans |
@@ -33,7 +33,7 @@ Last activity: 2026-03-10 -- Completed 07-02: Backup export UI (DataSettings + S
 | 5.1 | Prescription Entry Cleanup (INSERTED) | Complete | 2/2 |
 | 6 | Rx Notes Urdu Toggle | Complete | 2/2 |
 | 7 | Backup Export | Complete | 2/2 |
-| 8 | Backup Restore | Not Started | -- |
+| 8 | Backup Restore | In Progress | 1/2 |
 | 9 | Auto-Snapshots | Not Started | -- |
 |-------|------|--------|-------|
 
@@ -47,6 +47,7 @@ See: .planning/PROJECT.md Key Decisions table
 - [Phase 06-02]: Conditional Nastaliq/RTL print styling for Urdu rx notes on PrescriptionSlip. Hover tooltip on language toggle for keyboard shortcut hint (user-requested instead of dismissable hint).
 - [Phase 07-01]: Toast notifications via createPortal (success/info auto-dismiss 5s, error manual close). __APP_VERSION__ via Vite define. exportDatabase iterates db.tables, downloadBackup triggers anchor click download.
 - [Phase 07-02]: DataSettings component in Settings Data tab (4th tab). Export button triggers exportDatabase + downloadBackup with progress bar. Last backup timestamp persisted via db.settings key-value store.
+- [Phase 08]: [Phase 08-01]: ValidationResult discriminated union (invalid_format/newer_schema). restoreDatabase uses Dexie transaction: clear all tables then bulkPut from backup. downloadBackup filename includes HH-MM (local time).
 
 ## Accumulated Context
 - v1.0 shipped with 27/27 requirements, 3 phases, 14 plans
@@ -62,7 +63,10 @@ See: .planning/PROJECT.md Key Decisions table
 - Rx Notes field: RxNotesField component with En/Urdu segmented toggle, RTL Nastaliq styling, rxNotesLang persisted per visit
 - IndexedDB is origin-scoped and device-local (no cross-device data sharing)
 - Toast system: ToastProvider wraps AppContent in App.tsx, useToast() hook for app-wide access
-- Backup utility: `src/utils/backup.ts` exports exportDatabase(), downloadBackup(), BackupFile, BackupMetadata types
+- Backup utility: `src/utils/backup.ts` exports exportDatabase(), downloadBackup(), validateBackupFile(), restoreDatabase(), BackupFile, BackupMetadata, ValidationResult types
+- validateBackupFile checks shape, appName, schemaVersion (rejects newer), returns ValidationResult discriminated union
+- restoreDatabase uses `db.transaction('rw', db.tables, ...)` for atomic clear + bulkPut restore
+- downloadBackup filename format: `ClinicSoftware-backup-YYYY-MM-DD-HH-MM.json` (local time)
 - App version 1.1.0, injected as __APP_VERSION__ build-time constant
 - DataSettings component: `src/components/DataSettings.tsx` with export button, progress bar, last backup display
 - Settings tab extension pattern: add to SettingsCategory union + TABS array + conditional render
@@ -84,4 +88,4 @@ None.
 | 5 | Research prescription UX patterns and redesign recommendations | 2026-03-06 | 0ac3084 | Verified | [5-research-prescription-ux-patterns-and-re](./quick/5-research-prescription-ux-patterns-and-re/) |
 
 ---
-*Last updated: 2026-03-10 - Phase 7 Plan 02: Backup export UI*
+*Last updated: 2026-03-11 - Phase 8 Plan 01: Backup validation & restore logic*
