@@ -7,6 +7,7 @@ import { resetDatabase } from '@/db/index'
 import { registerPatient } from '@/db/patients'
 import { createVisit } from '@/db/visits'
 import { saveClinicInfo } from '@/db/settings'
+import { savePrintSetting } from '@/db/printSettings'
 import type { Patient } from '@/db/index'
 
 function renderPrintPage(visitId: string) {
@@ -25,6 +26,8 @@ let testVisitId: string
 
 afterEach(() => {
   cleanup()
+  // Remove injected print style to prevent jsdom CSS crash in subsequent tests
+  document.getElementById('print-page-style')?.remove()
 })
 
 beforeEach(async () => {
@@ -63,6 +66,187 @@ beforeEach(async () => {
         sortOrder: 0,
       },
     ],
+  })
+})
+
+describe('PrintVisitPage - dynamic @page injection (PRENG-01)', () => {
+  it('injects @page style into document.head before window.print with A5 default', async () => {
+    const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {})
+
+    renderPrintPage(testVisitId)
+
+    await waitFor(() => {
+      // 'Print Prescription' appears in both breadcrumb and button; use getAllByText
+      expect(screen.getAllByText('Print Prescription').length).toBeGreaterThanOrEqual(1)
+    })
+
+    // Click the print button (last occurrence is the button in the toolbar)
+    const printBtns = screen.getAllByText('Print Prescription')
+    fireEvent.click(printBtns[printBtns.length - 1])
+
+    // Style injected synchronously before setTimeout fires
+    const styleEl = document.getElementById('print-page-style')
+    expect(styleEl).not.toBeNull()
+    expect(styleEl!.textContent).toContain('@page { size: 148mm 210mm portrait; margin: 8mm; }')
+
+    printSpy.mockRestore()
+  })
+
+  it('injects correct @page for non-default paper size (A4)', async () => {
+    await savePrintSetting('printPrescriptionSize', 'A4')
+    const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {})
+
+    renderPrintPage(testVisitId)
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Print Prescription').length).toBeGreaterThanOrEqual(1)
+    })
+
+    const printBtns = screen.getAllByText('Print Prescription')
+    fireEvent.click(printBtns[printBtns.length - 1])
+
+    const styleEl = document.getElementById('print-page-style')
+    expect(styleEl).not.toBeNull()
+    expect(styleEl!.textContent).toContain('size: 210mm 297mm portrait; margin: 10mm')
+
+    printSpy.mockRestore()
+  })
+
+  it('removes @page style on afterprint event', async () => {
+    const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {})
+
+    renderPrintPage(testVisitId)
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Print Prescription').length).toBeGreaterThanOrEqual(1)
+    })
+
+    const printBtns = screen.getAllByText('Print Prescription')
+    fireEvent.click(printBtns[printBtns.length - 1])
+
+    // Style should be present after print trigger
+    expect(document.getElementById('print-page-style')).not.toBeNull()
+
+    // Simulate afterprint event
+    window.dispatchEvent(new Event('afterprint'))
+
+    await waitFor(() => {
+      expect(document.getElementById('print-page-style')).toBeNull()
+    })
+
+    printSpy.mockRestore()
+  })
+})
+
+describe('PrintVisitPage - conditional rendering (PRENG-03)', () => {
+  it('only prescription slip is in DOM when prescription preview is active', async () => {
+    renderPrintPage(testVisitId)
+
+    await waitFor(() => {
+      expect(document.querySelector('.prescription-slip')).toBeInTheDocument()
+    })
+
+    // Default previewMode is prescription: only prescription slip should be present
+    expect(document.querySelector('.prescription-slip')).not.toBeNull()
+    expect(document.querySelector('.dispensary-slip')).toBeNull()
+  })
+
+  it('only dispensary slip is in DOM when dispensary preview is active', async () => {
+    renderPrintPage(testVisitId)
+
+    await waitFor(() => {
+      // Wait for page to load
+      expect(screen.getAllByText('Dispensary').length).toBeGreaterThanOrEqual(1)
+    })
+
+    fireEvent.click(screen.getAllByText('Dispensary')[0])
+
+    await waitFor(() => {
+      expect(document.querySelector('.dispensary-slip')).not.toBeNull()
+    })
+
+    expect(document.querySelector('.prescription-slip')).toBeNull()
+  })
+
+  it('only prescription slip in DOM when print mode is prescription', async () => {
+    const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {})
+
+    renderPrintPage(testVisitId)
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Print Prescription').length).toBeGreaterThanOrEqual(1)
+    })
+
+    const printBtns = screen.getAllByText('Print Prescription')
+    fireEvent.click(printBtns[printBtns.length - 1])
+
+    // After clicking print (prescription), only prescription slip should be in DOM
+    expect(document.querySelector('.prescription-slip')).not.toBeNull()
+    expect(document.querySelector('.dispensary-slip')).toBeNull()
+
+    printSpy.mockRestore()
+  })
+
+  it('only dispensary slip in DOM when print mode is dispensary', async () => {
+    const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {})
+
+    renderPrintPage(testVisitId)
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Dispensary').length).toBeGreaterThanOrEqual(1)
+    })
+
+    fireEvent.click(screen.getAllByText('Dispensary')[0])
+
+    await waitFor(() => {
+      expect(screen.getByText('Print Dispensary Slip')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByText('Print Dispensary Slip'))
+
+    // After clicking print (dispensary), only dispensary slip should be in DOM
+    await waitFor(() => {
+      expect(document.querySelector('.dispensary-slip')).not.toBeNull()
+    })
+    expect(document.querySelector('.prescription-slip')).toBeNull()
+
+    printSpy.mockRestore()
+  })
+})
+
+describe('PrintVisitPage - size badge', () => {
+  it('displays paper size badge with default A5 for prescription preview', async () => {
+    renderPrintPage(testVisitId)
+
+    await waitFor(() => {
+      expect(screen.getByText('Paper: A5 (148 x 210 mm)')).toBeInTheDocument()
+    })
+  })
+
+  it('displays correct badge when prescription size is set to A4', async () => {
+    await savePrintSetting('printPrescriptionSize', 'A4')
+
+    renderPrintPage(testVisitId)
+
+    await waitFor(() => {
+      expect(screen.getByText('Paper: A4 (210 x 297 mm)')).toBeInTheDocument()
+    })
+  })
+
+  it('displays dispensary size badge when dispensary tab is active', async () => {
+    await savePrintSetting('printDispensarySize', 'A6')
+
+    renderPrintPage(testVisitId)
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Dispensary').length).toBeGreaterThanOrEqual(1)
+    })
+
+    fireEvent.click(screen.getAllByText('Dispensary')[0])
+
+    await waitFor(() => {
+      expect(screen.getByText('Paper: A6 (105 x 148 mm)')).toBeInTheDocument()
+    })
   })
 })
 
