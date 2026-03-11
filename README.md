@@ -33,8 +33,11 @@ Built for a clinic in an area with unreliable internet, used by a non-tech-savvy
 - Works without internet after first load
 - Nastaliq font cached for offline Urdu rendering
 
-### Data Backup
+### Data Backup & Restore
 - One-click full database export to JSON from Settings > Data tab
+- Restore from backup file with validation and inline confirmation
+- Smart re-login if credentials change after restore
+- Auto-snapshots: silent 24h backups with 3-copy rotation
 - Backup includes metadata (app version, schema version, record counts, export date)
 - Toast notifications for success/error feedback
 
@@ -95,14 +98,12 @@ npm run test:e2e      # E2E tests (Playwright)
 - Prescription writing with drug autocomplete
 - A5 prescription and dispensary slip printing
 
-### v1.1 Urdu & Backup (In Progress)
-- [x] Urdu foundation (Nastaliq font + translation maps)
-- [x] Bilingual prescription printing (English + Urdu)
-- [x] Prescription entry cleanup (field naming, drug display, custom value indicators)
-- [x] Rx Notes English/Urdu toggle with sticky language preference
-- [x] One-click database export (JSON backup with metadata)
-- [ ] Database restore from backup file
-- [ ] Auto-backup snapshots (silent, rotating)
+### v1.1 Urdu & Backup (Shipped)
+- Urdu prescription printing with Nastaliq font and bilingual headers
+- Rx Notes English/Urdu toggle with sticky language preference
+- Prescription entry cleanup (field naming, drug display, custom value indicators)
+- Full database backup/restore with validation and smart re-login
+- Auto-snapshots: silent 24h backups with 3-copy rotation
 
 ## Project Structure
 
@@ -112,7 +113,7 @@ src/
   pages/         # Route pages (NewVisitPage, EditVisitPage, PrintVisitPage, etc.)
   constants/     # Clinical data, translations, drug database
   db/            # Dexie database schema, settings, seed data
-  utils/         # Helpers (drug formatters, etc.)
+  utils/         # Helpers (drug formatters, backup, snapshots, etc.)
   __tests__/     # Unit and component tests
 ```
 
