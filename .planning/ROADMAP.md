@@ -163,14 +163,18 @@ Plans:
 
 #### Phase 9: Auto-Snapshots
 
+**Goal:** Silent in-app backup snapshots that auto-create every 24 hours and rotate old copies, with restore access from the existing DataSettings restore section.
 **Requirements:** BKUP-06, BKUP-07
 **Depends on:** Phase 7
 **Track:** Backup
+**Plans:** 2 plans
 
-Implement silent in-app backup snapshots that run automatically and rotate old copies.
+Plans:
+- [ ] 09-01-PLAN.md -- Snapshot data layer (separate Dexie DB, create/rotate/list, timer check, formatTimeAgo) via TDD
+- [ ] 09-02-PLAN.md -- App integration (fire-and-forget on load) + DataSettings UI (auto-backup status, snapshot list, snapshot restore)
 
 **Scope:**
-- Store snapshots in a dedicated IndexedDB table (or separate Dexie database)
+- Store snapshots in a separate Dexie database ('ClinicSoftwareSnapshots')
 - Trigger snapshot every 24 hours (check on app load, compare last snapshot timestamp)
 - Silent operation: no user interaction, no download, no blocking UI
 - Auto-rotate: keep only the last 3 snapshots, delete oldest when creating new one
@@ -235,8 +239,8 @@ Phases 5 and 6 can run in parallel. Phases 8 and 9 can run in parallel.
 | 5.1 Prescription Entry Cleanup | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 6. Rx Notes Urdu Toggle | v1.1 | 2/2 | Complete | 2026-03-07 |
 | 7. Backup Export | v1.1 | 2/2 | Complete | 2026-03-10 |
-| 8. Backup Restore | v1.1 | 0/2 | Not Started | -- |
-| 9. Auto-Snapshots | v1.1 | 0/? | Not Started | -- |
+| 8. Backup Restore | v1.1 | 2/2 | Complete | 2026-03-11 |
+| 9. Auto-Snapshots | v1.1 | 0/2 | Not Started | -- |
 
 ---
-*Last updated: 2026-03-11 after Phase 8 planning*
+*Last updated: 2026-03-11 after Phase 9 planning*
