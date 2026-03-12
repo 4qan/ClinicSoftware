@@ -38,9 +38,8 @@ const mockSavePrintSetting = vi.fn()
 vi.mock('@/db/printSettings', () => ({
   getPrintSettings: (...args: unknown[]) => mockGetPrintSettings(...args),
   savePrintSetting: (...args: unknown[]) => mockSavePrintSetting(...args),
-  PAPER_SIZE_ORDER: ['A6', 'A5', 'A4', 'Letter'],
+  PAPER_SIZE_ORDER: ['A5', 'A4', 'Letter'],
   PAPER_SIZES: {
-    A6: { width: 105, height: 148, label: 'A6 (105 x 148 mm)' },
     A5: { width: 148, height: 210, label: 'A5 (148 x 210 mm)' },
     A4: { width: 210, height: 297, label: 'A4 (210 x 297 mm)' },
     Letter: { width: 216, height: 279, label: 'Letter (216 x 279 mm)' },
@@ -139,19 +138,19 @@ describe('PrintSettings component', () => {
     })
   })
 
-  it('each dropdown shows 4 options', async () => {
+  it('each dropdown shows 3 options (A6 removed)', async () => {
     await openPrintTab()
     await waitFor(() => {
       const selects = screen.getAllByRole('combobox')
-      expect(selects[0].querySelectorAll('option')).toHaveLength(4)
-      expect(selects[1].querySelectorAll('option')).toHaveLength(4)
+      expect(selects[0].querySelectorAll('option')).toHaveLength(3)
+      expect(selects[1].querySelectorAll('option')).toHaveLength(3)
     })
   })
 
-  it('dropdown shows A6 option with dimensions', async () => {
+  it('dropdown does not show A6 option', async () => {
     await openPrintTab()
     await waitFor(() => {
-      expect(screen.getAllByRole('option', { name: 'A6 (105 x 148 mm)' })).toHaveLength(2)
+      expect(screen.queryAllByRole('option', { name: 'A6 (105 x 148 mm)' })).toHaveLength(0)
     })
   })
 
@@ -172,10 +171,10 @@ describe('PrintSettings component', () => {
     await waitFor(() => screen.getAllByRole('combobox'))
 
     const selects = screen.getAllByRole('combobox')
-    await user.selectOptions(selects[1], 'A6')
+    await user.selectOptions(selects[1], 'Letter')
 
     await waitFor(() => {
-      expect(mockSavePrintSetting).toHaveBeenCalledWith('printDispensarySize', 'A6')
+      expect(mockSavePrintSetting).toHaveBeenCalledWith('printDispensarySize', 'Letter')
     })
   })
 

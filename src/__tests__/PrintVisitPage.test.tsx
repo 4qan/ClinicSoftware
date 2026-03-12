@@ -233,7 +233,7 @@ describe('PrintVisitPage - size badge', () => {
     })
   })
 
-  it('displays dispensary size badge when dispensary tab is active', async () => {
+  it('shows A5 badge when stored size is A6 (fallback)', async () => {
     await savePrintSetting('printDispensarySize', 'A6')
 
     renderPrintPage(testVisitId)
@@ -245,7 +245,8 @@ describe('PrintVisitPage - size badge', () => {
     fireEvent.click(screen.getAllByText('Dispensary')[0])
 
     await waitFor(() => {
-      expect(screen.getByText('Paper: A6 (105 x 148 mm)')).toBeInTheDocument()
+      // A6 falls back to A5; badge should show A5 dimensions
+      expect(screen.getByText('Paper: A5 (148 x 210 mm)')).toBeInTheDocument()
     })
   })
 })
