@@ -251,6 +251,57 @@ describe('PrintVisitPage - size badge', () => {
   })
 })
 
+describe('PrintVisitPage - preview frame dimensions (SCALE-04)', () => {
+  it('preview frame dimensions match A5 paper proportions by default', async () => {
+    renderPrintPage(testVisitId)
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Print Prescription').length).toBeGreaterThanOrEqual(1)
+    })
+
+    const frame = document.querySelector('[data-testid="preview-frame"]') as HTMLElement
+    expect(frame).not.toBeNull()
+    // A5: width=148mm, height=210mm; PREVIEW_PX_PER_MM=2.8
+    expect(frame.style.width).toBe(`${Math.round(148 * 2.8)}px`)
+    expect(frame.style.minHeight).toBe(`${Math.round(210 * 2.8)}px`)
+  })
+
+  it('preview frame dimensions change when prescription size is A4', async () => {
+    await savePrintSetting('printPrescriptionSize', 'A4')
+
+    renderPrintPage(testVisitId)
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Print Prescription').length).toBeGreaterThanOrEqual(1)
+    })
+
+    const frame = document.querySelector('[data-testid="preview-frame"]') as HTMLElement
+    expect(frame).not.toBeNull()
+    // A4: width=210mm, height=297mm; PREVIEW_PX_PER_MM=2.8
+    expect(frame.style.width).toBe(`${Math.round(210 * 2.8)}px`)
+    expect(frame.style.minHeight).toBe(`${Math.round(297 * 2.8)}px`)
+  })
+
+  it('switching to dispensary tab shows dispensary size preview frame', async () => {
+    await savePrintSetting('printPrescriptionSize', 'A5')
+    await savePrintSetting('printDispensarySize', 'A4')
+
+    renderPrintPage(testVisitId)
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Dispensary').length).toBeGreaterThanOrEqual(1)
+    })
+
+    fireEvent.click(screen.getAllByText('Dispensary')[0])
+
+    await waitFor(() => {
+      const frame = document.querySelector('[data-testid="preview-frame"]') as HTMLElement
+      // A4 dispensary: width=210mm
+      expect(frame.style.width).toBe(`${Math.round(210 * 2.8)}px`)
+    })
+  })
+})
+
 describe('PrintVisitPage', () => {
   it('renders loading state initially', () => {
     renderPrintPage(testVisitId)

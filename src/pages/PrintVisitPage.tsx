@@ -7,6 +7,16 @@ import { getVisit } from '@/db/visits'
 import { getPatient } from '@/db/patients'
 import { getClinicInfo } from '@/db/settings'
 import { getPrintSettings, PAPER_SIZES, calcMargin } from '@/db/printSettings'
+
+const PREVIEW_PX_PER_MM = 2.8
+
+function previewDimensions(size: PaperSize) {
+  const { width, height } = PAPER_SIZES[size]
+  return {
+    widthPx: Math.round(width * PREVIEW_PX_PER_MM),
+    heightPx: Math.round(height * PREVIEW_PX_PER_MM),
+  }
+}
 import type { Visit, VisitMedication, Patient } from '@/db/index'
 import type { ClinicInfo } from '@/db/settings'
 import type { PrintSettings, PaperSize } from '@/db/printSettings'
@@ -195,8 +205,38 @@ export function PrintVisitPage() {
         </div>
       </div>
 
-      {/* Conditional rendering: only the active slip exists in DOM during print */}
-      {showPrescription && (
+      {/* Preview frame: paper-proportional dimensions, screen-only wrapper */}
+      {printMode === null && (() => {
+        const { widthPx, heightPx } = previewDimensions(activeSize)
+        return (
+          <div
+            data-testid="preview-frame"
+            className="no-print mx-auto bg-white border border-gray-300 shadow-md overflow-auto"
+            style={{ width: `${widthPx}px`, minHeight: `${heightPx}px` }}
+          >
+            {previewMode === 'prescription' && visit && patient && clinicInfo && (
+              <PrescriptionSlip
+                visit={visit}
+                medications={medications}
+                patient={patient}
+                clinicInfo={clinicInfo}
+                paperSize={activeSize}
+              />
+            )}
+            {previewMode === 'dispensary' && visit && patient && (
+              <DispensarySlip
+                visit={visit}
+                medications={medications}
+                patient={patient}
+                paperSize={activeSize}
+              />
+            )}
+          </div>
+        )
+      })()}
+
+      {/* Print-mode rendering: only the active slip, no preview frame, with correct paper size */}
+      {printMode === 'prescription' && showPrescription && (
         <PrescriptionSlip
           visit={visit}
           medications={medications}
@@ -205,11 +245,12 @@ export function PrintVisitPage() {
           paperSize={printSettings?.prescriptionSize ?? 'A5'}
         />
       )}
-      {showDispensary && (
+      {printMode === 'dispensary' && showDispensary && (
         <DispensarySlip
           visit={visit}
           medications={medications}
           patient={patient}
+          paperSize={printSettings?.dispensarySize ?? 'A5'}
         />
       )}
     </div>
