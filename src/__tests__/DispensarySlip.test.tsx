@@ -9,10 +9,13 @@ const mockPatient: Patient = {
   patientId: 'P001',
   firstName: 'Ahmed',
   lastName: 'Khan',
+  firstNameLower: 'ahmed',
+  lastNameLower: 'khan',
   age: 35,
   gender: 'male',
   contact: '03001234567',
   createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
 }
 
 const mockVisit: Visit = {
@@ -22,6 +25,7 @@ const mockVisit: Visit = {
   rxNotes: '',
   rxNotesLang: 'en',
   createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
 }
 
 const mockMedications: VisitMedication[] = [

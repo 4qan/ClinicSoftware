@@ -42,7 +42,7 @@ function removePageStyle(): void {
 export function PrintVisitPage() {
   const { id: visitId } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
 
   const [visit, setVisit] = useState<Visit | null>(null)
   const [medications, setMedications] = useState<VisitMedication[]>([])
