@@ -52,23 +52,23 @@
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 10-01-PLAN.md -- Print settings data layer, types/constants, and Settings UI with paper size dropdowns
-- [ ] 10-02-PLAN.md -- Dynamic @page injection, conditional slip rendering, size badge, index.css cleanup
+- [x] 10-01-PLAN.md -- Print settings data layer, types/constants, and Settings UI with paper size dropdowns
+- [x] 10-02-PLAN.md -- Dynamic @page injection, conditional slip rendering, size badge, index.css cleanup
 
 ### Phase 11: Layout Scaling & Preview
 **Goal**: Prescription and dispensary slip content fills the selected paper size proportionally, including correct Urdu rendering, with a preview before printing
 **Depends on**: Phase 10
 **Requirements**: SCALE-01, SCALE-02, SCALE-03, SCALE-04
 **Success Criteria** (what must be TRUE):
-  1. Prescription slip fonts, spacing, and content area visibly scale to fill the selected paper size (A4 content is larger than A5, A6 is smaller)
+  1. Prescription slip fonts, spacing, and content area visibly scale to fill the selected paper size (A4 content is larger than A5)
   2. Dispensary slip fonts, spacing, and content area scale proportionally to the selected paper size
   3. Urdu/Nastaliq text on printed slips renders with correct line-height and no clipping at every supported paper size
   4. On-screen print preview reflects the selected paper size proportions before the user triggers the browser print dialog
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 11-01: TBD
-- [ ] 11-02: TBD
+- [ ] 11-01-PLAN.md -- A6 removal, calcScale/URDU_LINE_HEIGHTS infrastructure, PrescriptionSlip scaling
+- [ ] 11-02-PLAN.md -- DispensarySlip scaling, preview frame, manual print verification
 
 ## Progress
 
@@ -86,8 +86,8 @@ Plans:
 | 7. Backup Export | v1.1 | 2/2 | Complete | 2026-03-10 |
 | 8. Backup Restore | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 9. Auto-Snapshots | v1.1 | 2/2 | Complete | 2026-03-11 |
-| 10. Print Infrastructure & Settings | 2/2 | Complete   | 2026-03-11 | - |
-| 11. Layout Scaling & Preview | v1.2 | 0/? | Not started | - |
+| 10. Print Infrastructure & Settings | v1.2 | 2/2 | Complete | 2026-03-11 |
+| 11. Layout Scaling & Preview | v1.2 | 0/2 | Not started | - |
 
 ---
-*Last updated: 2026-03-11 after Phase 10 planning*
+*Last updated: 2026-03-12 after Phase 11 planning*
