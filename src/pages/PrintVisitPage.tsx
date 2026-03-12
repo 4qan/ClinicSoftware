@@ -53,7 +53,7 @@ export function PrintVisitPage() {
   const [notFound, setNotFound] = useState(false)
   const [printMode, setPrintMode] = useState<PrintMode>(null)
   const [previewMode, setPreviewMode] = useState<PreviewMode>('prescription')
-  const autoPrintFired = useRef(false)
+  const autoPrintTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     async function loadData() {
@@ -86,17 +86,23 @@ export function PrintVisitPage() {
 
   // Auto-print when navigated with ?auto=prescription or ?auto=dispensary (fire once)
   useEffect(() => {
-    if (loading || autoPrintFired.current) return
+    if (loading) return
     const auto = searchParams.get('auto')
     if (auto === 'prescription' || auto === 'dispensary') {
-      autoPrintFired.current = true
       setPreviewMode(auto)
       setPrintMode(auto)
       if (printSettings) {
         const size = auto === 'prescription' ? printSettings.prescriptionSize : printSettings.dispensarySize
         injectPageStyle(size, calcMargin(size))
       }
-      setTimeout(() => window.print(), 200)
+      autoPrintTimer.current = setTimeout(() => window.print(), 200)
+    }
+    return () => {
+      // StrictMode remount: cancel pending print from previous mount
+      if (autoPrintTimer.current) {
+        clearTimeout(autoPrintTimer.current)
+        autoPrintTimer.current = null
+      }
     }
   }, [loading, searchParams, printSettings])
 
