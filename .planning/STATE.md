@@ -2,86 +2,66 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Print Customization
-status: planning
-stopped_at: Completed 11-02-PLAN.md
-last_updated: "2026-03-12T14:51:01.137Z"
-last_activity: 2026-03-11 -- Roadmap created for v1.2
+status: complete
+stopped_at: Milestone v1.2 completed
+last_updated: "2026-03-12T21:00:00.000Z"
+last_activity: 2026-03-12 -- v1.2 milestone completed
 progress:
   total_phases: 2
   completed_phases: 2
   total_plans: 4
   completed_plans: 4
-  percent: 0
+  percent: 100
 ---
 
 # Project State: ClinicSoftware
 
 ## Project Reference
-See: .planning/PROJECT.md (updated 2026-03-11)
+
+See: .planning/PROJECT.md (updated 2026-03-12)
+
 **Core value:** The doctor can see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even with no internet.
-**Current focus:** Phase 10 - Print Infrastructure & Settings
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 10 of 11 (Print Infrastructure & Settings)
-Plan: --
-Status: Ready to plan
-Last activity: 2026-03-11 -- Roadmap created for v1.2
+Milestone: v1.2 Print Customization -- SHIPPED 2026-03-12
+Status: Complete
+Next: `/gsd:new-milestone` to define v1.3
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
-**Velocity:**
-- Total plans completed: 0 (v1.2)
-- Average duration: --
-- Total execution time: --
+**Velocity (v1.2):**
+- Total plans completed: 4
+- Commits: 16
+- Timeline: 2 days
 
 **By Phase:**
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| - | - | - | - |
-
-*Updated after each plan completion*
-| Phase 10 P01 | 12 | 2 tasks | 5 files |
-| Phase 10 P02 | 25 | 2 tasks | 3 files |
-| Phase 11 P01 | 7 | 2 tasks | 7 files |
-| Phase 11 P02 | 15 | 2 tasks | 4 files |
-| Phase 11 P02 | 35 | 3 tasks | 5 files |
+| Phase | Plans | Tasks | Files |
+|-------|-------|-------|-------|
+| Phase 10 P01 | 12 min | 2 tasks | 5 files |
+| Phase 10 P02 | 25 min | 2 tasks | 3 files |
+| Phase 11 P01 | 7 min | 2 tasks | 7 files |
+| Phase 11 P02 | 15+35 min | 5 tasks | 9 files |
 
 ## Accumulated Context
 
 ### Decisions
-- v1.0 + v1.1 decisions logged in PROJECT.md Key Decisions table
-- No new v1.2 decisions yet
-- [Phase 10]: calcMargin uses proportional area ratio vs A5 baseline (8mm), clamped to [4, 10]mm
-- [Phase 10]: Auto-save on dropdown change with no Save button for print settings
-- [Phase 10]: A5 is default paper size for both slips when no DB key exists
-- [Phase 10]: style.media='print' on injected style element to scope @page to print media
-- [Phase 10]: fireEvent.click replaces userEvent.click for tab interactions after DispensarySlip mounts due to jsdom @page CSS crash
-- [Phase 11]: A5 (148mm) is the scaling baseline for calcScale(); all font sizes derive from this width ratio
-- [Phase 11]: URDU_LINE_HEIGHTS A4/Letter set to 2.6 as starting estimates needing empirical print testing
-- [Phase 11]: coerceSize() validates against explicit VALID_SIZES array for A6->A5 legacy DB fallback
-- [Phase Phase 11]: PREVIEW_PX_PER_MM=2.8 gives ~414px A5 preview frame fitting standard screens
-- [Phase Phase 11]: Preview frame only rendered in screen path (printMode===null); print path renders slips directly without frame
-- [Phase Phase 11]: DispensarySlip uses 10pt base (vs 11pt for PrescriptionSlip) to preserve compact density
-- [Phase Phase 11]: PAGE_SIZE_KEYWORD map uses CSS named keywords not raw mm so Chrome print dialog respects paper size
-- [Phase Phase 11]: Preview frame always mounted (no-print) with print-only slips in hidden print:block divs eliminates brief frameless flash
-- [Phase Phase 11]: useRef(autoPrintFired) guard ensures ?auto=dispensary URL param does not re-trigger auto-print after cancel
+- v1.0 + v1.1 + v1.2 decisions logged in PROJECT.md Key Decisions table
 
 ### Pending Todos
-None yet.
+None.
 
 ### Blockers/Concerns
-- Nastaliq line-height scales non-linearly across paper sizes (needs empirical testing in Phase 11)
-- A6 dispensary slip may be too narrow for 7-column medication table (flagged by research)
-- Chrome print dialog can override CSS @page margins (document limitation in UI)
+None active.
 
 ## Session Continuity
-Last session: 2026-03-12T14:51:01.135Z
-Stopped at: Completed 11-02-PLAN.md
+Last session: 2026-03-12
+Stopped at: Milestone v1.2 completed
 Resume file: None
 
 ---
-*Last updated: 2026-03-11 -- Roadmap created*
+*Last updated: 2026-03-12 -- v1.2 milestone completed*
