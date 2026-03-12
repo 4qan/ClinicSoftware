@@ -1,9 +1,12 @@
 import type { Visit, VisitMedication, Patient } from '@/db/index'
+import { calcScale, PAPER_SIZES, URDU_LINE_HEIGHTS } from '@/db/printSettings'
+import type { PaperSize } from '@/db/printSettings'
 
 interface DispensarySlipProps {
   visit: Visit
   medications: VisitMedication[]
   patient: Patient
+  paperSize: PaperSize
 }
 
 function formatDate(iso: string): string {
@@ -15,13 +18,25 @@ function formatDate(iso: string): string {
   })
 }
 
-export function DispensarySlip({ visit, medications, patient }: DispensarySlipProps) {
+export function DispensarySlip({ visit, medications, patient, paperSize }: DispensarySlipProps) {
+  const scale = calcScale(paperSize)
+  const basePt = +(10 * scale).toFixed(1)
+  const headerPt = +(12 * scale).toFixed(1)
+
   return (
-    <div className="dispensary-slip bg-white mx-auto" style={{ maxWidth: '148mm', fontFamily: "'Segoe UI', Arial, sans-serif" }}>
-      <div className="p-4" style={{ fontSize: '10pt' }}>
+    <div
+      className="dispensary-slip bg-white mx-auto"
+      style={{
+        maxWidth: `${PAPER_SIZES[paperSize].width}mm`,
+        fontFamily: "'Segoe UI', Arial, sans-serif",
+        fontSize: `${basePt}pt`,
+        '--urdu-line-height': URDU_LINE_HEIGHTS[paperSize],
+      } as React.CSSProperties}
+    >
+      <div style={{ padding: `${(4 * scale).toFixed(1)}mm` }}>
         {/* Header */}
         <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-2">
-          <h2 className="text-base font-bold text-gray-900">Dispensary Slip</h2>
+          <h2 className="font-bold text-gray-900" style={{ fontSize: `${headerPt}pt` }}>Dispensary Slip</h2>
           <span className="text-sm">
             <span className="text-gray-500">Patient: </span>
             <span className="font-medium">{patient.firstName} {patient.lastName}</span>
