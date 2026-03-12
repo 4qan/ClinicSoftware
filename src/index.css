@@ -54,7 +54,7 @@ button, a, [role="button"], input[type="radio"], input[type="checkbox"], select 
   .urdu-cell {
     font-family: 'Noto Nastaliq Urdu Variable', serif;
     direction: rtl;
-    line-height: 2.2;
+    line-height: var(--urdu-line-height, 2.2);
     overflow: visible;
     padding-top: 4px;
     padding-bottom: 4px;

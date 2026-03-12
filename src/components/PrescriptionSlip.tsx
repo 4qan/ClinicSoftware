@@ -1,5 +1,7 @@
 import type { Visit, VisitMedication, Patient } from '@/db/index'
 import type { ClinicInfo } from '@/db/settings'
+import type { PaperSize } from '@/db/printSettings'
+import { calcScale, PAPER_SIZES, URDU_LINE_HEIGHTS } from '@/db/printSettings'
 import { buildUrduInstruction, columnHeadersUrdu, sectionHeadersUrdu } from '@/constants/translations'
 
 interface PrescriptionSlipProps {
@@ -7,6 +9,7 @@ interface PrescriptionSlipProps {
   medications: VisitMedication[]
   patient: Patient
   clinicInfo: ClinicInfo
+  paperSize: PaperSize
 }
 
 function formatDate(iso: string): string {
@@ -18,14 +21,26 @@ function formatDate(iso: string): string {
   })
 }
 
-export function PrescriptionSlip({ visit, medications, patient, clinicInfo }: PrescriptionSlipProps) {
+export function PrescriptionSlip({ visit, medications, patient, clinicInfo, paperSize }: PrescriptionSlipProps) {
+  const scale = calcScale(paperSize)
+  const basePt = +(11 * scale).toFixed(1)
+  const headerPt = +(14 * scale).toFixed(1)
+
   return (
-    <div className="prescription-slip bg-white mx-auto" style={{ maxWidth: '148mm', fontFamily: "'Segoe UI', Arial, sans-serif" }}>
-      <div className="p-6" style={{ fontSize: '11pt' }}>
+    <div
+      className="prescription-slip bg-white mx-auto"
+      style={{
+        maxWidth: `${PAPER_SIZES[paperSize].width}mm`,
+        fontFamily: "'Segoe UI', Arial, sans-serif",
+        fontSize: `${basePt}pt`,
+        ['--urdu-line-height' as string]: URDU_LINE_HEIGHTS[paperSize],
+      } as React.CSSProperties}
+    >
+      <div className="p-6" style={{ fontSize: `${basePt}pt` }}>
         {/* Clinic Header */}
         <div className="text-center mb-3">
           {clinicInfo.doctorName && (
-            <h1 className="text-xl font-bold text-gray-900 mb-0.5" style={{ fontSize: '14pt' }}>
+            <h1 className="text-xl font-bold text-gray-900 mb-0.5" style={{ fontSize: `${headerPt}pt` }}>
               {clinicInfo.doctorName}
             </h1>
           )}

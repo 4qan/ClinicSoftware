@@ -202,6 +202,7 @@ export function PrintVisitPage() {
           medications={medications}
           patient={patient}
           clinicInfo={clinicInfo}
+          paperSize={printSettings?.prescriptionSize ?? 'A5'}
         />
       )}
       {showDispensary && (
