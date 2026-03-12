@@ -19,6 +19,13 @@ export const PAPER_SIZES: Record<PaperSize, PaperDimensions> = {
   Letter: { width: 216, height: 279, label: 'Letter (216 x 279 mm)' },
 }
 
+// CSS @page size keywords: Chrome needs named keywords (not raw mm) to set the print dialog paper size
+export const PAGE_SIZE_KEYWORD: Record<PaperSize, string> = {
+  A5: 'A5 portrait',
+  A4: 'A4 portrait',
+  Letter: 'letter portrait',
+}
+
 export const PAPER_SIZE_ORDER: PaperSize[] = ['A5', 'A4', 'Letter']
 
 const VALID_SIZES: PaperSize[] = ['A5', 'A4', 'Letter']

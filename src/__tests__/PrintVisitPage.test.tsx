@@ -87,7 +87,7 @@ describe('PrintVisitPage - dynamic @page injection (PRENG-01)', () => {
     // Style injected synchronously before setTimeout fires
     const styleEl = document.getElementById('print-page-style')
     expect(styleEl).not.toBeNull()
-    expect(styleEl!.textContent).toContain('@page { size: 148mm 210mm portrait; margin: 8mm; }')
+    expect(styleEl!.textContent).toContain('@page { size: A5 portrait; margin: 8mm; }')
 
     printSpy.mockRestore()
   })
@@ -107,7 +107,7 @@ describe('PrintVisitPage - dynamic @page injection (PRENG-01)', () => {
 
     const styleEl = document.getElementById('print-page-style')
     expect(styleEl).not.toBeNull()
-    expect(styleEl!.textContent).toContain('size: 210mm 297mm portrait; margin: 10mm')
+    expect(styleEl!.textContent).toContain('size: A4 portrait; margin: 10mm')
 
     printSpy.mockRestore()
   })

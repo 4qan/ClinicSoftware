@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { PrescriptionSlip } from '@/components/PrescriptionSlip'
@@ -6,7 +6,7 @@ import { DispensarySlip } from '@/components/DispensarySlip'
 import { getVisit } from '@/db/visits'
 import { getPatient } from '@/db/patients'
 import { getClinicInfo } from '@/db/settings'
-import { getPrintSettings, PAPER_SIZES, calcMargin } from '@/db/printSettings'
+import { getPrintSettings, PAPER_SIZES, PAGE_SIZE_KEYWORD, calcMargin } from '@/db/printSettings'
 
 const PREVIEW_PX_PER_MM = 2.8
 
@@ -27,11 +27,10 @@ type PreviewMode = 'prescription' | 'dispensary'
 function injectPageStyle(size: PaperSize, margin: number): void {
   const existing = document.getElementById('print-page-style')
   if (existing) existing.remove()
-  const { width, height } = PAPER_SIZES[size]
   const style = document.createElement('style')
   style.id = 'print-page-style'
   style.media = 'print'
-  style.textContent = `@page { size: ${width}mm ${height}mm portrait; margin: ${margin}mm; }`
+  style.textContent = `@page { size: ${PAGE_SIZE_KEYWORD[size]}; margin: ${margin}mm; }`
   document.head.appendChild(style)
 }
 
@@ -43,7 +42,7 @@ function removePageStyle(): void {
 export function PrintVisitPage() {
   const { id: visitId } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [visit, setVisit] = useState<Visit | null>(null)
   const [medications, setMedications] = useState<VisitMedication[]>([])
@@ -54,6 +53,7 @@ export function PrintVisitPage() {
   const [notFound, setNotFound] = useState(false)
   const [printMode, setPrintMode] = useState<PrintMode>(null)
   const [previewMode, setPreviewMode] = useState<PreviewMode>('prescription')
+  const autoPrintFired = useRef(false)
 
   useEffect(() => {
     async function loadData() {
@@ -84,11 +84,12 @@ export function PrintVisitPage() {
     loadData()
   }, [visitId])
 
-  // Auto-print when navigated with ?auto=prescription or ?auto=dispensary
+  // Auto-print when navigated with ?auto=prescription or ?auto=dispensary (fire once)
   useEffect(() => {
-    if (loading) return
+    if (loading || autoPrintFired.current) return
     const auto = searchParams.get('auto')
     if (auto === 'prescription' || auto === 'dispensary') {
+      autoPrintFired.current = true
       setPreviewMode(auto)
       setPrintMode(auto)
       if (printSettings) {
@@ -205,8 +206,8 @@ export function PrintVisitPage() {
         </div>
       </div>
 
-      {/* Preview frame: paper-proportional dimensions, screen-only wrapper */}
-      {printMode === null && (() => {
+      {/* Preview frame (screen-only) stays mounted during print to avoid layout flash */}
+      {(() => {
         const { widthPx, heightPx } = previewDimensions(activeSize)
         return (
           <div
@@ -235,23 +236,27 @@ export function PrintVisitPage() {
         )
       })()}
 
-      {/* Print-mode rendering: only the active slip, no preview frame, with correct paper size */}
+      {/* Print-only rendering: slip without preview frame, hidden on screen */}
       {printMode === 'prescription' && showPrescription && (
-        <PrescriptionSlip
-          visit={visit}
-          medications={medications}
-          patient={patient}
-          clinicInfo={clinicInfo}
-          paperSize={printSettings?.prescriptionSize ?? 'A5'}
-        />
+        <div className="hidden print:block">
+          <PrescriptionSlip
+            visit={visit}
+            medications={medications}
+            patient={patient}
+            clinicInfo={clinicInfo}
+            paperSize={printSettings?.prescriptionSize ?? 'A5'}
+          />
+        </div>
       )}
       {printMode === 'dispensary' && showDispensary && (
-        <DispensarySlip
-          visit={visit}
-          medications={medications}
-          patient={patient}
-          paperSize={printSettings?.dispensarySize ?? 'A5'}
-        />
+        <div className="hidden print:block">
+          <DispensarySlip
+            visit={visit}
+            medications={medications}
+            patient={patient}
+            paperSize={printSettings?.dispensarySize ?? 'A5'}
+          />
+        </div>
       )}
     </div>
   )
