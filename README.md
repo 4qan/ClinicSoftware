@@ -1,50 +1,68 @@
 # ClinicSoftware
 
-A lightweight, offline-first prescription and patient management app built for a single-doctor clinic. Works entirely in the browser with no server, no cloud, no internet required after first load.
+An offline-first prescription and patient management PWA built for a real single-doctor clinic operating in an area with unreliable internet, on older Windows hardware, by a non-tech-savvy doctor.
 
-**Live:** [https://4qan.github.io/ClinicSoftware/](https://4qan.github.io/ClinicSoftware/)
+**Live demo:** [4qan.github.io/ClinicSoftware](https://4qan.github.io/ClinicSoftware/)
 
-## Why This Exists
+<!-- TODO: Add screenshot or demo GIF here -->
 
-Built for a clinic in an area with unreliable internet, used by a non-tech-savvy doctor on older Windows hardware. The core goal: see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even offline.
+## The Problem
+
+Small clinics in underserved areas often rely on paper prescriptions and manual record-keeping. Existing EMR/EHR software assumes stable internet, modern hardware, and technical literacy. None of those assumptions hold here.
+
+The core requirement: **see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even offline.**
+
+## Approach
+
+Instead of building a traditional client-server app, I went with a **zero-backend architecture**:
+
+- **Offline-first PWA**: Service worker caches everything on first load. No internet needed after that.
+- **Browser-local storage**: All data lives in IndexedDB via Dexie.js. Nothing leaves the device.
+- **Local auth**: PBKDF2-hashed passwords stored client-side. No server to authenticate against.
+- **Manual backups**: JSON export/import instead of cloud sync. The user controls their data.
+
+This eliminates infrastructure costs, removes network dependency, and keeps patient data physically on the clinic's machine.
 
 ## Features
 
-### Patient Management
-- Register patients with auto-generated yearly IDs (format: `YYYY-XXXX`)
+**Patient Management**
+- Registration with auto-generated yearly IDs (`YYYY-XXXX`)
 - Search by name, ID, or contact number
-- Patient profile with full visit history
+- Patient profiles with full visit history
 
-### Prescription Writing
+**Prescription Writing**
 - 120+ pre-loaded drug database with autocomplete
-- Form-aware quantity suggestions (tablets, syrups, topicals, etc.)
-- Custom drug entry for medications not in the database
+- Form-aware quantity suggestions (tablets vs syrups vs topicals)
+- Custom drug entry for unlisted medications
 - Frequency and duration dropdowns with common clinical values
 
-### Bilingual Printing (English + Urdu)
-- A5 prescription slip with Urdu instructions in Nastaliq script
-- Dispensary slip for pharmacists
+**Bilingual Printing (English + Urdu)**
+- Configurable paper sizes (A5, A4, Letter) for prescription and dispensary slips independently
+- Proportional layout scaling: fonts, spacing, and content area fill the selected page size
+- On-screen preview before printing with paper-proportional dimensions
+- Urdu instructions in Nastaliq script with per-size line-height tuning
 - Bilingual column headers and natural Urdu sentence construction
-- Print directly from the browser (Ctrl+P)
 
-### Offline-First
-- Full PWA with service worker caching
-- All data stored locally in IndexedDB (nothing leaves the device)
-- Works without internet after first load
-- Nastaliq font cached for offline Urdu rendering
-
-### Data Backup & Restore
-- One-click full database export to JSON from Settings > Data tab
-- Restore from backup file with validation and inline confirmation
+**Data Safety**
+- One-click full database export/restore with validation
+- Auto-snapshots: silent 24-hour backups with 3-copy rotation
 - Smart re-login if credentials change after restore
-- Auto-snapshots: silent 24h backups with 3-copy rotation
-- Backup includes metadata (app version, schema version, record counts, export date)
-- Toast notifications for success/error feedback
 
-### Security
-- Local PIN/password authentication (PBKDF2, 100k iterations)
-- No cloud, no server, no data transmission
-- All patient data is device-local only
+**Security**
+- Local password authentication (PBKDF2, 100k iterations, random salt)
+- Zero data transmission, no cloud, no server
+- See [SECURITY.md](SECURITY.md) for details
+
+## Design Decisions
+
+| Constraint | Decision | Why |
+|-----------|----------|-----|
+| Unreliable internet | Offline-first PWA with full service worker caching | App must work with zero connectivity after first load |
+| Non-technical user | Minimal UI, autocomplete-driven workflows, print via Ctrl+P | Reduce training and cognitive load |
+| Older hardware | No heavy frameworks, no background sync, lightweight IndexedDB | Must run smoothly on low-spec Windows machines |
+| Patient privacy | All data in browser-local IndexedDB, no network calls | Data never leaves the device; no server to breach |
+| Urdu prescriptions | Noto Nastaliq Urdu font cached locally, bilingual layout engine | Patients need instructions in their language, offline |
+| Data durability | JSON backup/restore + auto-snapshots | No cloud means the user needs a simple, reliable backup mechanism |
 
 ## Tech Stack
 
@@ -53,70 +71,12 @@ Built for a clinic in an area with unreliable internet, used by a non-tech-savvy
 | Framework | React 19 + TypeScript |
 | Build | Vite 7 |
 | Styling | TailwindCSS v4 |
-| Database | Dexie.js (IndexedDB wrapper) |
+| Database | Dexie.js (IndexedDB) |
 | Offline | VitePWA (service worker + manifest) |
 | Routing | react-router-dom v7 |
 | Urdu Font | Noto Nastaliq Urdu (variable) |
 | Testing | Vitest + Testing Library + Playwright |
 
-## Getting Started
-
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-
-### Install and Run
-
-```bash
-git clone https://github.com/4qan/ClinicSoftware.git
-cd ClinicSoftware
-npm install
-npm run dev
-```
-
-Open [http://localhost:5173/ClinicSoftware/](http://localhost:5173/ClinicSoftware/) in Chrome or Edge.
-
-### Build for Production
-
-```bash
-npm run build
-npm run preview
-```
-
-### Run Tests
-
-```bash
-npm test              # Unit tests
-npm run test:e2e      # E2E tests (Playwright)
-```
-
-## Roadmap
-
-### v1.0 MVP (Shipped)
-- Patient registration, search, and profiles
-- Clinical encounter logging with timestamps
-- Prescription writing with drug autocomplete
-- A5 prescription and dispensary slip printing
-
-### v1.1 Urdu & Backup (Shipped)
-- Urdu prescription printing with Nastaliq font and bilingual headers
-- Rx Notes English/Urdu toggle with sticky language preference
-- Prescription entry cleanup (field naming, drug display, custom value indicators)
-- Full database backup/restore with validation and smart re-login
-- Auto-snapshots: silent 24h backups with 3-copy rotation
-
-## Project Structure
-
-```
-src/
-  components/    # Reusable UI (ComboBox, MedicationEntry, PrescriptionSlip, etc.)
-  pages/         # Route pages (NewVisitPage, EditVisitPage, PrintVisitPage, etc.)
-  constants/     # Clinical data, translations, drug database
-  db/            # Dexie database schema, settings, seed data
-  utils/         # Helpers (drug formatters, backup, snapshots, etc.)
-  __tests__/     # Unit and component tests
-```
-
 ## License
 
-Private project. Not open for contributions at this time.
+This project is source-available for portfolio and reference purposes. Not currently accepting contributions.
