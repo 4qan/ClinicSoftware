@@ -23,9 +23,9 @@ Requirements for Print Customization milestone. Each maps to roadmap phases.
 ### Layout Scaling
 
 - [x] **SCALE-01**: Prescription slip fonts, spacing, and content area scale proportionally to fill the selected paper size
-- [ ] **SCALE-02**: Dispensary slip fonts, spacing, and content area scale proportionally to fill the selected paper size
+- [x] **SCALE-02**: Dispensary slip fonts, spacing, and content area scale proportionally to fill the selected paper size
 - [x] **SCALE-03**: Urdu/Nastaliq text renders correctly at all supported paper sizes (line-height tuned per size)
-- [ ] **SCALE-04**: On-screen print preview reflects the selected paper size proportions before printing
+- [x] **SCALE-04**: On-screen print preview reflects the selected paper size proportions before printing
 
 ## Future Requirements
 
@@ -60,9 +60,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PRENG-02 | Phase 10 | Complete |
 | PRENG-03 | Phase 10 | Complete |
 | SCALE-01 | Phase 11 | Complete |
-| SCALE-02 | Phase 11 | Pending |
+| SCALE-02 | Phase 11 | Complete |
 | SCALE-03 | Phase 11 | Complete |
-| SCALE-04 | Phase 11 | Pending |
+| SCALE-04 | Phase 11 | Complete |
 
 **Coverage:**
 - v1.2 requirements: 11 total

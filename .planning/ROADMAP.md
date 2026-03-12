@@ -35,7 +35,7 @@
 **Milestone Goal:** Make print paper sizes configurable per slip type, with layouts that scale to fill the selected page size.
 
 - [x] **Phase 10: Print Infrastructure & Settings** - Paper size persistence, settings UI, dynamic @page injection, and conditional slip rendering (completed 2026-03-11)
-- [ ] **Phase 11: Layout Scaling & Preview** - Proportional font/spacing scaling for both slips across all paper sizes, with on-screen preview
+- [x] **Phase 11: Layout Scaling & Preview** - Proportional font/spacing scaling for both slips across all paper sizes, with on-screen preview (completed 2026-03-12)
 
 ## Phase Details
 
@@ -64,7 +64,7 @@ Plans:
   2. Dispensary slip fonts, spacing, and content area scale proportionally to the selected paper size
   3. Urdu/Nastaliq text on printed slips renders with correct line-height and no clipping at every supported paper size
   4. On-screen print preview reflects the selected paper size proportions before the user triggers the browser print dialog
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 11-01-PLAN.md -- A6 removal, calcScale/URDU_LINE_HEIGHTS infrastructure, PrescriptionSlip scaling
@@ -87,7 +87,7 @@ Plans:
 | 8. Backup Restore | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 9. Auto-Snapshots | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 10. Print Infrastructure & Settings | v1.2 | 2/2 | Complete | 2026-03-11 |
-| 11. Layout Scaling & Preview | 1/2 | In Progress|  | - |
+| 11. Layout Scaling & Preview | 2/2 | Complete   | 2026-03-12 | - |
 
 ---
 *Last updated: 2026-03-12 after Phase 11 planning*

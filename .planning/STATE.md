@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Print Customization
 status: planning
-stopped_at: Completed 11-01-PLAN.md
-last_updated: "2026-03-12T09:28:45.753Z"
+stopped_at: "Completed 11-02-PLAN.md (checkpoint: awaiting human print verification)"
+last_updated: "2026-03-12T09:35:12.803Z"
 last_activity: 2026-03-11 -- Roadmap created for v1.2
 progress:
   total_phases: 2
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 10 P01 | 12 | 2 tasks | 5 files |
 | Phase 10 P02 | 25 | 2 tasks | 3 files |
 | Phase 11 P01 | 7 | 2 tasks | 7 files |
+| Phase 11 P02 | 15 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -61,6 +62,9 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 11]: A5 (148mm) is the scaling baseline for calcScale(); all font sizes derive from this width ratio
 - [Phase 11]: URDU_LINE_HEIGHTS A4/Letter set to 2.6 as starting estimates needing empirical print testing
 - [Phase 11]: coerceSize() validates against explicit VALID_SIZES array for A6->A5 legacy DB fallback
+- [Phase Phase 11]: PREVIEW_PX_PER_MM=2.8 gives ~414px A5 preview frame fitting standard screens
+- [Phase Phase 11]: Preview frame only rendered in screen path (printMode===null); print path renders slips directly without frame
+- [Phase Phase 11]: DispensarySlip uses 10pt base (vs 11pt for PrescriptionSlip) to preserve compact density
 
 ### Pending Todos
 None yet.
@@ -71,8 +75,8 @@ None yet.
 - Chrome print dialog can override CSS @page margins (document limitation in UI)
 
 ## Session Continuity
-Last session: 2026-03-12T09:28:45.751Z
-Stopped at: Completed 11-01-PLAN.md
+Last session: 2026-03-12T09:35:12.801Z
+Stopped at: Completed 11-02-PLAN.md (checkpoint: awaiting human print verification)
 Resume file: None
 
 ---
