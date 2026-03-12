@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Print Customization
 status: planning
-stopped_at: "Completed 11-02-PLAN.md (checkpoint: awaiting human print verification)"
-last_updated: "2026-03-12T09:35:12.803Z"
+stopped_at: Completed 11-02-PLAN.md
+last_updated: "2026-03-12T14:51:01.137Z"
 last_activity: 2026-03-11 -- Roadmap created for v1.2
 progress:
   total_phases: 2
@@ -48,6 +48,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 10 P02 | 25 | 2 tasks | 3 files |
 | Phase 11 P01 | 7 | 2 tasks | 7 files |
 | Phase 11 P02 | 15 | 2 tasks | 4 files |
+| Phase 11 P02 | 35 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,9 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase Phase 11]: PREVIEW_PX_PER_MM=2.8 gives ~414px A5 preview frame fitting standard screens
 - [Phase Phase 11]: Preview frame only rendered in screen path (printMode===null); print path renders slips directly without frame
 - [Phase Phase 11]: DispensarySlip uses 10pt base (vs 11pt for PrescriptionSlip) to preserve compact density
+- [Phase Phase 11]: PAGE_SIZE_KEYWORD map uses CSS named keywords not raw mm so Chrome print dialog respects paper size
+- [Phase Phase 11]: Preview frame always mounted (no-print) with print-only slips in hidden print:block divs eliminates brief frameless flash
+- [Phase Phase 11]: useRef(autoPrintFired) guard ensures ?auto=dispensary URL param does not re-trigger auto-print after cancel
 
 ### Pending Todos
 None yet.
@@ -75,8 +79,8 @@ None yet.
 - Chrome print dialog can override CSS @page margins (document limitation in UI)
 
 ## Session Continuity
-Last session: 2026-03-12T09:35:12.801Z
-Stopped at: Completed 11-02-PLAN.md (checkpoint: awaiting human print verification)
+Last session: 2026-03-12T14:51:01.135Z
+Stopped at: Completed 11-02-PLAN.md
 Resume file: None
 
 ---
