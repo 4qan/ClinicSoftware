@@ -42,9 +42,9 @@ Requirements for keyboard navigation milestone. Each maps to roadmap phases.
 
 ### Print Flow
 
-- [ ] **PRNT-01**: User can Tab to the print button after completing a prescription
-- [ ] **PRNT-02**: User can trigger print with Enter on the print button
-- [ ] **PRNT-03**: Focus restores to a logical position after the print dialog closes
+- [x] **PRNT-01**: User can Tab to the print button after completing a prescription
+- [x] **PRNT-02**: User can trigger print with Enter on the print button
+- [x] **PRNT-03**: Focus restores to a logical position after the print dialog closes
 
 ## Future Requirements
 
@@ -89,9 +89,9 @@ Requirements for keyboard navigation milestone. Each maps to roadmap phases.
 | FORM-04 | Phase 13 | Complete |
 | ESC-02 | Phase 13 | Complete |
 | ESC-03 | Phase 13 | Complete |
-| PRNT-01 | Phase 14 | Pending |
-| PRNT-02 | Phase 14 | Pending |
-| PRNT-03 | Phase 14 | Pending |
+| PRNT-01 | Phase 14 | Complete |
+| PRNT-02 | Phase 14 | Complete |
+| PRNT-03 | Phase 14 | Complete |
 
 **Coverage:**
 - v1.3 requirements: 21 total

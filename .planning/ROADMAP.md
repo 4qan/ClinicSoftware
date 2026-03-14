@@ -45,7 +45,7 @@
 
 - [x] **Phase 12: Focus Foundation and Form Submission** - Visible focus indicators, logical tab order, Enter-to-submit on all critical-path forms (completed 2026-03-14)
 - [x] **Phase 13: Keyboard Interactions** - Fully keyboard-operable autocomplete, DrugComboBox consolidation, focus management after all actions, Escape to dismiss everywhere (completed 2026-03-14)
-- [ ] **Phase 14: Print Flow** - Tab to print, Enter to fire, focus restore after dialog
+- [x] **Phase 14: Print Flow** - Tab to print, Enter to fire, focus restore after dialog (completed 2026-03-14)
 
 ## Phase Details
 
@@ -90,7 +90,7 @@ Plans:
   1. User can Tab to the print button from the last prescription field without extra clicks
   2. User can press Enter on the focused print button to open the browser print dialog
   3. After the print dialog closes, focus returns to a usable position on the page (not lost to document body)
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 14-01-PLAN.md -- Tab path cleanup, autoFocus, auto-print param, afterprint focus restore
@@ -113,7 +113,7 @@ Plans:
 | 11. Layout Scaling & Preview | v1.2 | 2/2 | Complete | 2026-03-12 |
 | 12. Focus Foundation and Form Submission | v1.3 | 2/2 | Complete | 2026-03-14 |
 | 13. Keyboard Interactions | v1.3 | 3/3 | Complete | 2026-03-14 |
-| 14. Print Flow | v1.3 | 0/1 | Not started | - |
+| 14. Print Flow | 1/1 | Complete   | 2026-03-14 | - |
 
 ---
 *Last updated: 2026-03-15 -- Phase 14 planned (1 plan)*

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Keyboard Navigation
 status: executing
-stopped_at: Completed 13-03-PLAN.md
-last_updated: "2026-03-14T19:07:19.468Z"
+stopped_at: Completed 14-print-flow/14-01-PLAN.md
+last_updated: "2026-03-14T20:16:13.312Z"
 last_activity: 2026-03-14 -- Plan 12-02 complete (tab order fixes, button reorder)
 progress:
   total_phases: 3
-  completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  completed_phases: 3
+  total_plans: 6
+  completed_plans: 6
   percent: 40
 ---
 
@@ -53,6 +53,7 @@ Progress: [████████░░░░░░░░░░░░] 40% (Ph
 | Phase 13-keyboard-interactions P01 | 4 | 2 tasks | 6 files |
 | Phase 13-keyboard-interactions P02 | 3 | 1 tasks | 2 files |
 | Phase 13-keyboard-interactions P03 | 8 | 1 tasks | 2 files |
+| Phase 14-print-flow P01 | 146 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,10 @@ Progress: [████████░░░░░░░░░░░░] 40% (Ph
 - [Phase 13-keyboard-interactions]: pendingFocus flag pattern for focus transitions after async state changes in MedicationEntry
 - [Phase 13-keyboard-interactions]: document-level keydown listener for inline form Escape (focus leaves unmounted button, wrapper onKeyDown never fires)
 - [Phase 13-keyboard-interactions]: patientDropdownDismissed boolean: derived dropdown visibility needs explicit dismiss flag, reset on query change
+- [Phase 14-print-flow]: tabIndex={-1} on toggle tabs and Remove buttons removes them from tab order without hiding them visually
+- [Phase 14-print-flow]: printButtonRef + autoFocus on Print button gives keyboard users immediate access on PrintVisitPage load
+- [Phase 14-print-flow]: afterprint event calls printButtonRef.current?.focus() to restore focus after print dialog closes
+- [Phase 14-print-flow]: ?auto=prescription query param on navigate triggers existing auto-print logic on PrintVisitPage
 
 ### Pending Todos
 
@@ -89,8 +94,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-14T19:04:35.537Z
-Stopped at: Completed 13-03-PLAN.md
+Last session: 2026-03-14T20:16:13.309Z
+Stopped at: Completed 14-print-flow/14-01-PLAN.md
 Resume file: None
 
 ---
