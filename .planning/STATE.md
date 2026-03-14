@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Keyboard Navigation
 status: executing
-stopped_at: Completed 13-02-PLAN.md
-last_updated: "2026-03-14T18:59:49.420Z"
+stopped_at: Completed 13-03-PLAN.md
+last_updated: "2026-03-14T19:04:35.539Z"
 last_activity: 2026-03-14 -- Plan 12-02 complete (tab order fixes, button reorder)
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 40
 ---
 
@@ -52,6 +52,7 @@ Progress: [████████░░░░░░░░░░░░] 40% (Ph
 | Phase 12-focus-foundation-and-form-submission P01 | 6 | 2 tasks | 15 files |
 | Phase 13-keyboard-interactions P01 | 4 | 2 tasks | 6 files |
 | Phase 13-keyboard-interactions P02 | 3 | 1 tasks | 2 files |
+| Phase 13-keyboard-interactions P03 | 8 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,8 @@ Progress: [████████░░░░░░░░░░░░] 40% (Ph
 - [Phase 13-keyboard-interactions]: ComboBox optional inputRef prop (React.RefObject<HTMLInputElement|null>) -- falls back to internal ref if not provided
 - [Phase 13-keyboard-interactions]: MedicationEntry Enter stopPropagation when drug dropdown open -- prevents wrapper from double-firing add-medication on same keypress
 - [Phase 13-keyboard-interactions]: pendingFocus flag pattern for focus transitions after async state changes in MedicationEntry
+- [Phase 13-keyboard-interactions]: document-level keydown listener for inline form Escape (focus leaves unmounted button, wrapper onKeyDown never fires)
+- [Phase 13-keyboard-interactions]: patientDropdownDismissed boolean: derived dropdown visibility needs explicit dismiss flag, reset on query change
 
 ### Pending Todos
 
@@ -86,8 +89,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-14T18:59:45.409Z
-Stopped at: Completed 13-02-PLAN.md
+Last session: 2026-03-14T19:04:35.537Z
+Stopped at: Completed 13-03-PLAN.md
 Resume file: None
 
 ---

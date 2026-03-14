@@ -25,7 +25,7 @@ Requirements for keyboard navigation milestone. Each maps to roadmap phases.
 
 - [x] **FMGT-01**: After selecting a drug, focus moves to the quantity field
 - [x] **FMGT-02**: After completing a medication row (add), focus returns to the drug search field for the next medication
-- [ ] **FMGT-03**: After creating a patient inline in the visit form, focus moves to the next logical visit field
+- [x] **FMGT-03**: After creating a patient inline in the visit form, focus moves to the next logical visit field
 
 ### Form Submission
 
@@ -37,8 +37,8 @@ Requirements for keyboard navigation milestone. Each maps to roadmap phases.
 ### Escape/Cancel
 
 - [x] **ESC-01**: Escape closes open autocomplete dropdowns
-- [ ] **ESC-02**: Escape dismisses inline patient creation form
-- [ ] **ESC-03**: Escape closes modals and overlays
+- [x] **ESC-02**: Escape dismisses inline patient creation form
+- [x] **ESC-03**: Escape closes modals and overlays
 
 ### Print Flow
 
@@ -85,10 +85,10 @@ Requirements for keyboard navigation milestone. Each maps to roadmap phases.
 | ESC-01 | Phase 13 | Complete |
 | FMGT-01 | Phase 13 | Complete |
 | FMGT-02 | Phase 13 | Complete |
-| FMGT-03 | Phase 13 | Pending |
+| FMGT-03 | Phase 13 | Complete |
 | FORM-04 | Phase 13 | Complete |
-| ESC-02 | Phase 13 | Pending |
-| ESC-03 | Phase 13 | Pending |
+| ESC-02 | Phase 13 | Complete |
+| ESC-03 | Phase 13 | Complete |
 | PRNT-01 | Phase 14 | Pending |
 | PRNT-02 | Phase 14 | Pending |
 | PRNT-03 | Phase 14 | Pending |
