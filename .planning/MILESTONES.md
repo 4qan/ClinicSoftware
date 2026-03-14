@@ -1,5 +1,25 @@
 # Milestones
 
+## v1.3 Keyboard Navigation (Shipped: 2026-03-15)
+
+**Phases completed:** 3 phases (12-14), 6 plans
+**Timeline:** 1 day (2026-03-14 to 2026-03-15)
+**Stats:** 10 commits, 41 files, 12,164 LOC (TypeScript/React)
+**Git range:** feat(12-02) to fix(12)
+
+**Key accomplishments:**
+- Global :focus-visible CSS with keyboard-only focus indicators across all critical-path pages
+- Shared useAutocompleteKeyboard hook powering all 4 autocomplete consumers (ComboBox, SearchBar, MedicationEntry, NewVisitPage)
+- Consolidated drug search with intelligent focus transitions (drug to quantity, add to drug search, custom drug to form)
+- Patient search keyboard nav with inline form Escape/dismiss and post-create focus management
+- Keyboard-driven print flow: tab path cleanup, autoFocus print button, afterprint focus restore
+- Full keyboard-only critical path: login to patient to visit to prescription to print
+
+**Requirements:** 21/21 satisfied (FOCUS-02 gap fixed during completion)
+**Tech debt:** 5 non-blocking items (FORM-03 wording, ESC-03 no-op, login.test.tsx pre-existing failures, act() warnings)
+
+---
+
 ## v1.2 Print Customization (Shipped: 2026-03-12)
 
 **Phases completed:** 2 phases, 4 plans, 11 tasks

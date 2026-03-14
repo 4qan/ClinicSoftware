@@ -147,6 +147,54 @@
 
 ---
 
+## Milestone: v1.3 -- Keyboard Navigation
+
+**Shipped:** 2026-03-15
+**Phases:** 3 | **Plans:** 6 | **Commits:** 10
+
+### What Was Built
+- Global :focus-visible CSS rule with keyboard-only focus indicators
+- Shared useAutocompleteKeyboard hook for all 4 autocomplete consumers
+- Consolidated drug search with focus transitions (drug to quantity, add to drug search, custom drug to form)
+- Patient search keyboard nav with inline form Escape/dismiss and post-create focus
+- Keyboard-driven print flow: tab path, autoFocus print button, afterprint focus restore
+- Full keyboard-only critical path: login through printing
+
+### What Worked
+- Collapsed from 5 phases to 3 during planning (FMGT-03, ESC-02, ESC-03 folded into Phase 13; phases 14/15 merged). Tight scope.
+- Shared hook pattern (useAutocompleteKeyboard) eliminated duplication across 4 consumers with zero coupling issues
+- pendingFocus flag pattern solved React async state/focus timing elegantly
+- Phase-level verification caught the FOCUS-02 gap (wrong file paths in plan) before milestone completion
+- 48+ keyboard navigation tests written, all passing
+
+### What Was Inefficient
+- Plan 12-01 referenced wrong file paths (src/pages/LoginPage.tsx instead of src/auth/LoginPage.tsx), causing FOCUS-02 gap that wasn't caught until verification
+- focus-styles.test.tsx audit scope didn't include src/auth/, allowing the violation to persist through execution
+- SUMMARY.md frontmatter requirements_completed was incomplete for several plans (12-02, 13-03, 14-01 had empty arrays)
+- login.test.tsx 4 failures still unfixed (4th milestone carrying this debt)
+- Nyquist validation still draft for all 3 phases (4th milestone with partial compliance)
+
+### Patterns Established
+- useAutocompleteKeyboard: generic hook with ArrowDown/Up/Enter/Escape/Tab for any dropdown
+- pendingFocus flags: boolean state triggers useEffect to focus refs after React render cycle
+- tabIndex={-1} on chrome elements: removes from tab flow without hiding
+- document-level keydown listener for Escape on dynamically unmounted elements
+- patientDropdownDismissed: explicit dismiss flag for derived dropdown visibility
+
+### Key Lessons
+1. File path verification in plans is critical. The wrong path in plan 12-01 caused the only real gap in the milestone. Plans should verify paths exist before referencing them.
+2. Test audit scope must match cleanup scope. If you clean src/components/ and src/pages/, the audit test must scan those exact directories plus any others with similar code.
+3. SUMMARY.md requirements_completed frontmatter needs discipline. 3 of 6 plans had empty arrays, making automated traceability unreliable.
+4. The login.test.tsx failures are now 4 milestones old. This is a real problem for test suite confidence. Must fix or delete.
+5. Collapsing 5 phases to 3 was the right call: keyboard navigation has tight coupling between autocomplete, focus management, and escape handling. Splitting them would have caused integration churn.
+
+### Cost Observations
+- Model mix: ~50% sonnet (execution), ~40% opus (planning/verification/audit), ~10% haiku (agents)
+- Sessions: ~3 across 1 day
+- Notable: Fastest milestone yet. Tight scope, shared hook pattern, clean execution.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -156,6 +204,7 @@
 | v1.0 | 127 | 3 | First milestone. Established GSD workflow. |
 | v1.1 | 93 | 7 | First inserted phase (5.1). Two parallel tracks (Urdu + Backup). |
 | v1.2 | 16 | 2 | Tightest milestone. Infrastructure + scaling in clean two-phase split. |
+| v1.3 | 10 | 3 | Fastest milestone. Shared hook pattern, phase collapse from 5 to 3. |
 
 ### Cumulative Quality
 
@@ -164,6 +213,7 @@
 | v1.0 | 74 | 70/74 (95%) | 6,616 |
 | v1.1 | 187 | 183/187 (98%) | 9,761 |
 | v1.2 | 222+ | ~98% | 10,666 |
+| v1.3 | 303 | 299/303 (99%) | 12,164 |
 
 ### Top Lessons (Verified Across Milestones)
 

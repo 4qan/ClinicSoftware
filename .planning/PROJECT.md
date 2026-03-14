@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A lightweight prescription and patient management PWA for a single-doctor clinic. Works fully offline with IndexedDB, supports patient registration with auto-generated IDs, clinical encounter logging, prescription writing with medication autocomplete from a 120+ drug database, and configurable paper size printing (A5/A4/Letter) with proportional layout scaling and Urdu dosage instructions. Includes full database backup/restore and automatic in-app snapshots. Designed for a non-tech-savvy doctor on older Windows hardware.
+A lightweight prescription and patient management PWA for a single-doctor clinic. Works fully offline with IndexedDB, supports patient registration with auto-generated IDs, clinical encounter logging, prescription writing with medication autocomplete from a 120+ drug database, and configurable paper size printing (A5/A4/Letter) with proportional layout scaling and Urdu dosage instructions. Includes full database backup/restore and automatic in-app snapshots. Full keyboard-only workflow from login through printing. Designed for a non-tech-savvy doctor on older Windows hardware.
 
 ## Core Value
 
@@ -26,21 +26,16 @@ The doctor can see a patient, write a prescription with medication autocomplete,
 - PRSET-01 through PRSET-04: Print Management settings, independent paper sizes, A5 defaults -- v1.2
 - PRENG-01 through PRENG-03: Dynamic @page injection, proportional margins, conditional rendering -- v1.2
 - SCALE-01 through SCALE-04: Proportional slip scaling, Urdu rendering, on-screen preview -- v1.2
+- FOCUS-01 through FOCUS-03: Visible focus indicators, focus-visible keyboard-only, logical tab order -- v1.3
+- FORM-01 through FORM-04: Enter-to-submit on login, patient creation, medication add; visit form intentionally skipped (textarea) -- v1.3
+- AUTO-01 through AUTO-05: Autocomplete keyboard navigation, Enter/Escape/Tab/Arrow, drug search consolidation -- v1.3
+- FMGT-01 through FMGT-03: Focus transitions after drug select, medication add, inline patient create -- v1.3
+- ESC-01 through ESC-03: Escape closes dropdowns, inline forms; ESC-03 no-op (no modals exist) -- v1.3
+- PRNT-01 through PRNT-03: Tab to print button, Enter to print, focus restore after dialog -- v1.3
 
 ### Active
 
-## Current Milestone: v1.3 Keyboard Navigation
-
-**Goal:** The doctor can complete the entire critical path (login → patient → visit → prescription → print) without touching the mouse, using only tab/enter/escape.
-
-**Target features:**
-- Logical tab order through every form on the critical path
-- Autocomplete dropdown: dismiss on blur/tab, arrow key navigation, Enter to select
-- Focus management after actions (add med → quantity, complete row → drug search, inline patient create → next field)
-- Enter to submit on all forms
-- Escape to dismiss/cancel dropdowns and modals
-- Visible focus indicators throughout
-- Layout optimizations for keyboard-driven speed (informed by medical software UX research)
+(No active requirements. Next milestone not yet planned.)
 
 ### Out of Scope
 
@@ -60,13 +55,14 @@ The doctor can see a patient, write a prescription with medication autocomplete,
 
 ## Context
 
-Shipped v1.2 with 10,666 LOC TypeScript/React.
+Shipped v1.3 with 12,164 LOC TypeScript/React.
 Tech stack: React 19, TypeScript, Vite, TailwindCSS v4, Dexie.js (schema v4), VitePWA, react-router-dom v7.
 Deployed to GitHub Pages at https://4qan.github.io/ClinicSoftware/.
-236 commits across 9 days of development (v1.0 + v1.1 + v1.2).
+246+ commits across 10 days of development (v1.0 + v1.1 + v1.2 + v1.3).
 Dexie schema progression: v1 (foundation) -> v2 (drugs/visits) -> v3 (dosage->quantity rename) -> v4 (rxNotesLang).
 Separate Dexie instance for snapshots (ClinicSoftwareSnapshots).
 Print settings stored in Dexie settings table (prescriptionPaperSize, dispensaryPaperSize keys).
+Keyboard navigation: useAutocompleteKeyboard shared hook, pendingFocus pattern for post-action focus management.
 
 Clinic is in an area with unreliable internet. Doctor uses an old Windows system with Chrome/Edge. Health compliance team requires full patient records with unique IDs. Paper sizes now configurable (A5/A4/Letter), two prints per visit (prescription for patient, dispensary for dispenser).
 
@@ -106,6 +102,12 @@ Clinic is in an area with unreliable internet. Doctor uses an old Windows system
 | A6 removed post-Phase 10 | Too narrow for medication table, coerceSize() handles legacy DB values | Good |
 | Preview frame always mounted (no-print) | Eliminates brief frameless flash between screen and print modes | Good |
 | useRef auto-print guard | Prevents double-fire from React StrictMode remount | Good |
+| Global CSS @layer base for focus-visible | Single point of change, scalable across all components | Good |
+| useAutocompleteKeyboard shared hook | Single keyboard contract for all 4 autocomplete consumers, DRY | Good |
+| pendingFocus flag pattern | Reliable focus transitions after async state changes (React render cycle) | Good |
+| tabIndex={-1} on nav chrome | Removes sidebar/header/breadcrumbs from tab flow without hiding visually | Good |
+| No form wrapper on visit page | Textarea needs Enter for newlines; FORM-03 intentionally skipped | Good |
+| document-level Escape listener | Handles Escape when focus is on unmounted button (inline patient form) | Good |
 
 ---
-*Last updated: 2026-03-12 after v1.3 milestone started*
+*Last updated: 2026-03-15 after v1.3 milestone*
