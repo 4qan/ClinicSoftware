@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { describe, it, expect } from 'vitest'
 import { readFileSync, readdirSync } from 'fs'
 import path from 'path'
@@ -16,8 +17,6 @@ function getAllTsxFiles(dir: string): string[] {
 const COMPONENTS_DIR = path.join(SRC_ROOT, 'src/components')
 const PAGES_DIR = path.join(SRC_ROOT, 'src/pages')
 const INDEX_CSS = path.join(SRC_ROOT, 'src/index.css')
-
-const LEGACY_PATTERNS = [/\bfocus:ring-/g, /\bfocus:outline-none\b/g, /\bfocus:border-/g]
 
 describe('Focus styles: class audit', () => {
   const allFiles = [
