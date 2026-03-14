@@ -43,7 +43,7 @@
 
 **Milestone Goal:** The doctor can complete the entire critical path (login to patient to visit to prescription to print) without touching the mouse.
 
-- [ ] **Phase 12: Focus Foundation and Form Submission** - Visible focus indicators, logical tab order, Enter-to-submit on all critical-path forms
+- [x] **Phase 12: Focus Foundation and Form Submission** - Visible focus indicators, logical tab order, Enter-to-submit on all critical-path forms (completed 2026-03-14)
 - [ ] **Phase 13: Keyboard Interactions** - Fully keyboard-operable autocomplete, DrugComboBox consolidation, focus management after all actions, Escape to dismiss everywhere
 - [ ] **Phase 14: Print Flow** - Tab to print, Enter to fire, focus restore after dialog
 
@@ -59,7 +59,7 @@
   3. Tab moves through form fields in the order they appear visually on screen across all critical-path pages
   4. Pressing Enter on the login form submits it without clicking the button
   5. Pressing Enter on the patient creation form and visit form submits them without clicking the button
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 12-01-PLAN.md -- Global focus-visible CSS rule and legacy focus class cleanup
@@ -103,7 +103,7 @@ Plans:
 | 9. Auto-Snapshots | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 10. Print Infrastructure & Settings | v1.2 | 2/2 | Complete | 2026-03-11 |
 | 11. Layout Scaling & Preview | v1.2 | 2/2 | Complete | 2026-03-12 |
-| 12. Focus Foundation and Form Submission | 1/2 | In Progress|  | - |
+| 12. Focus Foundation and Form Submission | 2/2 | Complete   | 2026-03-14 | - |
 | 13. Keyboard Interactions | v1.3 | 0/? | Not started | - |
 | 14. Print Flow | v1.3 | 0/? | Not started | - |
 

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Keyboard Navigation
-status: planning
-stopped_at: "Completed 12-02-PLAN.md"
-last_updated: "2026-03-14T13:08:00.000Z"
-last_activity: "2026-03-14 -- Phase 12 plan 02 complete: tab order fixes, button reorder"
+status: executing
+stopped_at: Completed 12-01-PLAN.md
+last_updated: "2026-03-14T13:09:52.932Z"
+last_activity: 2026-03-14 -- Plan 12-02 complete (tab order fixes, button reorder)
 progress:
   total_phases: 3
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  completed_phases: 1
+  total_plans: 2
+  completed_plans: 2
   percent: 40
 ---
 
@@ -49,6 +49,7 @@ Progress: [████████░░░░░░░░░░░░] 40% (Ph
 | Phase 11 P02 | 15+35 min | 5 tasks | 9 files |
 | Phase 12 P01 | -- min | -- tasks | -- files |
 | Phase 12 P02 | 4 min | 2 tasks | 6 files |
+| Phase 12-focus-foundation-and-form-submission P01 | 6 | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,8 @@ Progress: [████████░░░░░░░░░░░░] 40% (Ph
 - v1.3 collapsed from 5 phases to 3: FMGT-03, ESC-02, ESC-03 folded into Phase 13 (bulk keyboard interactions); phases 14/15 merged
 - tabIndex={-1} on nav chrome (sidebar links, header links, breadcrumbs, toast close) removes them from tab flow without hiding visually (12-02)
 - NewVisitPage action button order: Save & Print > Save Visit > Cancel (primary action first, keyboard reaches it before secondary) (12-02)
+- [Phase 12]: Global CSS @layer base rule chosen for focus-visible (scalable, single point of change)
+- [Phase 12]: var(--color-blue-600) for focus outline color - design-system-linked TailwindCSS v4 token
 
 ### Pending Todos
 
@@ -76,9 +79,9 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-14T13:08:00.000Z
-Stopped at: Completed 12-02-PLAN.md
-Resume file: .planning/phases/12-focus-foundation-and-form-submission/12-02-SUMMARY.md
+Last session: 2026-03-14T13:09:52.930Z
+Stopped at: Completed 12-01-PLAN.md
+Resume file: None
 
 ---
 *Last updated: 2026-03-14 -- Phase 12 plan 02 complete*
