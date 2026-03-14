@@ -74,7 +74,7 @@ export function LoginPage() {
                   type="text"
                   value={recoveryCode}
                   onChange={(e) => setRecoveryCode(e.target.value)}
-                  className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg "
                   placeholder="Enter recovery code"
                   required
                 />
@@ -93,7 +93,7 @@ export function LoginPage() {
                     type={showNewPassword ? 'text' : 'password'}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full px-4 py-3 pr-16 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 pr-16 text-lg border border-gray-300 rounded-lg "
                     placeholder="Enter new password"
                     required
                   />
@@ -117,7 +117,7 @@ export function LoginPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 px-4 bg-blue-700 text-white text-lg font-semibold rounded-lg hover:bg-blue-800 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 min-h-[44px]"
+                className="w-full py-3 px-4 bg-blue-700 text-white text-lg font-semibold rounded-lg hover:bg-blue-800  disabled:opacity-50 min-h-[44px]"
               >
                 {isSubmitting ? 'Resetting...' : 'Reset Password'}
               </button>
@@ -158,7 +158,7 @@ export function LoginPage() {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 pr-16 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 pr-16 text-lg border border-gray-300 rounded-lg "
                 placeholder="Enter password"
                 autoFocus
                 required
@@ -183,7 +183,7 @@ export function LoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 px-4 bg-blue-700 text-white text-lg font-semibold rounded-lg hover:bg-blue-800 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 min-h-[44px]"
+            className="w-full py-3 px-4 bg-blue-700 text-white text-lg font-semibold rounded-lg hover:bg-blue-800  disabled:opacity-50 min-h-[44px]"
           >
             {isSubmitting ? 'Logging in...' : 'Log In'}
           </button>

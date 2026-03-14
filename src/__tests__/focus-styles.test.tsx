@@ -16,12 +16,14 @@ function getAllTsxFiles(dir: string): string[] {
 
 const COMPONENTS_DIR = path.join(SRC_ROOT, 'src/components')
 const PAGES_DIR = path.join(SRC_ROOT, 'src/pages')
+const AUTH_DIR = path.join(SRC_ROOT, 'src/auth')
 const INDEX_CSS = path.join(SRC_ROOT, 'src/index.css')
 
 describe('Focus styles: class audit', () => {
   const allFiles = [
     ...getAllTsxFiles(COMPONENTS_DIR),
     ...getAllTsxFiles(PAGES_DIR),
+    ...getAllTsxFiles(AUTH_DIR),
   ]
 
   it('no component or page file contains legacy focus:ring- classes', () => {

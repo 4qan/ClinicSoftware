@@ -113,7 +113,7 @@ Plans:
 | 11. Layout Scaling & Preview | v1.2 | 2/2 | Complete | 2026-03-12 |
 | 12. Focus Foundation and Form Submission | v1.3 | 2/2 | Complete | 2026-03-14 |
 | 13. Keyboard Interactions | v1.3 | 3/3 | Complete | 2026-03-14 |
-| 14. Print Flow | 1/1 | Complete   | 2026-03-14 | - |
+| 14. Print Flow | 1/1 | Complete    | 2026-03-14 | - |
 
 ---
 *Last updated: 2026-03-15 -- Phase 14 planned (1 plan)*
