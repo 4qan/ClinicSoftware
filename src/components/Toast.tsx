@@ -20,6 +20,7 @@ export function Toast({ id, type, message, onClose }: ToastProps) {
       <span className="flex-1 text-sm">{message}</span>
       <button
         onClick={() => onClose(id)}
+        tabIndex={-1}
         aria-label="Close"
         className="text-white/80 hover:text-white font-bold text-lg leading-none shrink-0"
       >

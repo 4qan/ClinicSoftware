@@ -55,7 +55,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     >
       <div className={`flex items-center ${collapsed ? 'justify-center py-5' : 'justify-between px-5 py-5'}`}>
         {!collapsed && (
-          <Link to="/" className="text-xl font-bold text-gray-900 hover:text-blue-700">
+          <Link to="/" tabIndex={-1} className="text-xl font-bold text-gray-900 hover:text-blue-700">
             Clinic Software
           </Link>
         )}
@@ -83,6 +83,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             <Link
               key={item.path}
               to={item.path}
+              tabIndex={-1}
               title={collapsed ? item.label : undefined}
               className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'} px-3 py-3 mb-1 rounded-lg text-base cursor-pointer transition-colors ${
                 active
@@ -101,6 +102,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       <div className={`${collapsed ? 'px-2' : 'px-3'} pb-5`}>
         <button
           onClick={logout}
+          tabIndex={-1}
           title={collapsed ? 'Log Out' : undefined}
           className={`w-full flex items-center ${collapsed ? 'justify-center' : ''} px-3 py-3 text-base text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors`}
           style={{ minHeight: '44px' }}

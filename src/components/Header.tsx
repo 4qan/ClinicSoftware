@@ -55,7 +55,7 @@ export function Header() {
   return (
     <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-        <Link to="/" className="text-xl sm:text-2xl font-bold text-gray-900 whitespace-nowrap hover:text-blue-700">
+        <Link to="/" tabIndex={-1} className="text-xl sm:text-2xl font-bold text-gray-900 whitespace-nowrap hover:text-blue-700">
           Clinic Software
         </Link>
 
@@ -68,7 +68,7 @@ export function Header() {
             onFocus={() => query.length >= 2 && results.length > 0 && setShowDropdown(true)}
             onKeyDown={handleKeyDown}
             placeholder="Search patients..."
-            className="w-full px-4 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 text-base border border-gray-300 rounded-lg"
           />
           {showDropdown && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
@@ -108,6 +108,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link
             to="/settings"
+            tabIndex={-1}
             className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
             aria-label="Settings"
           >
@@ -118,6 +119,7 @@ export function Header() {
           </Link>
           <button
             onClick={logout}
+            tabIndex={-1}
             className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
           >
             Log Out

@@ -353,11 +353,12 @@ export function NewVisitPage() {
         <div className={`flex items-center justify-end gap-3${isDisabled ? ' opacity-50 pointer-events-none' : ''}`}>
           <button
             type="button"
-            onClick={() => navigate(-1)}
-            className="px-4 py-2 text-base text-gray-500 hover:text-gray-700 cursor-pointer"
+            onClick={handleSaveAndPrint}
+            disabled={!canSave}
+            className="px-8 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-lg cursor-pointer transition-colors"
             style={{ minHeight: '44px' }}
           >
-            Cancel
+            {saving ? 'Saving...' : 'Save & Print'}
           </button>
           <button
             type="button"
@@ -370,12 +371,11 @@ export function NewVisitPage() {
           </button>
           <button
             type="button"
-            onClick={handleSaveAndPrint}
-            disabled={!canSave}
-            className="px-8 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-lg cursor-pointer transition-colors"
+            onClick={() => navigate(-1)}
+            className="px-4 py-2 text-base text-gray-500 hover:text-gray-700 cursor-pointer"
             style={{ minHeight: '44px' }}
           >
-            {saving ? 'Saving...' : 'Save & Print'}
+            Cancel
           </button>
         </div>
       </fieldset>

@@ -20,7 +20,7 @@ export function Breadcrumbs({ crumbs }: BreadcrumbsProps) {
             {isLast || !crumb.path ? (
               <span className="font-semibold text-gray-900">{crumb.label}</span>
             ) : (
-              <Link to={crumb.path} className="text-gray-500 hover:text-blue-600 hover:underline">
+              <Link to={crumb.path} tabIndex={-1} className="text-gray-500 hover:text-blue-600 hover:underline">
                 {crumb.label}
               </Link>
             )}
