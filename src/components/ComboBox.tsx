@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useAutocompleteKeyboard } from '@/hooks/useAutocompleteKeyboard'
 
 interface ComboBoxProps {
   options: string[]
@@ -9,6 +10,7 @@ interface ComboBoxProps {
   error?: string
   disabled?: boolean
   showCustomIndicator?: boolean
+  inputRef?: React.RefObject<HTMLInputElement | null>
 }
 
 export function ComboBox({
@@ -20,11 +22,12 @@ export function ComboBox({
   error,
   disabled = false,
   showCustomIndicator = false,
+  inputRef: externalInputRef,
 }: ComboBoxProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [highlightIndex, setHighlightIndex] = useState(-1)
   const containerRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const internalInputRef = useRef<HTMLInputElement>(null)
+  const inputRef = externalInputRef ?? internalInputRef
   const listRef = useRef<HTMLUListElement>(null)
 
   const filtered = value
@@ -34,10 +37,26 @@ export function ComboBox({
   const isCustomValue = showCustomIndicator && value.trim() !== '' &&
     !options.some(opt => opt.toLowerCase() === value.toLowerCase())
 
+  function handleSelect(option: string) {
+    onChange(option)
+    setIsOpen(false)
+  }
+
   const close = useCallback(() => {
     setIsOpen(false)
-    setHighlightIndex(-1)
   }, [])
+
+  const open = useCallback(() => {
+    setIsOpen(true)
+  }, [])
+
+  const { highlightIndex, setHighlightIndex, handleKeyDown } = useAutocompleteKeyboard<string>({
+    items: filtered,
+    isOpen,
+    onSelect: handleSelect,
+    onClose: close,
+    onOpen: open,
+  })
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -56,42 +75,6 @@ export function ComboBox({
     }
   }, [highlightIndex, isOpen])
 
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Escape') {
-      close()
-      inputRef.current?.blur()
-      return
-    }
-
-    if (!isOpen) {
-      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-        setIsOpen(true)
-        setHighlightIndex(0)
-        e.preventDefault()
-      }
-      return
-    }
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setHighlightIndex(prev => (prev < filtered.length - 1 ? prev + 1 : 0))
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setHighlightIndex(prev => (prev > 0 ? prev - 1 : filtered.length - 1))
-    } else if (e.key === 'Enter') {
-      e.preventDefault()
-      if (highlightIndex >= 0 && highlightIndex < filtered.length) {
-        onChange(filtered[highlightIndex])
-        close()
-      }
-    }
-  }
-
-  function handleSelect(option: string) {
-    onChange(option)
-    close()
-  }
-
   return (
     <div className="relative" ref={containerRef}>
       {label && (
@@ -106,11 +89,9 @@ export function ComboBox({
         onChange={(e) => {
           onChange(e.target.value)
           setIsOpen(true)
-          setHighlightIndex(-1)
         }}
         onFocus={() => {
           setIsOpen(true)
-          setHighlightIndex(-1)
         }}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}

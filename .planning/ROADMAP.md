@@ -75,7 +75,12 @@ Plans:
   3. After selecting a drug from autocomplete, focus moves automatically to the quantity field; after adding a medication row, focus returns to the drug search field
   4. After creating a patient inline, focus moves to the next logical visit field; pressing Escape on the inline patient form dismisses it and returns focus to patient search
   5. Pressing Escape closes any open modal or overlay and returns focus to a logical position; pressing Enter after filling required medication fields adds the row
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 13-01-PLAN.md -- Shared autocomplete keyboard hook, ComboBox and SearchBar fixes
+- [ ] 13-02-PLAN.md -- Drug search consolidation and MedicationEntry focus transitions
+- [ ] 13-03-PLAN.md -- NewVisitPage patient search keyboard nav, inline form Escape, post-create focus
 
 ### Phase 14: Print Flow
 **Goal**: The doctor can trigger printing and return to work using only the keyboard after completing a prescription.
@@ -104,8 +109,8 @@ Plans:
 | 10. Print Infrastructure & Settings | v1.2 | 2/2 | Complete | 2026-03-11 |
 | 11. Layout Scaling & Preview | v1.2 | 2/2 | Complete | 2026-03-12 |
 | 12. Focus Foundation and Form Submission | 2/2 | Complete   | 2026-03-14 | - |
-| 13. Keyboard Interactions | v1.3 | 0/? | Not started | - |
+| 13. Keyboard Interactions | v1.3 | 0/3 | Planned | - |
 | 14. Print Flow | v1.3 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-03-14 -- Phase 12 planned (2 plans)*
+*Last updated: 2026-03-14 -- Phase 13 planned (3 plans)*
