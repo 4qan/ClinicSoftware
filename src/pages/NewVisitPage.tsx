@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
@@ -8,6 +8,7 @@ import { RxNotesField } from '@/components/RxNotesField'
 import { PatientRegistrationForm } from '@/components/PatientRegistrationForm'
 import { getPatient, registerPatient } from '@/db/patients'
 import { usePatientSearch } from '@/hooks/usePatientSearch'
+import { useAutocompleteKeyboard } from '@/hooks/useAutocompleteKeyboard'
 import { createVisit } from '@/db/visits'
 import { getPatientVisits } from '@/db/visits'
 import { db } from '@/db/index'
@@ -22,6 +23,10 @@ export function NewVisitPage() {
 
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
   const [patientQuery, setPatientQuery] = useState('')
+  const [patientDropdownDismissed, setPatientDropdownDismissed] = useState(false)
+  const [pendingFocusTarget, setPendingFocusTarget] = useState<'clinicalNotes' | 'patientSearch' | null>(null)
+  const patientSearchRef = useRef<HTMLInputElement>(null)
+  const clinicalNotesRef = useRef<HTMLTextAreaElement>(null)
   const { results: patientResults, isSearching: isPatientSearching } = usePatientSearch(patientQuery)
 
   const [clinicalNotes, setClinicalNotes] = useState('')
@@ -83,6 +88,47 @@ export function NewVisitPage() {
     loadVisitHistory()
   }, [loadVisitHistory])
 
+  // Dropdown visibility: derived from query length, but dismissable via Escape
+  const showPatientDropdown = patientQuery.trim().length >= 2 && !patientDropdownDismissed
+
+  // Reset dismiss flag when user types again
+  useEffect(() => {
+    setPatientDropdownDismissed(false)
+  }, [patientQuery])
+
+  const { highlightIndex: patientHighlightIndex, setHighlightIndex: setPatientHighlightIndex, handleKeyDown: handlePatientKeyDown } =
+    useAutocompleteKeyboard<Patient>({
+      items: patientResults,
+      isOpen: showPatientDropdown,
+      onSelect: (patient) => handleSelectPatient(patient),
+      onClose: () => setPatientDropdownDismissed(true),
+    })
+
+  // Focus transitions via pendingFocusTarget
+  useEffect(() => {
+    if (pendingFocusTarget === 'clinicalNotes') {
+      clinicalNotesRef.current?.focus()
+      setPendingFocusTarget(null)
+    } else if (pendingFocusTarget === 'patientSearch') {
+      patientSearchRef.current?.focus()
+      setPendingFocusTarget(null)
+    }
+  }, [pendingFocusTarget])
+
+  // Escape on inline registration form: listen on document so it works even if
+  // focus moved to body after the triggering button was unmounted
+  useEffect(() => {
+    if (!showInlineRegistration) return
+    function onDocKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setShowInlineRegistration(false)
+        setPendingFocusTarget('patientSearch')
+      }
+    }
+    document.addEventListener('keydown', onDocKeyDown)
+    return () => document.removeEventListener('keydown', onDocKeyDown)
+  }, [showInlineRegistration])
+
   function handleSelectPatient(patient: Patient) {
     setSelectedPatient(patient)
     setPatientQuery('')
@@ -102,6 +148,7 @@ export function NewVisitPage() {
     setSelectedPatient(patient)
     setShowInlineRegistration(false)
     setPatientQuery('')
+    setPendingFocusTarget('clinicalNotes')
   }
 
   function handleAddMedication(med: MedicationFormData) {
@@ -232,14 +279,16 @@ export function NewVisitPage() {
           <div>
             <div className="relative">
               <input
+                ref={patientSearchRef}
                 type="text"
                 value={patientQuery}
                 onChange={(e) => setPatientQuery(e.target.value)}
+                onKeyDown={handlePatientKeyDown}
                 placeholder="Search patient by name, ID, or contact..."
                 className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg"
                 style={{ minHeight: '44px' }}
               />
-              {patientQuery.trim().length >= 2 && (
+              {showPatientDropdown && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
                   {isPatientSearching ? (
                     <div className="p-3 text-center text-gray-500 text-sm">Searching...</div>
@@ -252,12 +301,13 @@ export function NewVisitPage() {
                       Create &lsquo;{patientQuery.trim()}&rsquo; as new patient
                     </button>
                   ) : (
-                    patientResults.map((p) => (
+                    patientResults.map((p, idx) => (
                       <button
                         key={p.id}
                         type="button"
                         onClick={() => handleSelectPatient(p)}
-                        className="w-full px-3 py-2 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 flex items-center gap-2"
+                        onMouseEnter={() => setPatientHighlightIndex(idx)}
+                        className={`w-full px-3 py-2 text-left border-b border-gray-100 last:border-b-0 flex items-center gap-2 ${idx === patientHighlightIndex ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
                       >
                         <span className="text-xs font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
                           {p.patientId}
@@ -327,6 +377,7 @@ export function NewVisitPage() {
         <div className={`bg-white border border-gray-200 rounded-lg p-6${isDisabled ? ' opacity-50 pointer-events-none' : ''}`}>
           <h3 className="text-lg font-bold text-gray-900 mb-3">Clinical Notes</h3>
           <textarea
+            ref={clinicalNotesRef}
             value={clinicalNotes}
             onChange={(e) => setClinicalNotes(e.target.value)}
             placeholder={'Complaint:\nExamination:\nDiagnosis:'}
