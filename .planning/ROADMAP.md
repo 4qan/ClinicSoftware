@@ -59,7 +59,7 @@
   3. Tab moves through form fields in the order they appear visually on screen across all critical-path pages
   4. Pressing Enter on the login form submits it without clicking the button
   5. Pressing Enter on the patient creation form and visit form submits them without clicking the button
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 12-01-PLAN.md -- Global focus-visible CSS rule and legacy focus class cleanup
@@ -103,7 +103,7 @@ Plans:
 | 9. Auto-Snapshots | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 10. Print Infrastructure & Settings | v1.2 | 2/2 | Complete | 2026-03-11 |
 | 11. Layout Scaling & Preview | v1.2 | 2/2 | Complete | 2026-03-12 |
-| 12. Focus Foundation and Form Submission | v1.3 | 0/2 | Not started | - |
+| 12. Focus Foundation and Form Submission | 1/2 | In Progress|  | - |
 | 13. Keyboard Interactions | v1.3 | 0/? | Not started | - |
 | 14. Print Flow | v1.3 | 0/? | Not started | - |
 
