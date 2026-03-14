@@ -198,7 +198,7 @@ export function NewVisitPage() {
   async function handleSaveAndPrint() {
     const visitId = await saveVisit()
     if (visitId) {
-      navigate(`/visit/${visitId}/print`)
+      navigate(`/visit/${visitId}/print?auto=prescription`)
     }
   }
 

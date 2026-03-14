@@ -54,6 +54,7 @@ export function PrintVisitPage() {
   const [printMode, setPrintMode] = useState<PrintMode>(null)
   const [previewMode, setPreviewMode] = useState<PreviewMode>('prescription')
   const autoPrintTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const printButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     async function loadData() {
@@ -109,6 +110,7 @@ export function PrintVisitPage() {
   const handleAfterPrint = useCallback(() => {
     setPrintMode(null)
     removePageStyle()
+    printButtonRef.current?.focus()
   }, [])
 
   useEffect(() => {
@@ -172,6 +174,7 @@ export function PrintVisitPage() {
           <div className="flex bg-gray-100 rounded-lg p-0.5">
             <button
               type="button"
+              tabIndex={-1}
               onClick={() => setPreviewMode('prescription')}
               className={`px-3 py-1.5 text-sm font-medium rounded-md cursor-pointer transition-colors ${
                 previewMode === 'prescription'
@@ -183,6 +186,7 @@ export function PrintVisitPage() {
             </button>
             <button
               type="button"
+              tabIndex={-1}
               onClick={() => setPreviewMode('dispensary')}
               className={`px-3 py-1.5 text-sm font-medium rounded-md cursor-pointer transition-colors ${
                 previewMode === 'dispensary'
@@ -202,7 +206,9 @@ export function PrintVisitPage() {
 
             {/* Print button */}
             <button
+              ref={printButtonRef}
               type="button"
+              autoFocus
               onClick={() => handlePrint(previewMode)}
               className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer transition-colors"
             >

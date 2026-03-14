@@ -53,6 +53,7 @@ export function MedicationList({ medications, onRemove }: MedicationListProps) {
                 <td className="py-3">
                   <button
                     type="button"
+                    tabIndex={-1}
                     onClick={() => onRemove(index)}
                     className="text-sm text-red-600 hover:text-red-800 font-medium cursor-pointer"
                   >
@@ -82,6 +83,7 @@ export function MedicationList({ medications, onRemove }: MedicationListProps) {
             </div>
             <button
               type="button"
+              tabIndex={-1}
               onClick={() => onRemove(index)}
               className="text-sm text-red-600 hover:text-red-800 font-medium cursor-pointer ml-2 shrink-0"
             >
