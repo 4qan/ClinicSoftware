@@ -61,7 +61,7 @@ function AddDrugForm({ onAdded }: { onAdded: () => void }) {
             type="text"
             value={data.brandName}
             onChange={(e) => setData({ ...data, brandName: e.target.value })}
-            className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 ${
+            className={`w-full px-3 py-2 text-base border rounded-lg ${
               errors.brandName ? 'border-red-500' : 'border-gray-200'
             }`}
             style={{ minHeight: '44px' }}
@@ -75,7 +75,7 @@ function AddDrugForm({ onAdded }: { onAdded: () => void }) {
             type="text"
             value={data.saltName}
             onChange={(e) => setData({ ...data, saltName: e.target.value })}
-            className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 ${
+            className={`w-full px-3 py-2 text-base border rounded-lg ${
               errors.saltName ? 'border-red-500' : 'border-gray-200'
             }`}
             style={{ minHeight: '44px' }}
@@ -97,7 +97,7 @@ function AddDrugForm({ onAdded }: { onAdded: () => void }) {
             type="text"
             value={data.strength}
             onChange={(e) => setData({ ...data, strength: e.target.value })}
-            className="w-full px-3 py-2 text-base border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="w-full px-3 py-2 text-base border border-gray-200 rounded-lg"
             style={{ minHeight: '44px' }}
             placeholder="e.g. 500mg"
           />
@@ -182,7 +182,7 @@ function DrugRow({
               type="text"
               value={editData.brandName}
               onChange={(e) => setEditData({ ...editData, brandName: e.target.value })}
-              className={`w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-600 ${
+              className={`w-full px-2 py-1.5 text-sm border rounded ${
                 errors.brandName ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Brand Name"
@@ -194,7 +194,7 @@ function DrugRow({
               type="text"
               value={editData.saltName}
               onChange={(e) => setEditData({ ...editData, saltName: e.target.value })}
-              className={`w-full px-2 py-1.5 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-600 ${
+              className={`w-full px-2 py-1.5 text-sm border rounded ${
                 errors.saltName ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Salt Name"
@@ -212,7 +212,7 @@ function DrugRow({
             type="text"
             value={editData.strength}
             onChange={(e) => setEditData({ ...editData, strength: e.target.value })}
-            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-600"
+            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded"
             placeholder="Strength"
           />
         </div>
@@ -339,7 +339,7 @@ export function DrugManagement() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Filter custom drugs..."
-            className="w-full px-3 py-2 mb-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="w-full px-3 py-2 mb-2 text-sm border border-gray-200 rounded-lg"
           />
         )}
 

@@ -48,7 +48,7 @@ export function PrintSettings() {
             id="prescriptionSize"
             value={prescriptionSize}
             onChange={(e) => handlePrescriptionChange(e.target.value as PaperSize)}
-            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg"
           >
             {PAPER_SIZE_ORDER.map((size) => (
               <option key={size} value={size}>
@@ -70,7 +70,7 @@ export function PrintSettings() {
             id="dispensarySize"
             value={dispensarySize}
             onChange={(e) => handleDispensaryChange(e.target.value as PaperSize)}
-            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg"
           >
             {PAPER_SIZE_ORDER.map((size) => (
               <option key={size} value={size}>

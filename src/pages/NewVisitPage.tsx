@@ -236,7 +236,7 @@ export function NewVisitPage() {
                 value={patientQuery}
                 onChange={(e) => setPatientQuery(e.target.value)}
                 placeholder="Search patient by name, ID, or contact..."
-                className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg"
                 style={{ minHeight: '44px' }}
               />
               {patientQuery.trim().length >= 2 && (
@@ -330,7 +330,7 @@ export function NewVisitPage() {
             value={clinicalNotes}
             onChange={(e) => setClinicalNotes(e.target.value)}
             placeholder={'Complaint:\nExamination:\nDiagnosis:'}
-            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg resize-y"
             style={{ minHeight: '120px' }}
           />
         </div>

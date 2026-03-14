@@ -98,7 +98,7 @@ function RecoveryCodeSection() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg"
               required
             />
           </div>

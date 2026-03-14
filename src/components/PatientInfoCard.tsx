@@ -100,7 +100,7 @@ export function PatientInfoCard({ patient, onUpdated }: PatientInfoCardProps) {
               type="text"
               value={form.firstName}
               onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
-              className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.firstName ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 text-base border rounded-lg ${errors.firstName ? 'border-red-500' : 'border-gray-300'}`}
             />
             {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>}
           </div>
@@ -111,7 +111,7 @@ export function PatientInfoCard({ patient, onUpdated }: PatientInfoCardProps) {
               type="text"
               value={form.lastName}
               onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
-              className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.lastName ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 text-base border rounded-lg ${errors.lastName ? 'border-red-500' : 'border-gray-300'}`}
             />
             {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>}
           </div>
@@ -123,7 +123,7 @@ export function PatientInfoCard({ patient, onUpdated }: PatientInfoCardProps) {
               min="0"
               value={form.age || ''}
               onChange={(e) => setForm((f) => ({ ...f, age: parseInt(e.target.value) || 0 }))}
-              className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.age ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 text-base border rounded-lg ${errors.age ? 'border-red-500' : 'border-gray-300'}`}
             />
             {errors.age && <p className="mt-1 text-sm text-red-600">{errors.age}</p>}
           </div>
@@ -152,7 +152,7 @@ export function PatientInfoCard({ patient, onUpdated }: PatientInfoCardProps) {
               type="text"
               value={form.contact}
               onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))}
-              className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg"
             />
           </div>
           <div>
@@ -163,7 +163,7 @@ export function PatientInfoCard({ patient, onUpdated }: PatientInfoCardProps) {
               value={form.cnic}
               onChange={(e) => setForm((f) => ({ ...f, cnic: formatCNIC(e.target.value) }))}
               maxLength={15}
-              className={`w-full px-3 py-2 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.cnic ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 text-base border rounded-lg ${errors.cnic ? 'border-red-500' : 'border-gray-300'}`}
               placeholder="XXXXX-XXXXXXX-X"
             />
             <p className="mt-1 text-xs text-gray-400">Format: XXXXX-XXXXXXX-X</p>

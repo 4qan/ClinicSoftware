@@ -106,7 +106,7 @@ export function MedicationEntry({ onAdd }: MedicationEntryProps) {
           onChange={(e) => handleDrugQueryChange(e.target.value)}
           onFocus={() => drugQuery.trim().length >= 1 && setShowDrugDropdown(true)}
           placeholder="Type drug name..."
-          className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg"
           style={{ minHeight: '44px' }}
           autoComplete="off"
         />

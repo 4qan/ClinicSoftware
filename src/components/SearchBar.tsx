@@ -68,7 +68,7 @@ export function SearchBar({ variant = 'prominent' }: SearchBarProps) {
           onFocus={() => hasQuery && setShowDropdown(true)}
           onKeyDown={handleKeyDown}
           placeholder="Search patients by name, ID, or contact..."
-          className={`w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          className={`w-full border border-gray-300 rounded-lg ${
             isProminent ? 'pl-12 pr-4 py-4 text-lg' : 'pl-10 pr-4 py-2 text-base'
           }`}
         />

@@ -136,7 +136,7 @@ export function PatientRegistrationForm({
             type="text"
             value={form.firstName}
             onChange={(e) => updateField('firstName', e.target.value)}
-            className={`w-full px-3 py-2 ${compact ? 'text-sm' : 'text-base'} border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full px-3 py-2 ${compact ? 'text-sm' : 'text-base'} border rounded-lg ${
               errors.firstName ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="Enter first name"
@@ -154,7 +154,7 @@ export function PatientRegistrationForm({
             type="text"
             value={form.lastName}
             onChange={(e) => updateField('lastName', e.target.value)}
-            className={`w-full px-3 py-2 ${compact ? 'text-sm' : 'text-base'} border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full px-3 py-2 ${compact ? 'text-sm' : 'text-base'} border rounded-lg ${
               errors.lastName ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="Enter last name"
@@ -196,7 +196,7 @@ export function PatientRegistrationForm({
             min="0"
             value={form.age || ''}
             onChange={(e) => updateField('age', parseInt(e.target.value) || 0)}
-            className={`w-full px-3 py-2 ${compact ? 'text-sm' : 'text-base'} border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full px-3 py-2 ${compact ? 'text-sm' : 'text-base'} border rounded-lg ${
               errors.age ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="Enter age"
@@ -214,7 +214,7 @@ export function PatientRegistrationForm({
             type="text"
             value={form.contact}
             onChange={(e) => updateField('contact', e.target.value)}
-            className={`w-full px-3 py-2 ${compact ? 'text-sm' : 'text-base'} border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            className={`w-full px-3 py-2 ${compact ? 'text-sm' : 'text-base'} border border-gray-300 rounded-lg`}
             placeholder="Contact (optional)"
           />
         </div>
@@ -230,7 +230,7 @@ export function PatientRegistrationForm({
             value={form.cnic}
             onChange={(e) => updateField('cnic', formatCNIC(e.target.value))}
             maxLength={15}
-            className={`w-full px-3 py-2 ${compact ? 'text-sm' : 'text-base'} border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`w-full px-3 py-2 ${compact ? 'text-sm' : 'text-base'} border rounded-lg ${
               errors.cnic ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="XXXXX-XXXXXXX-X"

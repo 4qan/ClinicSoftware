@@ -51,7 +51,7 @@ export function ClinicInfoSettings() {
             type="text"
             value={form.doctorName}
             onChange={(e) => updateField('doctorName', e.target.value)}
-            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg"
             placeholder="Dr. ..."
           />
         </div>
@@ -65,7 +65,7 @@ export function ClinicInfoSettings() {
             type="text"
             value={form.clinicName}
             onChange={(e) => updateField('clinicName', e.target.value)}
-            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg"
             placeholder="Clinic name"
           />
         </div>
@@ -78,7 +78,7 @@ export function ClinicInfoSettings() {
             id="clinicAddress"
             value={form.address}
             onChange={(e) => updateField('address', e.target.value)}
-            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg resize-y"
             placeholder="Full address"
             style={{ minHeight: '60px' }}
           />
@@ -93,7 +93,7 @@ export function ClinicInfoSettings() {
             type="text"
             value={form.phone}
             onChange={(e) => updateField('phone', e.target.value)}
-            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg"
             placeholder="Phone number"
           />
         </div>
@@ -106,7 +106,7 @@ export function ClinicInfoSettings() {
             id="clinicFooterText"
             value={form.footerText}
             onChange={(e) => updateField('footerText', e.target.value)}
-            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+            className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg resize-y"
             placeholder="Footer text for printed prescriptions"
             style={{ minHeight: '60px' }}
           />

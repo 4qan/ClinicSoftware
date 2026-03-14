@@ -50,7 +50,7 @@ export function RxNotesField({ value, onChange, lang, onLangChange, disabled }: 
         disabled={disabled}
         dir={lang === 'ur' ? 'rtl' : 'ltr'}
         placeholder={lang === 'ur' ? 'نسخے کی اضافی ہدایات...' : 'Additional prescription notes...'}
-        className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+        className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg resize-y"
         style={
           lang === 'ur'
             ? {
