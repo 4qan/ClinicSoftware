@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { usePatientSearch } from '@/hooks/usePatientSearch'
+import { useAutocompleteKeyboard } from '@/hooks/useAutocompleteKeyboard'
 import type { Patient } from '@/db/index'
 
 interface SearchBarProps {
@@ -12,7 +13,6 @@ export function SearchBar({ variant = 'prominent' }: SearchBarProps) {
   const [query, setQuery] = useState('')
   const { results, isSearching } = usePatientSearch(query)
   const [showDropdown, setShowDropdown] = useState(false)
-  const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -25,7 +25,6 @@ export function SearchBar({ variant = 'prominent' }: SearchBarProps) {
     } else {
       setShowDropdown(false)
     }
-    setHighlightedIndex(-1)
   }, [hasQuery, results])
 
   useEffect(() => {
@@ -44,23 +43,17 @@ export function SearchBar({ variant = 'prominent' }: SearchBarProps) {
     navigate(`/patient/${patient.id}`)
   }
 
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Escape') {
-      setQuery('')
-      setShowDropdown(false)
-      setHighlightedIndex(-1)
-      inputRef.current?.blur()
-    } else if (e.key === 'ArrowDown' && showDropdown && results.length > 0) {
-      e.preventDefault()
-      setHighlightedIndex((prev) => (prev + 1) % results.length)
-    } else if (e.key === 'ArrowUp' && showDropdown && results.length > 0) {
-      e.preventDefault()
-      setHighlightedIndex((prev) => (prev <= 0 ? results.length - 1 : prev - 1))
-    } else if (e.key === 'Enter' && highlightedIndex >= 0 && results[highlightedIndex]) {
-      e.preventDefault()
-      handleSelect(results[highlightedIndex])
-    }
-  }
+  const close = useCallback(() => {
+    setShowDropdown(false)
+    // Intentionally do NOT clear query or blur -- hook manages only close
+  }, [])
+
+  const { highlightIndex: highlightedIndex, handleKeyDown } = useAutocompleteKeyboard<Patient>({
+    items: results,
+    isOpen: showDropdown,
+    onSelect: handleSelect,
+    onClose: close,
+  })
 
   return (
     <div className="relative" ref={dropdownRef}>
