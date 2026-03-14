@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: Print Customization
-status: complete
-stopped_at: Milestone v1.2 completed
-last_updated: "2026-03-12T21:00:00.000Z"
-last_activity: 2026-03-12 -- v1.2 milestone completed
+milestone: v1.3
+milestone_name: Keyboard Navigation
+status: active
+stopped_at: null
+last_updated: "2026-03-12T22:00:00.000Z"
+last_activity: 2026-03-12 -- Milestone v1.3 started
 progress:
-  total_phases: 2
-  completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State: ClinicSoftware
@@ -21,15 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** The doctor can see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even with no internet.
-**Current focus:** Planning next milestone
+**Current focus:** v1.3 Keyboard Navigation
 
 ## Current Position
 
-Milestone: v1.2 Print Customization -- SHIPPED 2026-03-12
-Status: Complete
-Next: `/gsd:new-milestone` to define v1.3
-
-Progress: [##########] 100%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-12 — Milestone v1.3 started
 
 ## Performance Metrics
 

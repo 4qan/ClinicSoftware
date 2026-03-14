@@ -29,7 +29,18 @@ The doctor can see a patient, write a prescription with medication autocomplete,
 
 ### Active
 
-(No active requirements. Define next milestone with `/gsd:new-milestone`.)
+## Current Milestone: v1.3 Keyboard Navigation
+
+**Goal:** The doctor can complete the entire critical path (login → patient → visit → prescription → print) without touching the mouse, using only tab/enter/escape.
+
+**Target features:**
+- Logical tab order through every form on the critical path
+- Autocomplete dropdown: dismiss on blur/tab, arrow key navigation, Enter to select
+- Focus management after actions (add med → quantity, complete row → drug search, inline patient create → next field)
+- Enter to submit on all forms
+- Escape to dismiss/cancel dropdowns and modals
+- Visible focus indicators throughout
+- Layout optimizations for keyboard-driven speed (informed by medical software UX research)
 
 ### Out of Scope
 
@@ -97,4 +108,4 @@ Clinic is in an area with unreliable internet. Doctor uses an old Windows system
 | useRef auto-print guard | Prevents double-fire from React StrictMode remount | Good |
 
 ---
-*Last updated: 2026-03-12 after v1.2 milestone*
+*Last updated: 2026-03-12 after v1.3 milestone started*
