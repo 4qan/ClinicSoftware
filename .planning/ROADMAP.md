@@ -90,7 +90,10 @@ Plans:
   1. User can Tab to the print button from the last prescription field without extra clicks
   2. User can press Enter on the focused print button to open the browser print dialog
   3. After the print dialog closes, focus returns to a usable position on the page (not lost to document body)
-**Plans**: TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 14-01-PLAN.md -- Tab path cleanup, autoFocus, auto-print param, afterprint focus restore
 
 ## Progress
 
@@ -108,9 +111,9 @@ Plans:
 | 9. Auto-Snapshots | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 10. Print Infrastructure & Settings | v1.2 | 2/2 | Complete | 2026-03-11 |
 | 11. Layout Scaling & Preview | v1.2 | 2/2 | Complete | 2026-03-12 |
-| 12. Focus Foundation and Form Submission | 2/2 | Complete   | 2026-03-14 | - |
-| 13. Keyboard Interactions | 3/3 | Complete   | 2026-03-14 | - |
-| 14. Print Flow | v1.3 | 0/? | Not started | - |
+| 12. Focus Foundation and Form Submission | v1.3 | 2/2 | Complete | 2026-03-14 |
+| 13. Keyboard Interactions | v1.3 | 3/3 | Complete | 2026-03-14 |
+| 14. Print Flow | v1.3 | 0/1 | Not started | - |
 
 ---
-*Last updated: 2026-03-14 -- Phase 13 planned (3 plans)*
+*Last updated: 2026-03-15 -- Phase 14 planned (1 plan)*
