@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Keyboard Navigation
 status: executing
-stopped_at: Completed 13-01-PLAN.md
-last_updated: "2026-03-14T18:55:23.258Z"
+stopped_at: Completed 13-02-PLAN.md
+last_updated: "2026-03-14T18:59:49.420Z"
 last_activity: 2026-03-14 -- Plan 12-02 complete (tab order fixes, button reorder)
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 40
 ---
 
@@ -51,6 +51,7 @@ Progress: [████████░░░░░░░░░░░░] 40% (Ph
 | Phase 12 P02 | 4 min | 2 tasks | 6 files |
 | Phase 12-focus-foundation-and-form-submission P01 | 6 | 2 tasks | 15 files |
 | Phase 13-keyboard-interactions P01 | 4 | 2 tasks | 6 files |
+| Phase 13-keyboard-interactions P02 | 3 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,8 @@ Progress: [████████░░░░░░░░░░░░] 40% (Ph
 - [Phase 13-keyboard-interactions]: useAutocompleteKeyboard uses ref-based JSON.stringify comparison for items change detection -- not [items] as useEffect dep (new array refs reset highlight on every render)
 - [Phase 13-keyboard-interactions]: Escape in hook only calls onClose, no blur or query clear -- callers manage their own state cleanup in onClose
 - [Phase 13-keyboard-interactions]: ComboBox optional inputRef prop (React.RefObject<HTMLInputElement|null>) -- falls back to internal ref if not provided
+- [Phase 13-keyboard-interactions]: MedicationEntry Enter stopPropagation when drug dropdown open -- prevents wrapper from double-firing add-medication on same keypress
+- [Phase 13-keyboard-interactions]: pendingFocus flag pattern for focus transitions after async state changes in MedicationEntry
 
 ### Pending Todos
 
@@ -83,8 +86,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-14T18:55:23.256Z
-Stopped at: Completed 13-01-PLAN.md
+Last session: 2026-03-14T18:59:45.409Z
+Stopped at: Completed 13-02-PLAN.md
 Resume file: None
 
 ---
