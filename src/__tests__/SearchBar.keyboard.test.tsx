@@ -16,26 +16,30 @@ vi.mock('react-router-dom', async () => {
 
 const mockPatients: Patient[] = [
   {
-    id: 1,
+    id: '1',
     patientId: 'PT-001',
     firstName: 'Ahmed',
     lastName: 'Khan',
+    firstNameLower: 'ahmed',
+    lastNameLower: 'khan',
     age: 35,
     gender: 'male',
     contact: '03001234567',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
-    id: 2,
+    id: '2',
     patientId: 'PT-002',
     firstName: 'Sara',
     lastName: 'Ahmed',
+    firstNameLower: 'sara',
+    lastNameLower: 'ahmed',
     age: 28,
     gender: 'female',
     contact: '03111234567',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
 ]
 

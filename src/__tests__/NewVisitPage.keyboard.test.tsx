@@ -43,25 +43,29 @@ vi.mock('@/hooks/usePatientSearch', () => ({
 
 const mockPatients: Patient[] = [
   {
-    id: 1,
+    id: '1',
     patientId: 'PT-001',
     firstName: 'Ahmed',
     lastName: 'Khan',
+    firstNameLower: 'ahmed',
+    lastNameLower: 'khan',
     age: 35,
     gender: 'male',
     contact: '03001234567',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
-    id: 2,
+    id: '2',
     patientId: 'PT-002',
     firstName: 'Sara',
     lastName: 'Ahmed',
+    firstNameLower: 'sara',
+    lastNameLower: 'ahmed',
     age: 28,
     gender: 'female',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
 ]
 
@@ -229,14 +233,16 @@ describe('NewVisitPage post-inline-create focus', () => {
   it('After creating a patient inline, focus moves to clinical notes textarea', async () => {
     const { registerPatient } = await import('@/db/patients')
     const fakePatient: Patient = {
-      id: 99,
+      id: '99',
       patientId: 'PT-099',
       firstName: 'New',
       lastName: 'Patient',
+      firstNameLower: 'new',
+      lastNameLower: 'patient',
       age: 25,
       gender: 'male',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     }
     vi.mocked(registerPatient).mockResolvedValue(fakePatient)
 
