@@ -12,6 +12,7 @@ export function SearchBar({ variant = 'prominent' }: SearchBarProps) {
   const [query, setQuery] = useState('')
   const { results, isSearching } = usePatientSearch(query)
   const [showDropdown, setShowDropdown] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -24,6 +25,7 @@ export function SearchBar({ variant = 'prominent' }: SearchBarProps) {
     } else {
       setShowDropdown(false)
     }
+    setHighlightedIndex(-1)
   }, [hasQuery, results])
 
   useEffect(() => {
@@ -44,8 +46,19 @@ export function SearchBar({ variant = 'prominent' }: SearchBarProps) {
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Escape') {
+      setQuery('')
       setShowDropdown(false)
+      setHighlightedIndex(-1)
       inputRef.current?.blur()
+    } else if (e.key === 'ArrowDown' && showDropdown && results.length > 0) {
+      e.preventDefault()
+      setHighlightedIndex((prev) => (prev + 1) % results.length)
+    } else if (e.key === 'ArrowUp' && showDropdown && results.length > 0) {
+      e.preventDefault()
+      setHighlightedIndex((prev) => (prev <= 0 ? results.length - 1 : prev - 1))
+    } else if (e.key === 'Enter' && highlightedIndex >= 0 && results[highlightedIndex]) {
+      e.preventDefault()
+      handleSelect(results[highlightedIndex])
     }
   }
 
@@ -89,11 +102,13 @@ export function SearchBar({ variant = 'prominent' }: SearchBarProps) {
               </button>
             </div>
           ) : (
-            results.map((patient) => (
+            results.map((patient, index) => (
               <button
                 key={patient.id}
                 onClick={() => handleSelect(patient)}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 flex items-center gap-3"
+                className={`w-full px-4 py-3 text-left border-b border-gray-100 last:border-b-0 flex items-center gap-3 ${
+                  index === highlightedIndex ? 'bg-blue-50' : 'hover:bg-gray-50'
+                }`}
               >
                 <span className="text-xs font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
                   {patient.patientId}
