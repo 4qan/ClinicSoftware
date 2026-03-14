@@ -48,11 +48,14 @@ This eliminates infrastructure costs, removes network dependency, and keeps pati
 - Auto-snapshots: silent 24-hour backups with 3-copy rotation
 - Smart re-login if credentials change after restore
 
-**Keyboard Accessibility** (v1.3, in progress)
+**Keyboard-Only Workflow**
+- Full critical path (login to patient to visit to prescription to print) without touching the mouse
 - Visible focus indicators on keyboard navigation only (no mouse click rings)
 - Streamlined tab order: skips nav chrome, focuses on content
-- Arrow key navigation through search results with Enter to select
-- Escape to dismiss search and dropdowns
+- Arrow key navigation through all autocomplete dropdowns with Enter to select, Tab to confirm and advance
+- Intelligent focus transitions: drug select moves to quantity, medication add returns to drug search, patient create moves to visit fields
+- Escape to dismiss dropdowns, inline forms, and overlays
+- Tab directly to Print button, Enter to print, focus restores after print dialog
 
 **Security**
 - Local password authentication (PBKDF2, 100k iterations, random salt)
