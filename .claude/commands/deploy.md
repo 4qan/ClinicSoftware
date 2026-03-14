@@ -10,7 +10,9 @@ Steps:
 3. If README.md changed, stage and commit it with message: `docs: update README`
 4. Run `git status` to show what's committed and pending
 5. Run `git log origin/main..HEAD --oneline` to show commits that will be pushed
-6. If there are commits to push, run `git push origin main`
+6. If there are commits to push:
+   - First ensure the `4qan` GitHub account is active: run `gh auth status` and if active account is not `4qan`, run `gh auth switch --user 4qan`
+   - Then run `git push origin main`
 7. After push, poll the GitHub Actions workflow to verify deployment:
    - Run `gh run list --workflow=deploy.yml --limit=1` to get the latest run
    - Poll with `gh run watch <run-id> --exit-status` (timeout 5 minutes)

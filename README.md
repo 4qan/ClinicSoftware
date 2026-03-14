@@ -48,6 +48,12 @@ This eliminates infrastructure costs, removes network dependency, and keeps pati
 - Auto-snapshots: silent 24-hour backups with 3-copy rotation
 - Smart re-login if credentials change after restore
 
+**Keyboard Accessibility** (v1.3, in progress)
+- Visible focus indicators on keyboard navigation only (no mouse click rings)
+- Streamlined tab order: skips nav chrome, focuses on content
+- Arrow key navigation through search results with Enter to select
+- Escape to dismiss search and dropdowns
+
 **Security**
 - Local password authentication (PBKDF2, 100k iterations, random salt)
 - Zero data transmission, no cloud, no server
