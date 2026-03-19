@@ -64,6 +64,8 @@ beforeEach(async () => {
         frequency: 'TDS',
         duration: '5 days',
         sortOrder: 0,
+        // slipType='prescription' so the prescription preview is non-empty and the print button is enabled
+        slipType: 'prescription' as const,
       },
     ],
   })
@@ -152,7 +154,27 @@ describe('PrintVisitPage - conditional rendering (PRENG-03)', () => {
   })
 
   it('only dispensary slip is in DOM when dispensary preview is active', async () => {
-    renderPrintPage(testVisitId)
+    // Create a visit with a dispensary-tagged medication so the dispensary slip renders
+    const dispensaryVisitId = await createVisit({
+      patientId: testPatient.id,
+      clinicalNotes: '',
+      rxNotes: '',
+      rxNotesLang: 'en',
+      medications: [
+        {
+          brandName: 'Brufen',
+          saltName: 'Ibuprofen',
+          form: 'Tablet',
+          strength: '400mg',
+          quantity: '1',
+          frequency: 'BD',
+          duration: '5 days',
+          sortOrder: 0,
+          slipType: 'dispensary' as const,
+        },
+      ],
+    })
+    renderPrintPage(dispensaryVisitId)
 
     await waitFor(() => {
       // Wait for page to load
@@ -190,7 +212,27 @@ describe('PrintVisitPage - conditional rendering (PRENG-03)', () => {
   it('only dispensary slip in DOM when print mode is dispensary', async () => {
     const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {})
 
-    renderPrintPage(testVisitId)
+    // Create a visit with a dispensary-tagged medication so the button is enabled
+    const dispensaryVisitId = await createVisit({
+      patientId: testPatient.id,
+      clinicalNotes: '',
+      rxNotes: '',
+      rxNotesLang: 'en',
+      medications: [
+        {
+          brandName: 'Brufen',
+          saltName: 'Ibuprofen',
+          form: 'Tablet',
+          strength: '400mg',
+          quantity: '1',
+          frequency: 'BD',
+          duration: '5 days',
+          sortOrder: 0,
+          slipType: 'dispensary' as const,
+        },
+      ],
+    })
+    renderPrintPage(dispensaryVisitId)
 
     await waitFor(() => {
       expect(screen.getAllByText('Dispensary').length).toBeGreaterThanOrEqual(1)
@@ -374,7 +416,27 @@ describe('PrintVisitPage', () => {
   it('calls window.print when Dispensary tab selected and print clicked', async () => {
     const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {})
 
-    renderPrintPage(testVisitId)
+    // Create a visit with a dispensary-tagged medication so the button is enabled
+    const dispensaryVisitId = await createVisit({
+      patientId: testPatient.id,
+      clinicalNotes: '',
+      rxNotes: '',
+      rxNotesLang: 'en',
+      medications: [
+        {
+          brandName: 'Brufen',
+          saltName: 'Ibuprofen',
+          form: 'Tablet',
+          strength: '400mg',
+          quantity: '1',
+          frequency: 'BD',
+          duration: '5 days',
+          sortOrder: 0,
+          slipType: 'dispensary' as const,
+        },
+      ],
+    })
+    renderPrintPage(dispensaryVisitId)
 
     await waitFor(() => {
       expect(screen.getAllByText('Dispensary').length).toBeGreaterThanOrEqual(1)

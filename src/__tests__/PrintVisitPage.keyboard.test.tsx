@@ -62,6 +62,8 @@ beforeEach(async () => {
         frequency: 'TDS',
         duration: '5 days',
         sortOrder: 0,
+        // slipType='prescription' so the prescription preview is non-empty and the print button is enabled
+        slipType: 'prescription' as const,
       },
     ],
   })

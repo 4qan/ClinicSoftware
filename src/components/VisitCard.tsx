@@ -130,6 +130,9 @@ export function VisitCard({ visit, medications, defaultExpanded = false, onDelet
                           {med.saltName && (
                             <span className="text-gray-500"> ({med.saltName}{med.strength ? ` ${med.strength}` : ''}{med.form ? ` ${med.form}` : ''})</span>
                           )}
+                          {med.slipType === 'prescription' && (
+                            <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded ml-1.5">Rx</span>
+                          )}
                         </td>
                         <td className="py-1.5 pr-3 text-gray-700">{formatDosageDisplay(med.form, med.quantity)}</td>
                         <td className="py-1.5 pr-3 text-gray-700">{med.frequency}</td>
@@ -147,6 +150,9 @@ export function VisitCard({ visit, medications, defaultExpanded = false, onDelet
                       {med.brandName}
                       {med.saltName && (
                         <span className="text-gray-500 font-normal"> ({med.saltName})</span>
+                      )}
+                      {med.slipType === 'prescription' && (
+                        <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded ml-1.5">Rx</span>
                       )}
                     </p>
                     <p className="text-gray-600 text-xs mt-0.5">
