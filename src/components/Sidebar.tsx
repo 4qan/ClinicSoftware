@@ -52,9 +52,15 @@ interface SidebarProps {
   onToggle: () => void
 }
 
+const NURSE_ALLOWED_PATHS = ['/', '/patients']
+
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const location = useLocation()
-  const { logout } = useAuthContext()
+  const { logout, role } = useAuthContext()
+
+  const visibleItems = role === 'nurse'
+    ? navItems.filter(item => NURSE_ALLOWED_PATHS.includes(item.path))
+    : navItems
 
   return (
     <aside
@@ -86,7 +92,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </div>
 
       <nav className={`flex-1 ${collapsed ? 'px-2' : 'px-3'}`}>
-        {navItems.map((item) => {
+        {visibleItems.map((item) => {
           const active = isActive(item.path, location.pathname)
           return (
             <Link
@@ -109,6 +115,22 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </nav>
 
       <div className={`${collapsed ? 'px-2' : 'px-3'} pb-5`}>
+        {/* Role label */}
+        {role && (
+          collapsed ? (
+            <div className="flex justify-center py-2 mb-1" title={role === 'doctor' ? 'Doctor' : 'Nurse'}>
+              <span className="text-sm font-semibold text-gray-400">
+                {role === 'doctor' ? 'Dr' : 'Ns'}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 px-3 py-2 mb-1">
+              <span className="text-sm font-normal text-gray-400 uppercase tracking-wide">
+                {role === 'doctor' ? 'Doctor' : 'Nurse'}
+              </span>
+            </div>
+          )
+        )}
         <button
           onClick={logout}
           tabIndex={-1}
