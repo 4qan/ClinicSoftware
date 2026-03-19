@@ -40,7 +40,17 @@ export function NewVisitPage() {
   const [showInlineRegistration, setShowInlineRegistration] = useState(false)
 
   const [visitHistory, setVisitHistory] = useState<
-    Array<{ id: string; date: string; notePreview: string; medCount: number }>
+    Array<{
+      id: string
+      date: string
+      notePreview: string
+      medCount: number
+      temperature?: number
+      systolic?: number
+      diastolic?: number
+      weight?: number
+      spo2?: number
+    }>
   >([])
 
   // Load pre-selected patient
@@ -83,6 +93,11 @@ export function NewVisitPage() {
             ? v.visit.clinicalNotes.substring(0, 100) + '...'
             : v.visit.clinicalNotes,
         medCount: v.medications.length,
+        temperature: v.visit.temperature,
+        systolic: v.visit.systolic,
+        diastolic: v.visit.diastolic,
+        weight: v.visit.weight,
+        spo2: v.visit.spo2,
       })),
     )
   }, [selectedPatient])
@@ -375,6 +390,9 @@ export function NewVisitPage() {
                   <div>
                     <p className="text-sm font-medium text-gray-700">{v.date}</p>
                     <p className="text-sm text-gray-500 mt-0.5">{v.notePreview || 'No notes'}</p>
+                    <p className="text-xs text-gray-400 mt-0.5 font-mono">
+                      {`Temp: ${v.temperature ?? '--'} | BP: ${v.systolic ?? '--'}/${v.diastolic ?? '--'} | Wt: ${v.weight ?? '--'} | SpO2: ${v.spo2 ?? '--'}`}
+                    </p>
                   </div>
                   {v.medCount > 0 && (
                     <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full shrink-0 ml-2">

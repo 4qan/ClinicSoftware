@@ -9,11 +9,11 @@ import { saveClinicInfo } from '@/db/settings'
 import type { Patient } from '@/db/index'
 
 // Pure utility functions extracted for unit testing (same logic as PrintVisitPage)
-function filterPrescriptionMeds(medications: { slipType?: string }[]) {
+function filterPrescriptionMeds<T extends { slipType?: string }>(medications: T[]) {
   return medications.filter((m) => m.slipType === 'prescription')
 }
 
-function filterDispensaryMeds(medications: { slipType?: string }[]) {
+function filterDispensaryMeds<T extends { slipType?: string }>(medications: T[]) {
   return medications.filter((m) => (m.slipType ?? 'dispensary') === 'dispensary')
 }
 
