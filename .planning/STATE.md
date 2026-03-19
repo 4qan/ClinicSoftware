@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Multi-User Sync
 status: unknown
-stopped_at: Completed 21-01-PLAN.md
-last_updated: "2026-03-19T18:37:38.423Z"
+stopped_at: Completed 21-03-PLAN.md
+last_updated: "2026-03-19T18:43:16.701Z"
 progress:
   total_phases: 9
   completed_phases: 6
   total_plans: 15
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Project State: ClinicSoftware
@@ -49,6 +49,8 @@ Plan: 2 of 3
 - [Phase 21-01]: useCouchAuth reads couchUrl from PouchDB settings on mount; if not set login returns not_configured
 - [Phase 21-01]: Recovery code flow (PBKDF2) deleted entirely; RecoveryCodeSection removed from SettingsPage
 - [Phase 21-01]: Session verified against CouchDB on mount; unreachable CouchDB clears session rather than trusting it
+- [Phase 21-03]: PBKDF2 test file deleted alongside source files -- tests were for code that no longer exists
+- [Phase 21-03]: install-couchdb.ps1 uses hardcoded defaults (admin123/doctor123/nurse123) -- zero-friction setup, passwords changeable via app after install
 
 ### Pending Todos
 
@@ -62,8 +64,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T18:37:38.420Z
-Stopped at: Completed 21-01-PLAN.md
+Last session: 2026-03-19T18:43:16.699Z
+Stopped at: Completed 21-03-PLAN.md
 Resume file: None
 
 ---
