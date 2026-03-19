@@ -10,6 +10,8 @@ import { getVisit, updateVisit, deleteVisit } from '@/db/visits'
 import { db } from '@/db/index'
 import type { Patient } from '@/db/index'
 import type { MedicationFormData } from '@/components/MedicationEntry'
+import { VitalsInput, celsiusToFahrenheit } from '@/components/VitalsInput'
+import type { VitalsData } from '@/components/VitalsInput'
 
 export function EditVisitPage() {
   const navigate = useNavigate()
@@ -20,6 +22,7 @@ export function EditVisitPage() {
   const [rxNotes, setRxNotes] = useState('')
   const [rxNotesLang, setRxNotesLang] = useState<'en' | 'ur'>('en')
   const [medications, setMedications] = useState<MedicationFormData[]>([])
+  const [vitals, setVitals] = useState<VitalsData>({ tempUnit: 'F' })
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -42,6 +45,14 @@ export function EditVisitPage() {
       setClinicalNotes(result.visit.clinicalNotes)
       setRxNotes(result.visit.rxNotes)
       setRxNotesLang(result.visit.rxNotesLang ?? 'en')
+      setVitals({
+        tempUnit: 'F',
+        temperature: result.visit.temperature,
+        systolic: result.visit.systolic,
+        diastolic: result.visit.diastolic,
+        weight: result.visit.weight,
+        spo2: result.visit.spo2,
+      })
       setMedications(
         result.medications.map((m) => ({
           drugId: m.drugId,
@@ -83,10 +94,18 @@ export function EditVisitPage() {
     if (!visitId || (!clinicalNotes.trim() && medications.length === 0)) return false
     setSaving(true)
     try {
+      const tempF = vitals.temperature !== undefined
+        ? (vitals.tempUnit === 'C' ? celsiusToFahrenheit(vitals.temperature) : vitals.temperature)
+        : undefined
       await updateVisit(visitId, {
         clinicalNotes: clinicalNotes.trim(),
         rxNotes: rxNotes.trim(),
         rxNotesLang,
+        temperature: tempF,
+        systolic: vitals.systolic,
+        diastolic: vitals.diastolic,
+        weight: vitals.weight,
+        spo2: vitals.spo2,
         medications: medications.map((med, index) => ({
           drugId: med.drugId,
           brandName: med.brandName,
@@ -197,6 +216,11 @@ export function EditVisitPage() {
           </div>
         </CollapsibleSection>
       )}
+
+      {/* Vitals */}
+      <CollapsibleSection title="Vitals" defaultOpen={true}>
+        <VitalsInput value={vitals} onChange={setVitals} />
+      </CollapsibleSection>
 
       {/* Clinical Notes */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">

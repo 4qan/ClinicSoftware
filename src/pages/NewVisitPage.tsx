@@ -15,6 +15,8 @@ import { db } from '@/db/index'
 import type { Patient } from '@/db/index'
 import type { PatientInput } from '@/db/patients'
 import type { MedicationFormData } from '@/components/MedicationEntry'
+import { VitalsInput, celsiusToFahrenheit } from '@/components/VitalsInput'
+import type { VitalsData } from '@/components/VitalsInput'
 
 export function NewVisitPage() {
   const navigate = useNavigate()
@@ -33,6 +35,7 @@ export function NewVisitPage() {
   const [rxNotes, setRxNotes] = useState('')
   const [rxNotesLang, setRxNotesLang] = useState<'en' | 'ur'>('en')
   const [medications, setMedications] = useState<MedicationFormData[]>([])
+  const [vitals, setVitals] = useState<VitalsData>({ tempUnit: 'F' })
   const [saving, setSaving] = useState(false)
   const [showInlineRegistration, setShowInlineRegistration] = useState(false)
 
@@ -173,11 +176,19 @@ export function NewVisitPage() {
     if (!selectedPatient || (!clinicalNotes.trim() && medications.length === 0)) return null
     setSaving(true)
     try {
+      const tempF = vitals.temperature !== undefined
+        ? (vitals.tempUnit === 'C' ? celsiusToFahrenheit(vitals.temperature) : vitals.temperature)
+        : undefined
       const visitId = await createVisit({
         patientId: selectedPatient.id,
         clinicalNotes: clinicalNotes.trim(),
         rxNotes: rxNotes.trim(),
         rxNotesLang,
+        temperature: tempF,
+        systolic: vitals.systolic,
+        diastolic: vitals.diastolic,
+        weight: vitals.weight,
+        spo2: vitals.spo2,
         medications: medications.map((med, index) => ({
           drugId: med.drugId,
           brandName: med.brandName,
@@ -382,6 +393,15 @@ export function NewVisitPage() {
           )}
         </CollapsibleSection>
       )}
+
+      {/* Vitals - always visible, disabled without patient */}
+      <fieldset disabled={isDisabled}>
+        <div className={isDisabled ? 'opacity-50 pointer-events-none' : ''}>
+          <CollapsibleSection title="Vitals" defaultOpen={true}>
+            <VitalsInput value={vitals} onChange={setVitals} />
+          </CollapsibleSection>
+        </div>
+      </fieldset>
 
       {/* Clinical Notes - always visible, disabled without patient */}
       <fieldset disabled={isDisabled}>
