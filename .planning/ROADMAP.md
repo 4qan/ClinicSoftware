@@ -155,7 +155,7 @@ Plans:
   2. Drug seeds use content-addressable IDs so the same drug is never created twice across machines
   3. Opening the app a second time after migration completes does not re-run the migration or modify any data
   4. App functionality is indistinguishable from v1.6 to the user (no workflow changes)
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 Plans:
 - [ ] 19-01-PLAN.md -- PouchDB foundation, legacy adapter, one-time migration with tests
 - [ ] 19-02-PLAN.md -- Rewrite all DB modules (patients, visits, drugs, settings, seeds) for PouchDB
@@ -229,7 +229,7 @@ Plans:
 | 16. Auto-Print Toggle | v1.4 | 1/1 | Complete | 2026-03-19 |
 | 17. Visit Vitals | v1.5 | 2/2 | Complete | 2026-03-19 |
 | 18. Unified Medication Management | v1.6 | 2/2 | Complete | 2026-03-19 |
-| 19. PouchDB Migration | 1/3 | In Progress|  | - |
+| 19. PouchDB Migration | 2/3 | In Progress|  | - |
 | 20. CouchDB Infrastructure | v2.0 | 0/TBD | Not started | - |
 | 21. Auth and Role Enforcement | v2.0 | 0/TBD | Not started | - |
 | 22. Live Sync | v2.0 | 0/TBD | Not started | - |

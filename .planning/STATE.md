@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Multi-User Sync
 status: unknown
-stopped_at: Completed 19-01-PLAN.md
-last_updated: "2026-03-19T15:46:38.302Z"
+stopped_at: Completed 19-02-PLAN.md
+last_updated: "2026-03-19T15:55:17.424Z"
 progress:
   total_phases: 9
   completed_phases: 4
   total_plans: 10
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State: ClinicSoftware
@@ -38,6 +38,9 @@ Plan: 2 of 3
 - Backup restore redesign required: restore must target CouchDB server, not local PouchDB client
 - [Phase 19-01]: PouchDB instance named ClinicSoftware_v2 to avoid IndexedDB collision with Dexie
 - [Phase 19-01]: 409 conflicts on migration re-run treated as success for crash recovery
+- [Phase 19]: putSetting/getSetting helpers in pouchdb.ts centralize upsert pattern across settings modules
+- [Phase 19]: Drug seeding uses allDocs key check for multi-machine idempotency (no count-check shortcut)
+- [Phase 19]: timestamps.ts deprecated helpers removed; timestamps.test.ts will fail until Plan 03 updates
 
 ### Pending Todos
 
@@ -51,8 +54,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T15:46:38.300Z
-Stopped at: Completed 19-01-PLAN.md
+Last session: 2026-03-19T15:55:17.422Z
+Stopped at: Completed 19-02-PLAN.md
 Resume file: None
 
 ---
