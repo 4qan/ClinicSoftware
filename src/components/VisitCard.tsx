@@ -29,6 +29,15 @@ function truncateText(text: string, maxLength: number): string {
   return firstLine.substring(0, maxLength) + '...'
 }
 
+function formatVitalsLine(visit: Visit): string {
+  const temp = visit.temperature !== undefined ? String(visit.temperature) : '--'
+  const sys = visit.systolic !== undefined ? String(visit.systolic) : '--'
+  const dia = visit.diastolic !== undefined ? String(visit.diastolic) : '--'
+  const wt = visit.weight !== undefined ? String(visit.weight) : '--'
+  const spo2 = visit.spo2 !== undefined ? String(visit.spo2) : '--'
+  return `Temp: ${temp} | BP: ${sys}/${dia} | Wt: ${wt} | SpO2: ${spo2}`
+}
+
 export function VisitCard({ visit, medications, defaultExpanded = false, onDeleted }: VisitCardProps) {
   const [expanded, setExpanded] = useState(defaultExpanded)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -79,6 +88,9 @@ export function VisitCard({ visit, medications, defaultExpanded = false, onDelet
               {truncateText(visit.clinicalNotes, 80)}
             </p>
           )}
+          <p className="text-xs text-gray-400 mt-1 font-mono">
+            {formatVitalsLine(visit)}
+          </p>
         </div>
         <svg
           className={`w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200 ${

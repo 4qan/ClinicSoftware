@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Visit Vitals
 status: planning
-stopped_at: Completed 18-02-PLAN.md
-last_updated: "2026-03-19T12:22:07.291Z"
+stopped_at: Completed 17-01-PLAN.md
+last_updated: "2026-03-19T12:29:26.268Z"
 last_activity: 2026-03-19 -- Roadmap created
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
   percent: 0
 ---
 
@@ -54,6 +54,8 @@ Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (v1.
 - [Phase 18-unified-medication-management]: Inline row confirm for delete/reset in MedicationsPage: avoids double-modal pattern
 - [Phase 18-unified-medication-management]: Settings page: persistent blue banner linking to /medications replaces medications tab
 - [Phase 18-unified-medication-management]: resetDrugToDefault uses seedKey field with partial-match fallback to handle legacy UUID-based records
+- [Phase 17-visit-vitals]: Temperature stored as Fahrenheit in DB; C is UI-only via VitalsData.tempUnit, not persisted
+- [Phase 17-visit-vitals]: VitalsInput: no min/max validation on vital inputs; DB v7 migration requires no upgrade callback
 
 ### Roadmap Evolution
 
@@ -70,8 +72,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T12:18:25.030Z
-Stopped at: Completed 18-02-PLAN.md
+Last session: 2026-03-19T12:29:19.296Z
+Stopped at: Completed 17-01-PLAN.md
 Resume file: None
 
 ---

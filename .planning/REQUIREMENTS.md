@@ -26,12 +26,12 @@ Requirements for v1.5 Visit Vitals. Maps to Phase 17.
 
 ### Visit Vitals
 
-- [ ] **VIT-01**: NewVisitPage and EditVisitPage show a collapsible "Vitals" section above clinical notes with a 2x2 grid (temperature, BP, weight, SpO2)
-- [ ] **VIT-02**: Temperature input supports Fahrenheit (default) and Celsius with a toggle that converts the displayed value
-- [ ] **VIT-03**: Blood pressure captured as systolic/diastolic (mmHg); weight in kg; SpO2 as percentage; all fields optional with no validation
+- [x] **VIT-01**: NewVisitPage and EditVisitPage show a collapsible "Vitals" section above clinical notes with a 2x2 grid (temperature, BP, weight, SpO2)
+- [x] **VIT-02**: Temperature input supports Fahrenheit (default) and Celsius with a toggle that converts the displayed value
+- [x] **VIT-03**: Blood pressure captured as systolic/diastolic (mmHg); weight in kg; SpO2 as percentage; all fields optional with no validation
 - [ ] **VIT-04**: Vitals display in VisitCard collapsed state as compact inline badges (Temp: X | BP: X/X | Wt: X | SpO2: X)
 - [ ] **VIT-05**: Vitals display in NewVisitPage inline visit history preview, same format as VisitCard
-- [ ] **VIT-06**: Vitals persist via DB migration (v6), survive save/reload, and do NOT appear on printed slips
+- [x] **VIT-06**: Vitals persist via DB migration (v6), survive save/reload, and do NOT appear on printed slips
 
 ## v1.6 Requirements
 
