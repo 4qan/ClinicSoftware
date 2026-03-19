@@ -48,14 +48,47 @@ export interface PouchRecentPatient extends RecentPatient {
   type: 'recent'
 }
 
+const DB_NAME = 'clinicsoftware_v2'
+const OLD_DB_NAME = 'ClinicSoftware_v2'
+const RENAME_FLAG = 'clinic_db_renamed_v2'
+
 function createDb(): PouchDB.Database {
   if (import.meta.env.VITEST) {
-    return new PouchDB('ClinicSoftware_v2', { adapter: 'memory' })
+    return new PouchDB(DB_NAME, { adapter: 'memory' })
   }
-  return new PouchDB('ClinicSoftware_v2')
+  return new PouchDB(DB_NAME)
 }
 
 export let pouchDb: PouchDB.Database = createDb()
+
+/**
+ * One-time migration: copy data from old uppercase DB name to new lowercase name.
+ * CouchDB requires lowercase database names, so PouchDB must match.
+ * IndexedDB names are case-sensitive, so the old data sits in a different store.
+ * Runs once, guarded by localStorage flag.
+ */
+export async function migrateDbName(): Promise<void> {
+  if (import.meta.env.VITEST) return
+  if (localStorage.getItem(RENAME_FLAG)) return
+
+  const oldDb = new PouchDB(OLD_DB_NAME)
+  try {
+    const info = await oldDb.info()
+    if (info.doc_count === 0) {
+      localStorage.setItem(RENAME_FLAG, 'true')
+      await oldDb.close()
+      return
+    }
+
+    await oldDb.replicate.to(pouchDb)
+    await oldDb.destroy()
+    localStorage.setItem(RENAME_FLAG, 'true')
+  } catch {
+    // Old DB doesn't exist or is empty, nothing to migrate
+    localStorage.setItem(RENAME_FLAG, 'true')
+    await oldDb.close()
+  }
+}
 
 export async function ensureIndexes(): Promise<void> {
   await pouchDb.createIndex({ index: { fields: ['type', 'patientId'] } })
