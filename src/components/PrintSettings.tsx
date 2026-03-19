@@ -104,7 +104,7 @@ export function PrintSettings() {
               aria-checked={autoPrint}
               aria-label="Auto-Print on Save"
               onClick={handleAutoPrintToggle}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none cursor-pointer ${
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
                 autoPrint ? 'bg-blue-600' : 'bg-gray-300'
               }`}
             >

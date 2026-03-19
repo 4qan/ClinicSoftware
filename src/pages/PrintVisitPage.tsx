@@ -102,6 +102,7 @@ export function PrintVisitPage() {
         const size = auto === 'prescription' ? printSettings.prescriptionSize : printSettings.dispensarySize
         injectPageStyle(size, calcMargin(size))
       }
+      if (!printSettings?.autoPrint) return   // auto-print disabled; doctor prints manually
       autoPrintTimer.current = setTimeout(() => window.print(), 200)
     }
     return () => {
