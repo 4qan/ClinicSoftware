@@ -17,12 +17,13 @@ The core requirement: **see a patient, write a prescription with medication auto
 Instead of building a traditional client-server app, I went with a **zero-backend architecture**:
 
 - **Offline-first PWA**: Service worker caches everything on first load. No internet needed after that.
-- **Browser-local storage**: All data lives in IndexedDB via Dexie.js. Nothing leaves the device.
+- **Browser-local storage**: All data lives in IndexedDB via PouchDB. Nothing leaves the local network.
+- **LAN sync (in progress)**: Doctor and nurse machines sync over the local network via CouchDB, with role-based write restrictions. No cloud, no internet required.
 - **Local auth**: PBKDF2-hashed passwords stored client-side. No server to authenticate against.
-- **Manual backups**: JSON export/import instead of cloud sync. The user controls their data.
+- **Manual backups**: JSON export/import for data portability. The user controls their data.
 - **Auto-print control**: Toggle automatic slip printing on/off from settings
 
-This eliminates infrastructure costs, removes network dependency, and keeps patient data physically on the clinic's machine.
+This eliminates infrastructure costs, removes network dependency, and keeps patient data on the clinic's machines.
 
 ## Features
 
@@ -82,8 +83,9 @@ This eliminates infrastructure costs, removes network dependency, and keeps pati
 |-----------|----------|-----|
 | Unreliable internet | Offline-first PWA with full service worker caching | App must work with zero connectivity after first load |
 | Non-technical user | Minimal UI, autocomplete-driven workflows, print via Ctrl+P | Reduce training and cognitive load |
-| Older hardware | No heavy frameworks, no background sync, lightweight IndexedDB | Must run smoothly on low-spec Windows machines |
-| Patient privacy | All data in browser-local IndexedDB, no network calls | Data never leaves the device; no server to breach |
+| Older hardware | No heavy frameworks, lightweight IndexedDB via PouchDB | Must run smoothly on low-spec Windows machines |
+| Patient privacy | All data stays on the clinic LAN, no cloud, no external calls | Data never leaves the physical network |
+| Multi-user access | LAN-only CouchDB sync with role-based write restrictions | Doctor and nurse share data without internet; nurse can't modify prescriptions |
 | Urdu prescriptions | Noto Nastaliq Urdu font cached locally, bilingual layout engine | Patients need instructions in their language, offline |
 | Data durability | JSON backup/restore + auto-snapshots | No cloud means the user needs a simple, reliable backup mechanism |
 
@@ -94,7 +96,7 @@ This eliminates infrastructure costs, removes network dependency, and keeps pati
 | Framework | React 19 + TypeScript |
 | Build | Vite 7 |
 | Styling | TailwindCSS v4 |
-| Database | Dexie.js (IndexedDB) |
+| Database | PouchDB (IndexedDB) with CouchDB LAN sync |
 | Offline | VitePWA (service worker + manifest) |
 | Routing | react-router-dom v7 |
 | Urdu Font | Noto Nastaliq Urdu (variable) |
