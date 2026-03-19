@@ -8,6 +8,7 @@ import { checkAndCreateSnapshot } from './utils/snapshots'
 import { runMigrationIfNeeded } from './db/migration'
 import { ensureIndexes, migrateDbName } from './db/pouchdb'
 import { AppLayout } from './components/AppLayout'
+import { ProtectedRoute } from './components/ProtectedRoute'
 import { HomePage } from './pages/HomePage'
 import { PatientsPage } from './pages/PatientsPage'
 import { RegisterPatientPage } from './pages/RegisterPatientPage'
@@ -43,13 +44,13 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/patients" element={<PatientsPage />} />
-        <Route path="/medications" element={<MedicationsPage />} />
+        <Route path="/medications" element={<ProtectedRoute allowedRoles={['doctor']}><MedicationsPage /></ProtectedRoute>} />
         <Route path="/register" element={<RegisterPatientPage />} />
         <Route path="/patient/:id" element={<PatientProfilePage />} />
         <Route path="/visit/new" element={<NewVisitPage />} />
         <Route path="/visit/:id/edit" element={<EditVisitPage />} />
-        <Route path="/visit/:id/print" element={<PrintVisitPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/visit/:id/print" element={<ProtectedRoute allowedRoles={['doctor']}><PrintVisitPage /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute allowedRoles={['doctor']}><SettingsPage /></ProtectedRoute>} />
       </Routes>
     </AppLayout>
   )
