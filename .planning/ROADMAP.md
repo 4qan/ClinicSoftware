@@ -170,7 +170,10 @@ Plans:
   2. From the nurse's machine, a browser can reach the CouchDB endpoint at the doctor's LAN IP on port 5984
   3. CouchDB rejects unauthenticated requests and requires valid credentials before allowing any data access
   4. A nurse-authenticated request to write a prescription document is rejected by CouchDB, even if attempted directly (not through the app UI)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 20-01-PLAN.md -- CouchDB setup scripts, configuration, validate_doc_update, verification
+- [ ] 20-02-PLAN.md -- Manual verification on doctor's Windows machine (checkpoint)
 
 ### Phase 21: Auth and Role Enforcement
 **Goal**: Doctor and nurse each log in with their own username and password via CouchDB session auth; the app enforces role-based access so nurse can only reach patient and vitals pages
@@ -229,11 +232,11 @@ Plans:
 | 16. Auto-Print Toggle | v1.4 | 1/1 | Complete | 2026-03-19 |
 | 17. Visit Vitals | v1.5 | 2/2 | Complete | 2026-03-19 |
 | 18. Unified Medication Management | v1.6 | 2/2 | Complete | 2026-03-19 |
-| 19. PouchDB Migration | 3/3 | Complete    | 2026-03-19 | - |
-| 20. CouchDB Infrastructure | v2.0 | 0/TBD | Not started | - |
+| 19. PouchDB Migration | v2.0 | 3/3 | Complete | 2026-03-19 |
+| 20. CouchDB Infrastructure | v2.0 | 0/2 | Not started | - |
 | 21. Auth and Role Enforcement | v2.0 | 0/TBD | Not started | - |
 | 22. Live Sync | v2.0 | 0/TBD | Not started | - |
 | 23. Backup Redesign | v2.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-03-19 -- Phase 19 plans created (3 plans, 3 waves)*
+*Last updated: 2026-03-19 -- Phase 20 plans created (2 plans, 2 waves)*

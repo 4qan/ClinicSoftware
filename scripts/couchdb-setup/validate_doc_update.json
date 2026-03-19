@@ -1,0 +1,4 @@
+{
+  "_id": "_design/roles",
+  "validate_doc_update": "function(newDoc, oldDoc, userCtx, secObj) { var isAdmin = userCtx.roles.indexOf('_admin') !== -1 || userCtx.roles.indexOf('doctor') !== -1; var isNurse = userCtx.roles.indexOf('nurse') !== -1; var restricted = ['visit', 'visitmed', 'drug']; if (isNurse && restricted.indexOf(newDoc.type) !== -1) { throw({ forbidden: 'Nurse role cannot write ' + newDoc.type + ' documents.' }); } }"
+}

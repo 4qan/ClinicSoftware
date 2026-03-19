@@ -67,8 +67,8 @@ The doctor can see a patient, write a prescription with medication autocomplete,
 
 ## Context
 
-Shipped through v1.5 with TypeScript/React.
-Tech stack: React 19, TypeScript, Vite, TailwindCSS v4, Dexie.js (schema v6), VitePWA, react-router-dom v7.
+Shipped through v1.5 with TypeScript/React. Phase 19 (PouchDB migration) complete: all DB operations now use PouchDB.
+Tech stack: React 19, TypeScript, Vite, TailwindCSS v4, PouchDB 9.0.0 (migrated from Dexie.js), VitePWA, react-router-dom v7.
 Deployed to GitHub Pages at https://4qan.github.io/ClinicSoftware/.
 Dexie schema progression: v1 (foundation) -> v2 (drugs/visits) -> v3 (dosage->quantity rename) -> v4 (rxNotesLang) -> v5 (slipType) -> v6 (vitals).
 Separate Dexie instance for snapshots (ClinicSoftwareSnapshots).
@@ -121,8 +121,8 @@ Clinic is in an area with unreliable internet. Doctor uses an old Windows system
 | No form wrapper on visit page | Textarea needs Enter for newlines; FORM-03 intentionally skipped | Good |
 | document-level Escape listener | Handles Escape when focus is on unmounted button (inline patient form) | Good |
 | LAN CouchDB over cloud | Unreliable internet makes cloud sync unreliable; LAN sync works without internet; nurse-to-doctor handoff must be real-time | — Pending |
-| PouchDB over keeping Dexie | PouchDB uses IndexedDB under the hood, has native CouchDB sync protocol, schemaless (simpler migrations) | — Pending |
+| PouchDB over keeping Dexie | PouchDB uses IndexedDB under the hood, has native CouchDB sync protocol, schemaless (simpler migrations) | Good (Phase 19) |
 | Pre-created user accounts | Doctor and nurse accounts created during development, no setup wizard needed | — Pending |
 
 ---
-*Last updated: 2026-03-19 after v2.0 milestone start*
+*Last updated: 2026-03-19 after Phase 19 (PouchDB migration) complete*
