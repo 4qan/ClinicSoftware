@@ -54,7 +54,7 @@
 **Milestone Goal:** Let the doctor control which medicines appear on which printed slip, and toggle auto-print behavior.
 
 - [x] **Phase 15: Slip Assignment** - Per-medication slip designation with print filtering (completed 2026-03-19)
-- [ ] **Phase 16: Auto-Print Toggle** - Auto-print on/off setting with persistent preference
+- [x] **Phase 16: Auto-Print Toggle** - Auto-print on/off setting with persistent preference (completed 2026-03-19)
 
 ## Phase Details
 
@@ -81,7 +81,7 @@ Plans:
   2. With auto-print on, slips print automatically on visit save (existing behavior preserved)
   3. With auto-print off, slips do not auto-print; doctor triggers print manually
   4. Auto-print preference persists after page refresh and browser restart
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 16-01-PLAN.md -- Auto-print toggle in settings UI, persistence, and print gate
 
@@ -105,7 +105,7 @@ Plans:
 | 13. Keyboard Interactions | v1.3 | 3/3 | Complete | 2026-03-14 |
 | 14. Print Flow | v1.3 | 1/1 | Complete | 2026-03-14 |
 | 15. Slip Assignment | v1.4 | 2/2 | Complete | 2026-03-19 |
-| 16. Auto-Print Toggle | v1.4 | 0/1 | Not started | - |
+| 16. Auto-Print Toggle | 1/1 | Complete   | 2026-03-19 | - |
 
 ---
 *Last updated: 2026-03-19 -- Phase 16 planned (1 plan)*

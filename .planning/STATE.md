@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Slip Assignment & Print Settings
 status: planning
-stopped_at: Completed 15-02-PLAN.md
-last_updated: "2026-03-19T10:42:27.154Z"
+stopped_at: Completed 16-01-PLAN.md
+last_updated: "2026-03-19T11:24:47.699Z"
 last_activity: 2026-03-19 -- Roadmap created
 progress:
   total_phases: 2
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  completed_phases: 2
+  total_plans: 3
+  completed_plans: 3
   percent: 0
 ---
 
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (v1.
 - [Phase 15-slip-assignment]: prescriptionMeds and dispensaryMeds derived inline in PrintVisitPage; no separate utility file
 - [Phase 15-slip-assignment]: Rx badge shown only for prescription; dispensary (default) gets no badge
 - [Phase 15-slip-assignment]: Auto-print skip: check targetMeds.length before scheduling window.print(); empty slip skipped silently
+- [Phase 16-auto-print-toggle]: autoPrint defaults true when key absent from DB; page style injected regardless of autoPrint so manual print always works
 
 ### Pending Todos
 
@@ -58,8 +59,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T10:42:20.046Z
-Stopped at: Completed 15-02-PLAN.md
+Last session: 2026-03-19T11:24:47.697Z
+Stopped at: Completed 16-01-PLAN.md
 Resume file: None
 
 ---

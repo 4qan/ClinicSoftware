@@ -17,8 +17,8 @@ Requirements for v1.4 Slip Assignment & Print Settings. Each maps to roadmap pha
 
 ### Print Settings
 
-- [ ] **PRSET-05**: User can toggle auto-print on/off in Print Management settings
-- [ ] **PRSET-06**: Auto-print preference persists across sessions
+- [x] **PRSET-05**: User can toggle auto-print on/off in Print Management settings
+- [x] **PRSET-06**: Auto-print preference persists across sessions
 
 ## Future Requirements
 
@@ -42,8 +42,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SLIP-03 | Phase 15 | Complete |
 | SLIP-04 | Phase 15 | Complete |
 | SLIP-05 | Phase 15 | Complete |
-| PRSET-05 | Phase 16 | Pending |
-| PRSET-06 | Phase 16 | Pending |
+| PRSET-05 | Phase 16 | Complete |
+| PRSET-06 | Phase 16 | Complete |
 
 **Coverage:**
 - v1.4 requirements: 7 total
