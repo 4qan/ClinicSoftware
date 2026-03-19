@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Slip Assignment & Print Settings
 status: planning
-stopped_at: Completed 15-01-PLAN.md
-last_updated: "2026-03-19T10:31:14.924Z"
+stopped_at: Completed 15-02-PLAN.md
+last_updated: "2026-03-19T10:42:27.154Z"
 last_activity: 2026-03-19 -- Roadmap created
 progress:
   total_phases: 2
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -42,6 +42,11 @@ Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (v1.
 - Auto-print double-fire guard uses useRef: relevant context for PRSET-05 toggle behavior
 - [Phase 15-slip-assignment]: slipType optional on VisitMedication, not indexed; missing value = dispensary by convention
 - [Phase 15-slip-assignment]: Toggle lives in MedicationList next to Actions, not in MedicationEntry form
+- [Phase 15-slip-assignment]: prescriptionMeds and dispensaryMeds derived inline in PrintVisitPage; no separate util file
+- [Phase 15-slip-assignment]: Auto-print skip checks targetMeds.length before scheduling window.print(); empty slip skipped silently
+- [Phase 15-slip-assignment]: prescriptionMeds and dispensaryMeds derived inline in PrintVisitPage; no separate utility file
+- [Phase 15-slip-assignment]: Rx badge shown only for prescription; dispensary (default) gets no badge
+- [Phase 15-slip-assignment]: Auto-print skip: check targetMeds.length before scheduling window.print(); empty slip skipped silently
 
 ### Pending Todos
 
@@ -53,8 +58,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T10:31:14.922Z
-Stopped at: Completed 15-01-PLAN.md
+Last session: 2026-03-19T10:42:20.046Z
+Stopped at: Completed 15-02-PLAN.md
 Resume file: None
 
 ---

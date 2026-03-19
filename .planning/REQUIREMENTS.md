@@ -11,8 +11,8 @@ Requirements for v1.4 Slip Assignment & Print Settings. Each maps to roadmap pha
 
 - [x] **SLIP-01**: User can designate each medication as "dispensary" or "prescription" when adding it
 - [x] **SLIP-02**: New medications default to "dispensary"
-- [ ] **SLIP-03**: Prescription slip only prints medications tagged as "prescription"
-- [ ] **SLIP-04**: Dispensary slip only prints medications tagged as "dispensary"
+- [x] **SLIP-03**: Prescription slip only prints medications tagged as "prescription"
+- [x] **SLIP-04**: Dispensary slip only prints medications tagged as "dispensary"
 - [x] **SLIP-05**: Slip assignment is stored with the medication snapshot (persists with the encounter)
 
 ### Print Settings
@@ -39,8 +39,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | SLIP-01 | Phase 15 | Complete |
 | SLIP-02 | Phase 15 | Complete |
-| SLIP-03 | Phase 15 | Pending |
-| SLIP-04 | Phase 15 | Pending |
+| SLIP-03 | Phase 15 | Complete |
+| SLIP-04 | Phase 15 | Complete |
 | SLIP-05 | Phase 15 | Complete |
 | PRSET-05 | Phase 16 | Pending |
 | PRSET-06 | Phase 16 | Pending |

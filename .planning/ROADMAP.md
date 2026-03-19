@@ -53,7 +53,7 @@
 
 **Milestone Goal:** Let the doctor control which medicines appear on which printed slip, and toggle auto-print behavior.
 
-- [ ] **Phase 15: Slip Assignment** - Per-medication slip designation with print filtering
+- [x] **Phase 15: Slip Assignment** - Per-medication slip designation with print filtering (completed 2026-03-19)
 - [ ] **Phase 16: Auto-Print Toggle** - Auto-print on/off setting with persistent preference
 
 ## Phase Details
@@ -67,7 +67,7 @@
   2. Prescription slip prints only medications tagged as "prescription"
   3. Dispensary slip prints only medications tagged as "dispensary"
   4. Slip assignment persists when the encounter is saved and reopened
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 15-01-PLAN.md -- Data model (slipType field) and toggle UI in medication list
 - [ ] 15-02-PLAN.md -- Print filtering by slip type, empty slip handling, Rx badge in visit history
@@ -102,7 +102,7 @@ Plans:
 | 12. Focus Foundation and Form Submission | v1.3 | 2/2 | Complete | 2026-03-14 |
 | 13. Keyboard Interactions | v1.3 | 3/3 | Complete | 2026-03-14 |
 | 14. Print Flow | v1.3 | 1/1 | Complete | 2026-03-14 |
-| 15. Slip Assignment | 1/2 | In Progress|  | - |
+| 15. Slip Assignment | 2/2 | Complete   | 2026-03-19 | - |
 | 16. Auto-Print Toggle | v1.4 | 0/? | Not started | - |
 
 ---
