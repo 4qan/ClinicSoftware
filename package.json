@@ -17,6 +17,7 @@
     "@fontsource-variable/noto-nastaliq-urdu": "^5.2.8",
     "dexie": "^4.3.0",
     "dexie-react-hooks": "^4.2.0",
+    "events": "^3.3.0",
     "pouchdb": "^9.0.0",
     "pouchdb-find": "^9.0.0",
     "react": "^19.2.0",
