@@ -17,6 +17,8 @@
     "@fontsource-variable/noto-nastaliq-urdu": "^5.2.8",
     "dexie": "^4.3.0",
     "dexie-react-hooks": "^4.2.0",
+    "pouchdb": "^9.0.0",
+    "pouchdb-find": "^9.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.1"
@@ -29,6 +31,7 @@
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.10.1",
+    "@types/pouchdb": "^6.4.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",

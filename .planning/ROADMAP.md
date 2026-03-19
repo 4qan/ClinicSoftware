@@ -7,7 +7,9 @@
 - v1.2 Print Customization -- 2 phases (shipped 2026-03-12)
 - v1.3 Keyboard Navigation -- 3 phases (shipped 2026-03-15)
 - v1.4 Slip Assignment & Print Settings -- Phases 15-16 (shipped 2026-03-19)
-- v1.5 Visit Vitals -- Phase 17 (in progress)
+- v1.5 Visit Vitals -- Phase 17 (shipped 2026-03-19)
+- v1.6 Unified Medication Management -- Phase 18 (shipped 2026-03-19)
+- v2.0 Multi-User Sync -- Phases 19-23 (planned)
 
 ## Phases
 
@@ -58,11 +60,29 @@
 
 </details>
 
-### v1.5 Visit Vitals (In Progress)
+<details>
+<summary>v1.5 Visit Vitals (Phase 17) -- SHIPPED 2026-03-19</summary>
 
-**Milestone Goal:** Record optional vital signs per visit (temperature, blood pressure, weight, SpO2) and surface them in visit history for quick clinical reference.
+- [x] Phase 17: Visit Vitals (2/2 plans) -- completed 2026-03-19
 
-- [x] **Phase 17: Visit Vitals** - Vital signs data model, input UI, and visit history display (completed 2026-03-19)
+</details>
+
+<details>
+<summary>v1.6 Unified Medication Management (Phase 18) -- SHIPPED 2026-03-19</summary>
+
+- [x] Phase 18: Unified Medication Management (2/2 plans) -- completed 2026-03-19
+
+</details>
+
+### v2.0 Multi-User Sync (Planned)
+
+**Milestone Goal:** Nurse and doctor work on separate computers. Nurse creates patients and records vitals. Doctor sees everything and writes prescriptions. Data syncs over LAN via CouchDB/PouchDB, no internet required.
+
+- [ ] **Phase 19: PouchDB Migration** - Replace Dexie with PouchDB and migrate all existing clinic data without loss
+- [ ] **Phase 20: CouchDB Infrastructure** - CouchDB running as a secured Windows service on the doctor's machine, accessible from nurse's machine over LAN
+- [ ] **Phase 21: Auth and Role Enforcement** - Two-user login with CouchDB session auth and role-based access gating
+- [ ] **Phase 22: Live Sync** - Bidirectional real-time sync between machines with visible sync status
+- [ ] **Phase 23: Backup Redesign** - Backup and restore adapted for the synced multi-machine environment
 
 ## Phase Details
 
@@ -77,8 +97,8 @@
   4. Slip assignment persists when the encounter is saved and reopened
 **Plans:** 2/2 plans complete
 Plans:
-- [ ] 15-01-PLAN.md -- Data model (slipType field) and toggle UI in medication list
-- [ ] 15-02-PLAN.md -- Print filtering by slip type, empty slip handling, Rx badge in visit history
+- [x] 15-01-PLAN.md -- Data model (slipType field) and toggle UI in medication list
+- [x] 15-02-PLAN.md -- Print filtering by slip type, empty slip handling, Rx badge in visit history
 
 ### Phase 16: Auto-Print Toggle
 **Goal**: Doctor can enable or disable auto-print from Print Management settings, and the preference survives sessions
@@ -91,7 +111,7 @@ Plans:
   4. Auto-print preference persists after page refresh and browser restart
 **Plans:** 1/1 plans complete
 Plans:
-- [ ] 16-01-PLAN.md -- Auto-print toggle in settings UI, persistence, and print gate
+- [x] 16-01-PLAN.md -- Auto-print toggle in settings UI, persistence, and print gate
 
 ### Phase 17: Visit Vitals
 **Goal**: Doctor can record optional vital signs (temperature, BP, weight, SpO2) per visit; vitals display prominently in visit history cards for quick clinical reference
@@ -107,8 +127,8 @@ Plans:
   7. Vitals do NOT appear on printed slips
 **Plans:** 2/2 plans complete
 Plans:
-- [ ] 17-01-PLAN.md -- Data model (Visit interface + DB v6), VitalsInput component, wire into NewVisitPage and EditVisitPage
-- [ ] 17-02-PLAN.md -- Vitals display in VisitCard badges and inline visit history, verify no print impact
+- [x] 17-01-PLAN.md -- Data model (Visit interface + DB v6), VitalsInput component, wire into NewVisitPage and EditVisitPage
+- [x] 17-02-PLAN.md -- Vitals display in VisitCard badges and inline visit history, verify no print impact
 
 ### Phase 18: Unified Medication Management
 **Goal**: Doctor can manage all medications (predefined and custom) from a dedicated top-level page with full CRUD, search, filtering, and an override model that tracks edits to predefined drugs with reset capability
@@ -123,8 +143,68 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 18-01-PLAN.md -- Data layer: Drug interface update, CRUD functions, seed-once logic
-- [ ] 18-02-PLAN.md -- Medications page UI, navigation, routing, settings cleanup
+- [x] 18-01-PLAN.md -- Data layer: Drug interface update, CRUD functions, seed-once logic
+- [x] 18-02-PLAN.md -- Medications page UI, navigation, routing, settings cleanup
+
+### Phase 19: PouchDB Migration
+**Goal**: App runs identically to v1.6 but on PouchDB instead of Dexie -- all existing clinic data survives the upgrade, the migration runs exactly once, and drug seeds are idempotent across machines
+**Depends on**: Phase 18
+**Requirements**: MIGR-01, MIGR-02, MIGR-03
+**Success Criteria** (what must be TRUE):
+  1. After upgrading, all existing patients, visits, prescriptions, medications, and settings are accessible without any manual data entry
+  2. Drug seeds use content-addressable IDs so the same drug is never created twice across machines
+  3. Opening the app a second time after migration completes does not re-run the migration or modify any data
+  4. App functionality is indistinguishable from v1.6 to the user (no workflow changes)
+**Plans:** 3 plans
+Plans:
+- [ ] 19-01-PLAN.md -- PouchDB foundation, legacy adapter, one-time migration with tests
+- [ ] 19-02-PLAN.md -- Rewrite all DB modules (patients, visits, drugs, settings, seeds) for PouchDB
+- [ ] 19-03-PLAN.md -- App integration: boot sequence, consumer updates, backup/snapshot adaptation
+
+### Phase 20: CouchDB Infrastructure
+**Goal**: CouchDB 3.5.1 runs as a secured Windows service on the doctor's machine, is accessible from the nurse's machine over LAN, and has two pre-created user accounts with role-based write restrictions enforced at the database level
+**Depends on**: Phase 19
+**Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04
+**Success Criteria** (what must be TRUE):
+  1. CouchDB starts automatically when the doctor's Windows machine boots, without manual intervention
+  2. From the nurse's machine, a browser can reach the CouchDB endpoint at the doctor's LAN IP on port 5984
+  3. CouchDB rejects unauthenticated requests and requires valid credentials before allowing any data access
+  4. A nurse-authenticated request to write a prescription document is rejected by CouchDB, even if attempted directly (not through the app UI)
+**Plans**: TBD
+
+### Phase 21: Auth and Role Enforcement
+**Goal**: Doctor and nurse each log in with their own username and password via CouchDB session auth; the app enforces role-based access so nurse can only reach patient and vitals pages
+**Depends on**: Phase 20
+**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06
+**Success Criteria** (what must be TRUE):
+  1. Login screen has both username and password fields; entering wrong credentials shows an error
+  2. Logging in as doctor provides full access to all pages (prescriptions, medications, print, settings, backup)
+  3. Logging in as nurse restricts navigation to patient search, patient creation, and vitals recording only
+  4. Nurse attempting to navigate to a doctor-only route is redirected to an accessible page
+  5. App header shows the logged-in user's role label ("Doctor" or "Nurse")
+**Plans**: TBD
+
+### Phase 22: Live Sync
+**Goal**: Data created or edited on one machine appears on the other within seconds; both machines keep working if the network drops and sync resumes automatically when connectivity returns
+**Depends on**: Phase 21
+**Requirements**: SYNC-01, SYNC-02, SYNC-03, SYNC-04
+**Success Criteria** (what must be TRUE):
+  1. A patient created on the nurse's machine appears on the doctor's machine within seconds without either user taking action
+  2. Both machines continue to accept reads and writes normally when the clinic WiFi goes down
+  3. After WiFi is restored, changes made offline on either machine sync automatically without user intervention
+  4. Settings page shows current sync state (syncing / synced / disconnected) and is accurate when the network is toggled
+  5. If the doctor's machine is off, nurse keeps working; her data appears on the doctor's machine once it comes back online
+**Plans**: TBD
+
+### Phase 23: Backup Redesign
+**Goal**: Manual export still produces a downloadable backup file; restore pushes data to the shared CouchDB so both machines reflect the restored state via sync; auto-snapshots continue working
+**Depends on**: Phase 22
+**Requirements**: BKUP-01, BKUP-02, BKUP-03
+**Success Criteria** (what must be TRUE):
+  1. Doctor can export a backup file from Settings; the file contains all clinic data in a downloadable format
+  2. After a restore, both the doctor's and nurse's machines show the restored data without manual steps on the nurse's machine
+  3. Auto-snapshots continue to trigger and rotate (24h interval, 3-copy rotation) after the PouchDB migration
+**Plans**: TBD
 
 ## Progress
 
@@ -147,8 +227,13 @@ Plans:
 | 14. Print Flow | v1.3 | 1/1 | Complete | 2026-03-14 |
 | 15. Slip Assignment | v1.4 | 2/2 | Complete | 2026-03-19 |
 | 16. Auto-Print Toggle | v1.4 | 1/1 | Complete | 2026-03-19 |
-| 17. Visit Vitals | 2/2 | Complete   | 2026-03-19 | - |
-| 18. Unified Medication Management | 2/2 | Complete    | 2026-03-19 | - |
+| 17. Visit Vitals | v1.5 | 2/2 | Complete | 2026-03-19 |
+| 18. Unified Medication Management | v1.6 | 2/2 | Complete | 2026-03-19 |
+| 19. PouchDB Migration | v2.0 | 0/3 | Planning | - |
+| 20. CouchDB Infrastructure | v2.0 | 0/TBD | Not started | - |
+| 21. Auth and Role Enforcement | v2.0 | 0/TBD | Not started | - |
+| 22. Live Sync | v2.0 | 0/TBD | Not started | - |
+| 23. Backup Redesign | v2.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-03-19 -- Phase 17 planned (Visit Vitals)*
+*Last updated: 2026-03-19 -- Phase 19 plans created (3 plans, 3 waves)*

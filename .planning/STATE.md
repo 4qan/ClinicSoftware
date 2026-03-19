@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.5
-milestone_name: Visit Vitals
+milestone: v2.0
+milestone_name: Multi-User Sync
 status: planning
-stopped_at: Completed 17-02-PLAN.md
-last_updated: "2026-03-19T12:34:24.682Z"
-last_activity: 2026-03-19 -- Roadmap created
+stopped_at: null
+last_updated: "2026-03-19"
+last_activity: 2026-03-19 -- Milestone v2.0 started
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 7
-  completed_plans: 7
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
   percent: 0
 ---
 
@@ -21,48 +21,32 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** The doctor can see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even with no internet.
-**Current focus:** Phase 15 -- Slip Assignment
+**Current focus:** Defining requirements for v2.0 Multi-User Sync
 
 ## Current Position
 
-Phase: 15 of 16 (v1.4)
-Plan: -- (not yet planned)
-Status: Ready to plan
-Last activity: 2026-03-19 -- Roadmap created
-
-Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (v1.4)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-19 — Milestone v2.0 started
 
 ## Accumulated Context
 
 ### Decisions
 
-- v1.0 through v1.3 decisions logged in PROJECT.md Key Decisions table
-- Medications stored as snapshots: SLIP-05 (slip assignment) stores with snapshot, follows existing pattern
-- Print settings in Dexie settings table: PRSET-06 (auto-print persistence) follows same pattern as paper size settings
-- Auto-print double-fire guard uses useRef: relevant context for PRSET-05 toggle behavior
-- [Phase 15-slip-assignment]: slipType optional on VisitMedication, not indexed; missing value = dispensary by convention
-- [Phase 15-slip-assignment]: Toggle lives in MedicationList next to Actions, not in MedicationEntry form
-- [Phase 15-slip-assignment]: prescriptionMeds and dispensaryMeds derived inline in PrintVisitPage; no separate util file
-- [Phase 15-slip-assignment]: Auto-print skip checks targetMeds.length before scheduling window.print(); empty slip skipped silently
-- [Phase 15-slip-assignment]: prescriptionMeds and dispensaryMeds derived inline in PrintVisitPage; no separate utility file
-- [Phase 15-slip-assignment]: Rx badge shown only for prescription; dispensary (default) gets no badge
-- [Phase 15-slip-assignment]: Auto-print skip: check targetMeds.length before scheduling window.print(); empty slip skipped silently
-- [Phase 16-auto-print-toggle]: autoPrint defaults true when key absent from DB; page style injected regardless of autoPrint so manual print always works
-- [Phase 18-unified-medication-management]: isOverridden is optional on Drug interface for backward compatibility with existing records
-- [Phase 18-unified-medication-management]: backup.ts needs no changes: seed-once logic (count > 0 = skip) handles restore interaction
-- [Phase 18-unified-medication-management]: updateCustomDrug/deleteCustomDrug kept as deprecated wrappers; SEED_VERSION removed, seeding now count-based
-- [Phase 18-unified-medication-management]: Inline row confirm for delete/reset in MedicationsPage: avoids double-modal pattern
-- [Phase 18-unified-medication-management]: Settings page: persistent blue banner linking to /medications replaces medications tab
-- [Phase 18-unified-medication-management]: resetDrugToDefault uses seedKey field with partial-match fallback to handle legacy UUID-based records
-- [Phase 17-visit-vitals]: Temperature stored as Fahrenheit in DB; C is UI-only via VitalsData.tempUnit, not persisted
-- [Phase 17-visit-vitals]: VitalsInput: no min/max validation on vital inputs; DB v7 migration requires no upgrade callback
-- [Phase 17-visit-vitals]: Vitals row appears on every visit card including all-'--' placeholders
-- [Phase 17-visit-vitals]: formatVitalsLine helper in VisitCard.tsx; NewVisitPage uses inline template literal -- same format
+- v1.0 through v1.5 decisions logged in PROJECT.md Key Decisions table
+- LAN CouchDB chosen over cloud (unreliable internet, real-time sync needed between nurse and doctor in same building)
+- PouchDB replaces Dexie.js (native CouchDB sync protocol, schemaless)
+- User accounts pre-created during development (no setup wizard)
+- Sequential workflow: nurse screens patient first, doctor sees them after
+- Doctor's machine hosts CouchDB as Windows service (auto-starts)
+- Backup restore needs sync-aware redesign (can't blindly replace local DB)
+- Auto-snapshots may be simplified (CouchDB + two local copies = three copies by default)
 
 ### Roadmap Evolution
 
-- Phase 17 added: Visit Vitals (optional vital signs per visit with history display)
-- Phase 18 added: Unified Medication Management (top-level medications page, override model for predefined drugs, hardened seeding)
+- Phase 17 (Visit Vitals) and Phase 18 (Unified Medication Management) completed in v1.5
+- v2.0 phases start from 19
 
 ### Pending Todos
 
@@ -74,9 +58,9 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T12:34:24.680Z
-Stopped at: Completed 17-02-PLAN.md
+Last session: 2026-03-19
+Stopped at: null
 Resume file: None
 
 ---
-*Last updated: 2026-03-19 -- v1.4 roadmap created*
+*Last updated: 2026-03-19 -- v2.0 milestone started*

@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A lightweight prescription and patient management PWA for a single-doctor clinic. Works fully offline with IndexedDB, supports patient registration with auto-generated IDs, clinical encounter logging, prescription writing with medication autocomplete from a 120+ drug database, and configurable paper size printing (A5/A4/Letter) with proportional layout scaling and Urdu dosage instructions. Includes full database backup/restore and automatic in-app snapshots. Full keyboard-only workflow from login through printing. Designed for a non-tech-savvy doctor on older Windows hardware.
+A lightweight prescription and patient management PWA for a small clinic. Works fully offline with IndexedDB, supports patient registration with auto-generated IDs, clinical encounter logging with vitals, prescription writing with medication autocomplete from a 120+ drug database, and configurable paper size printing (A5/A4/Letter) with proportional layout scaling and Urdu dosage instructions. Includes a dedicated medications management page, full database backup/restore, and automatic in-app snapshots. Full keyboard-only workflow from login through printing. Designed for non-tech-savvy clinic staff on older Windows hardware.
 
 ## Core Value
 
@@ -32,27 +32,33 @@ The doctor can see a patient, write a prescription with medication autocomplete,
 - FMGT-01 through FMGT-03: Focus transitions after drug select, medication add, inline patient create -- v1.3
 - ESC-01 through ESC-03: Escape closes dropdowns, inline forms; ESC-03 no-op (no modals exist) -- v1.3
 - PRNT-01 through PRNT-03: Tab to print button, Enter to print, focus restore after dialog -- v1.3
+- SLIP-01 through SLIP-05: Per-medication slip assignment (dispensary/prescription), stored with snapshot -- v1.4
+- PRSET-05, PRSET-06: Auto-print toggle in Print Management, persists across sessions -- v1.4
+- VIT-01 through VIT-06: Optional vitals per visit (temp, BP, weight, SpO2), collapsible UI, VisitCard badges, DB v6 -- v1.5
+- MED-01 through MED-08: Top-level medications page, full CRUD, override model for predefined drugs, seed-once logic -- v1.5
 
 ### Active
 
-#### Current Milestone: v1.4 Slip Assignment & Print Settings
+#### Current Milestone: v2.0 Multi-User Sync
 
-**Goal:** Let the doctor control which medicines appear on which printed slip, and toggle auto-print behavior.
+**Goal:** Nurse and doctor work on separate computers in the same clinic. Nurse creates patients and records vitals. Doctor sees everything and writes prescriptions. Data syncs over LAN via CouchDB/PouchDB, no internet required.
 
 **Target features:**
-- Per-medication slip assignment (dispensary default, prescription option)
-- Auto-print on/off toggle in Print Management
+- Two user roles (Doctor: full access, Nurse: patient creation + vitals)
+- CouchDB on doctor's machine as shared database
+- Dexie.js replaced with PouchDB (bidirectional LAN sync)
+- Role-based route and feature gating
+- Backup system adapted for sync-aware restore
 
 ### Out of Scope
 
-- Multi-doctor / multi-role support -- single user only
+- Multi-clinic sync -- single clinic only, LAN sync sufficient
+- Cloud-hosted database -- LAN CouchDB chosen over cloud for internet independence
 - Mobile-native app -- PWA covers mobile access
 - Billing / payments -- not needed
 - Appointment scheduling -- walk-in clinic
 - Lab results / imaging -- not needed
 - Drug interaction warnings -- complexity not justified
-- Real-time sync / CRDTs -- single user, single device
-- Cloud sync (Firebase/Supabase) -- deferred to future milestone, local backup covers data safety for now
 - Full Urdu UI (menus, buttons, navigation) -- doctor works in English UI, Urdu need is print-only
 - BKUP-05 auto-safety-backup before restore -- dropped v1.1, snapshots provide sufficient safety net
 - Orientation toggle (landscape) -- prescriptions are always portrait
@@ -61,23 +67,23 @@ The doctor can see a patient, write a prescription with medication autocomplete,
 
 ## Context
 
-Shipped v1.3 with 12,164 LOC TypeScript/React.
-Tech stack: React 19, TypeScript, Vite, TailwindCSS v4, Dexie.js (schema v4), VitePWA, react-router-dom v7.
+Shipped through v1.5 with TypeScript/React.
+Tech stack: React 19, TypeScript, Vite, TailwindCSS v4, Dexie.js (schema v6), VitePWA, react-router-dom v7.
 Deployed to GitHub Pages at https://4qan.github.io/ClinicSoftware/.
-246+ commits across 10 days of development (v1.0 + v1.1 + v1.2 + v1.3).
-Dexie schema progression: v1 (foundation) -> v2 (drugs/visits) -> v3 (dosage->quantity rename) -> v4 (rxNotesLang).
+Dexie schema progression: v1 (foundation) -> v2 (drugs/visits) -> v3 (dosage->quantity rename) -> v4 (rxNotesLang) -> v5 (slipType) -> v6 (vitals).
 Separate Dexie instance for snapshots (ClinicSoftwareSnapshots).
 Print settings stored in Dexie settings table (prescriptionPaperSize, dispensaryPaperSize keys).
 Keyboard navigation: useAutocompleteKeyboard shared hook, pendingFocus pattern for post-action focus management.
+Top-level Medications page with override model for predefined drugs and seed-once logic.
 
-Clinic is in an area with unreliable internet. Doctor uses an old Windows system with Chrome/Edge. Health compliance team requires full patient records with unique IDs. Paper sizes now configurable (A5/A4/Letter), two prints per visit (prescription for patient, dispensary for dispenser).
+Clinic is in an area with unreliable internet. Doctor uses an old Windows system with Chrome/Edge. A nurse screens patients in a separate room before the doctor sees them. Health compliance team requires full patient records with unique IDs. Paper sizes now configurable (A5/A4/Letter), two prints per visit (prescription for patient, dispensary for dispenser). Both computers are on the same local WiFi network.
 
 ## Constraints
 
 - **Tech**: PWA with offline-first architecture (Service Worker + IndexedDB)
 - **UX**: Minimal clicks, large text, obvious navigation. Doctor must not need training.
 - **Hardware**: Must work on older Windows machines with Chrome/Edge
-- **Data**: All patient data stored locally in IndexedDB
+- **Data**: Patient data in IndexedDB (PouchDB), synced to CouchDB on LAN
 - **Print**: Configurable paper sizes (A5/A4/Letter) with proportional scaling, compact dispensary slips
 - **Fonts**: Noto Nastaliq Urdu self-hosted and SW-cached for offline Urdu printing
 
@@ -114,6 +120,9 @@ Clinic is in an area with unreliable internet. Doctor uses an old Windows system
 | tabIndex={-1} on nav chrome | Removes sidebar/header/breadcrumbs from tab flow without hiding visually | Good |
 | No form wrapper on visit page | Textarea needs Enter for newlines; FORM-03 intentionally skipped | Good |
 | document-level Escape listener | Handles Escape when focus is on unmounted button (inline patient form) | Good |
+| LAN CouchDB over cloud | Unreliable internet makes cloud sync unreliable; LAN sync works without internet; nurse-to-doctor handoff must be real-time | — Pending |
+| PouchDB over keeping Dexie | PouchDB uses IndexedDB under the hood, has native CouchDB sync protocol, schemaless (simpler migrations) | — Pending |
+| Pre-created user accounts | Doctor and nurse accounts created during development, no setup wizard needed | — Pending |
 
 ---
-*Last updated: 2026-03-19 after v1.4 milestone start*
+*Last updated: 2026-03-19 after v2.0 milestone start*
