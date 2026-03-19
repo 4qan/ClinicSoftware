@@ -37,19 +37,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SLIP-01 | -- | Pending |
-| SLIP-02 | -- | Pending |
-| SLIP-03 | -- | Pending |
-| SLIP-04 | -- | Pending |
-| SLIP-05 | -- | Pending |
-| PRSET-05 | -- | Pending |
-| PRSET-06 | -- | Pending |
+| SLIP-01 | Phase 15 | Pending |
+| SLIP-02 | Phase 15 | Pending |
+| SLIP-03 | Phase 15 | Pending |
+| SLIP-04 | Phase 15 | Pending |
+| SLIP-05 | Phase 15 | Pending |
+| PRSET-05 | Phase 16 | Pending |
+| PRSET-06 | Phase 16 | Pending |
 
 **Coverage:**
 - v1.4 requirements: 7 total
-- Mapped to phases: 0
-- Unmapped: 7
+- Mapped to phases: 7
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-19*
-*Last updated: 2026-03-19 after initial definition*
+*Last updated: 2026-03-19 -- traceability updated after roadmap creation*

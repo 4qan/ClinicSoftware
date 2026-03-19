@@ -6,6 +6,7 @@
 - v1.1 Urdu & Backup -- 7 phases (shipped 2026-03-11)
 - v1.2 Print Customization -- 2 phases (shipped 2026-03-12)
 - v1.3 Keyboard Navigation -- 3 phases (shipped 2026-03-15)
+- v1.4 Slip Assignment & Print Settings -- Phases 15-16 (in progress)
 
 ## Phases
 
@@ -48,6 +49,37 @@
 
 </details>
 
+### v1.4 Slip Assignment & Print Settings (In Progress)
+
+**Milestone Goal:** Let the doctor control which medicines appear on which printed slip, and toggle auto-print behavior.
+
+- [ ] **Phase 15: Slip Assignment** - Per-medication slip designation with print filtering
+- [ ] **Phase 16: Auto-Print Toggle** - Auto-print on/off setting with persistent preference
+
+## Phase Details
+
+### Phase 15: Slip Assignment
+**Goal**: Doctor can tag each medication as dispensary or prescription, and each slip prints only its tagged medications
+**Depends on**: Phase 14
+**Requirements**: SLIP-01, SLIP-02, SLIP-03, SLIP-04, SLIP-05
+**Success Criteria** (what must be TRUE):
+  1. When adding a medication, user sees a dispensary/prescription selector (defaults to dispensary)
+  2. Prescription slip prints only medications tagged as "prescription"
+  3. Dispensary slip prints only medications tagged as "dispensary"
+  4. Slip assignment persists when the encounter is saved and reopened
+**Plans**: TBD
+
+### Phase 16: Auto-Print Toggle
+**Goal**: Doctor can enable or disable auto-print from Print Management settings, and the preference survives sessions
+**Depends on**: Phase 15
+**Requirements**: PRSET-05, PRSET-06
+**Success Criteria** (what must be TRUE):
+  1. Print Management settings page shows an auto-print on/off toggle
+  2. With auto-print on, slips print automatically on visit save (existing behavior preserved)
+  3. With auto-print off, slips do not auto-print; doctor triggers print manually
+  4. Auto-print preference persists after page refresh and browser restart
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -67,6 +99,8 @@
 | 12. Focus Foundation and Form Submission | v1.3 | 2/2 | Complete | 2026-03-14 |
 | 13. Keyboard Interactions | v1.3 | 3/3 | Complete | 2026-03-14 |
 | 14. Print Flow | v1.3 | 1/1 | Complete | 2026-03-14 |
+| 15. Slip Assignment | v1.4 | 0/? | Not started | - |
+| 16. Auto-Print Toggle | v1.4 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-03-15 -- v1.3 Keyboard Navigation shipped*
+*Last updated: 2026-03-19 -- v1.4 roadmap created*
