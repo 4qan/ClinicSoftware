@@ -17,10 +17,10 @@ Requirements for v2.0 Multi-User Sync. Nurse and doctor on separate computers, d
 
 - [x] **AUTH-01**: Login screen shows a username field alongside the existing password field
 - [x] **AUTH-02**: Doctor and nurse accounts are pre-created; no setup wizard needed
-- [ ] **AUTH-03**: Doctor has full access to all features (unchanged from today)
-- [ ] **AUTH-04**: Nurse can only access patient search/creation and vitals recording
-- [ ] **AUTH-05**: Nurse cannot access prescriptions, medications, print, settings, or backup
-- [ ] **AUTH-06**: App header shows the logged-in user's role ("Doctor" or "Nurse")
+- [x] **AUTH-03**: Doctor has full access to all features (unchanged from today)
+- [x] **AUTH-04**: Nurse can only access patient search/creation and vitals recording
+- [x] **AUTH-05**: Nurse cannot access prescriptions, medications, print, settings, or backup
+- [x] **AUTH-06**: App header shows the logged-in user's role ("Doctor" or "Nurse")
 
 ### Sync
 
@@ -83,10 +83,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-04 | Phase 20 | Complete |
 | AUTH-01 | Phase 21 | Complete |
 | AUTH-02 | Phase 21 | Complete |
-| AUTH-03 | Phase 21 | Pending |
-| AUTH-04 | Phase 21 | Pending |
-| AUTH-05 | Phase 21 | Pending |
-| AUTH-06 | Phase 21 | Pending |
+| AUTH-03 | Phase 21 | Complete |
+| AUTH-04 | Phase 21 | Complete |
+| AUTH-05 | Phase 21 | Complete |
+| AUTH-06 | Phase 21 | Complete |
 | SYNC-01 | Phase 22 | Pending |
 | SYNC-02 | Phase 22 | Pending |
 | SYNC-03 | Phase 22 | Pending |
