@@ -47,6 +47,11 @@ export interface Visit {
   clinicalNotes: string
   rxNotes: string
   rxNotesLang?: 'en' | 'ur'
+  temperature?: number
+  systolic?: number
+  diastolic?: number
+  weight?: number
+  spo2?: number
   createdAt: string
   updatedAt: string
 }
@@ -149,6 +154,17 @@ export class ClinicDatabase extends Dexie {
           drug.isOverridden = false
         }
       })
+    })
+
+    // v7: adds optional vital fields to Visit (temperature, systolic, diastolic, weight, spo2)
+    // No new indexes needed; missing fields are treated as "not recorded"
+    this.version(7).stores({
+      patients: 'id, patientId, firstNameLower, lastNameLower, contact, createdAt',
+      settings: 'key',
+      recentPatients: 'id, viewedAt',
+      drugs: 'id, brandNameLower, saltNameLower, isCustom',
+      visits: 'id, patientId, createdAt',
+      visitMedications: 'id, visitId',
     })
   }
 }

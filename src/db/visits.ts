@@ -7,6 +7,11 @@ export interface CreateVisitData {
   rxNotes: string
   rxNotesLang: 'en' | 'ur'
   medications: Omit<VisitMedication, 'id' | 'visitId'>[]
+  temperature?: number
+  systolic?: number
+  diastolic?: number
+  weight?: number
+  spo2?: number
 }
 
 export interface UpdateVisitData {
@@ -14,6 +19,11 @@ export interface UpdateVisitData {
   rxNotes: string
   rxNotesLang: 'en' | 'ur'
   medications: Omit<VisitMedication, 'id' | 'visitId'>[]
+  temperature?: number
+  systolic?: number
+  diastolic?: number
+  weight?: number
+  spo2?: number
 }
 
 export async function createVisit(data: CreateVisitData): Promise<string> {
@@ -27,6 +37,11 @@ export async function createVisit(data: CreateVisitData): Promise<string> {
       clinicalNotes: data.clinicalNotes,
       rxNotes: data.rxNotes,
       rxNotesLang: data.rxNotesLang,
+      temperature: data.temperature,
+      systolic: data.systolic,
+      diastolic: data.diastolic,
+      weight: data.weight,
+      spo2: data.spo2,
       createdAt: now,
       updatedAt: now,
     }
@@ -54,6 +69,11 @@ export async function updateVisit(visitId: string, data: UpdateVisitData): Promi
       clinicalNotes: data.clinicalNotes,
       rxNotes: data.rxNotes,
       rxNotesLang: data.rxNotesLang,
+      temperature: data.temperature,
+      systolic: data.systolic,
+      diastolic: data.diastolic,
+      weight: data.weight,
+      spo2: data.spo2,
       updatedAt: now,
     })
 
