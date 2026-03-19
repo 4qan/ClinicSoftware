@@ -1,4 +1,4 @@
-import { db } from './index'
+import { pouchDb } from './pouchdb'
 import type { Visit, VisitMedication } from './index'
 
 export interface CreateVisitData {
@@ -26,117 +26,183 @@ export interface UpdateVisitData {
   spo2?: number
 }
 
+function stripPouchFields<T>(doc: Record<string, unknown>): T {
+  const result = { ...doc }
+  delete result._id
+  delete result._rev
+  delete result.type
+  return result as T
+}
+
 export async function createVisit(data: CreateVisitData): Promise<string> {
-  return await db.transaction('rw', [db.visits, db.visitMedications], async () => {
-    const now = new Date().toISOString()
-    const visitId = crypto.randomUUID()
+  const now = new Date().toISOString()
+  const visitId = crypto.randomUUID()
 
-    const visit: Visit = {
-      id: visitId,
-      patientId: data.patientId,
-      clinicalNotes: data.clinicalNotes,
-      rxNotes: data.rxNotes,
-      rxNotesLang: data.rxNotesLang,
-      temperature: data.temperature,
-      systolic: data.systolic,
-      diastolic: data.diastolic,
-      weight: data.weight,
-      spo2: data.spo2,
-      createdAt: now,
-      updatedAt: now,
+  const visitDoc = {
+    _id: 'visit:' + visitId,
+    type: 'visit' as const,
+    id: visitId,
+    patientId: data.patientId,
+    clinicalNotes: data.clinicalNotes,
+    rxNotes: data.rxNotes,
+    rxNotesLang: data.rxNotesLang,
+    temperature: data.temperature,
+    systolic: data.systolic,
+    diastolic: data.diastolic,
+    weight: data.weight,
+    spo2: data.spo2,
+    createdAt: now,
+    updatedAt: now,
+  }
+
+  await pouchDb.put(visitDoc as PouchDB.Core.PutDocument<Record<string, unknown>>)
+
+  const medDocs = data.medications.map(med => {
+    const medId = crypto.randomUUID()
+    return {
+      _id: 'visitmed:' + medId,
+      type: 'visitmed' as const,
+      id: medId,
+      visitId,
+      ...med,
     }
-
-    await db.visits.add(visit)
-
-    for (const med of data.medications) {
-      const medication: VisitMedication = {
-        id: crypto.randomUUID(),
-        visitId,
-        ...med,
-      }
-      await db.visitMedications.add(medication)
-    }
-
-    return visitId
   })
+
+  if (medDocs.length > 0) {
+    await pouchDb.bulkDocs(medDocs as PouchDB.Core.PutDocument<Record<string, unknown>>[])
+  }
+
+  return visitId
 }
 
 export async function updateVisit(visitId: string, data: UpdateVisitData): Promise<void> {
-  await db.transaction('rw', [db.visits, db.visitMedications], async () => {
-    const now = new Date().toISOString()
+  const now = new Date().toISOString()
 
-    await db.visits.update(visitId, {
-      clinicalNotes: data.clinicalNotes,
-      rxNotes: data.rxNotes,
-      rxNotesLang: data.rxNotesLang,
-      temperature: data.temperature,
-      systolic: data.systolic,
-      diastolic: data.diastolic,
-      weight: data.weight,
-      spo2: data.spo2,
-      updatedAt: now,
-    })
+  // Get existing visit with _rev
+  const existingDoc = await pouchDb.get('visit:' + visitId)
 
-    // Replace all medications: delete existing, insert new
-    await db.visitMedications.where('visitId').equals(visitId).delete()
+  // Update visit
+  await pouchDb.put({
+    ...(existingDoc as Record<string, unknown>),
+    clinicalNotes: data.clinicalNotes,
+    rxNotes: data.rxNotes,
+    rxNotesLang: data.rxNotesLang,
+    temperature: data.temperature,
+    systolic: data.systolic,
+    diastolic: data.diastolic,
+    weight: data.weight,
+    spo2: data.spo2,
+    updatedAt: now,
+  } as PouchDB.Core.PutDocument<Record<string, unknown>>)
 
-    for (const med of data.medications) {
-      const medication: VisitMedication = {
-        id: crypto.randomUUID(),
-        visitId,
-        ...med,
-      }
-      await db.visitMedications.add(medication)
+  // Delete old medications
+  const oldMedsResult = await pouchDb.find({
+    selector: { type: 'visitmed', visitId },
+    limit: 1000,
+  })
+  if (oldMedsResult.docs.length > 0) {
+    await pouchDb.bulkDocs(
+      oldMedsResult.docs.map(m => ({ ...(m as Record<string, unknown>), _deleted: true })) as PouchDB.Core.PutDocument<Record<string, unknown>>[]
+    )
+  }
+
+  // Insert new medications
+  const newMedDocs = data.medications.map(med => {
+    const medId = crypto.randomUUID()
+    return {
+      _id: 'visitmed:' + medId,
+      type: 'visitmed' as const,
+      id: medId,
+      visitId,
+      ...med,
     }
   })
+
+  if (newMedDocs.length > 0) {
+    await pouchDb.bulkDocs(newMedDocs as PouchDB.Core.PutDocument<Record<string, unknown>>[])
+  }
 }
 
 export async function deleteVisit(visitId: string): Promise<void> {
-  await db.transaction('rw', [db.visits, db.visitMedications], async () => {
-    await db.visitMedications.where('visitId').equals(visitId).delete()
-    await db.visits.delete(visitId)
+  const visitDoc = await pouchDb.get('visit:' + visitId)
+
+  const medsResult = await pouchDb.find({
+    selector: { type: 'visitmed', visitId },
+    limit: 1000,
   })
+
+  const deletedVisit = { ...(visitDoc as Record<string, unknown>), _deleted: true }
+  const deletedMeds = medsResult.docs.map(m => ({ ...(m as Record<string, unknown>), _deleted: true }))
+
+  await pouchDb.bulkDocs(
+    [deletedVisit, ...deletedMeds] as PouchDB.Core.PutDocument<Record<string, unknown>>[]
+  )
 }
 
 export async function getVisit(
   visitId: string,
 ): Promise<{ visit: Visit; medications: VisitMedication[] } | null> {
-  const visit = await db.visits.get(visitId)
-  if (!visit) return null
+  let visitDoc: Record<string, unknown>
+  try {
+    visitDoc = await pouchDb.get('visit:' + visitId) as Record<string, unknown>
+  } catch (err: unknown) {
+    if ((err as PouchDB.Core.Error).status === 404) return null
+    throw err
+  }
 
-  const medications = await db.visitMedications
-    .where('visitId')
-    .equals(visitId)
-    .sortBy('sortOrder')
+  const medsResult = await pouchDb.find({
+    selector: { type: 'visitmed', visitId },
+    limit: 1000,
+  })
 
-  return { visit, medications }
+  const medications = medsResult.docs
+    .map(m => stripPouchFields<VisitMedication>(m as Record<string, unknown>))
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+
+  return {
+    visit: stripPouchFields<Visit>(visitDoc),
+    medications,
+  }
 }
 
 export async function getPatientVisits(
   patientId: string,
 ): Promise<Array<{ visit: Visit; medications: VisitMedication[] }>> {
-  const visits = await db.visits
-    .where('patientId')
-    .equals(patientId)
-    .reverse()
-    .sortBy('createdAt')
+  const visitsResult = await pouchDb.find({
+    selector: { type: 'visit', patientId },
+    limit: 1000,
+  })
 
-  // Sort in reverse chronological order
-  visits.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  // Sort by createdAt descending
+  const visitDocs = visitsResult.docs
+    .map(d => d as Record<string, unknown>)
+    .sort((a, b) =>
+      String(b.createdAt ?? '').localeCompare(String(a.createdAt ?? ''))
+    )
 
   const results: Array<{ visit: Visit; medications: VisitMedication[] }> = []
 
-  for (const visit of visits) {
-    const medications = await db.visitMedications
-      .where('visitId')
-      .equals(visit.id)
-      .sortBy('sortOrder')
-    results.push({ visit, medications })
+  for (const visitDoc of visitDocs) {
+    const visitId = visitDoc.id as string
+    const medsResult = await pouchDb.find({
+      selector: { type: 'visitmed', visitId },
+      limit: 1000,
+    })
+
+    const medications = medsResult.docs
+      .map(m => stripPouchFields<VisitMedication>(m as Record<string, unknown>))
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+
+    results.push({
+      visit: stripPouchFields<Visit>(visitDoc),
+      medications,
+    })
   }
 
   return results
 }
 
 export async function removeMedicationFromVisit(medicationId: string): Promise<void> {
-  await db.visitMedications.delete(medicationId)
+  const doc = await pouchDb.get('visitmed:' + medicationId)
+  await pouchDb.remove(doc as PouchDB.Core.RemoveDocument)
 }
