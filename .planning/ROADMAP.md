@@ -62,7 +62,7 @@
 
 **Milestone Goal:** Record optional vital signs per visit (temperature, blood pressure, weight, SpO2) and surface them in visit history for quick clinical reference.
 
-- [ ] **Phase 17: Visit Vitals** - Vital signs data model, input UI, and visit history display
+- [x] **Phase 17: Visit Vitals** - Vital signs data model, input UI, and visit history display (completed 2026-03-19)
 
 ## Phase Details
 
@@ -105,7 +105,7 @@ Plans:
   5. Vitals display in VisitCard collapsed state (compact inline badges) and in NewVisitPage inline visit history preview
   6. Vitals persist via DB migration (v6) and survive save/reload cycle
   7. Vitals do NOT appear on printed slips
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 17-01-PLAN.md -- Data model (Visit interface + DB v6), VitalsInput component, wire into NewVisitPage and EditVisitPage
 - [ ] 17-02-PLAN.md -- Vitals display in VisitCard badges and inline visit history, verify no print impact
@@ -147,7 +147,7 @@ Plans:
 | 14. Print Flow | v1.3 | 1/1 | Complete | 2026-03-14 |
 | 15. Slip Assignment | v1.4 | 2/2 | Complete | 2026-03-19 |
 | 16. Auto-Print Toggle | v1.4 | 1/1 | Complete | 2026-03-19 |
-| 17. Visit Vitals | 1/2 | In Progress|  | - |
+| 17. Visit Vitals | 2/2 | Complete   | 2026-03-19 | - |
 | 18. Unified Medication Management | 2/2 | Complete    | 2026-03-19 | - |
 
 ---
