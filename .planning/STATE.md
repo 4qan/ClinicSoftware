@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: Slip Assignment & Print Settings
+milestone: v1.5
+milestone_name: Visit Vitals
 status: planning
-stopped_at: Completed 16-01-PLAN.md
-last_updated: "2026-03-19T11:28:18.604Z"
+stopped_at: Completed 18-01-PLAN.md
+last_updated: "2026-03-19T11:57:29.228Z"
 last_activity: 2026-03-19 -- Roadmap created
 progress:
-  total_phases: 3
+  total_phases: 4
   completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 7
+  completed_plans: 4
   percent: 0
 ---
 
@@ -48,6 +48,14 @@ Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (v1.
 - [Phase 15-slip-assignment]: Rx badge shown only for prescription; dispensary (default) gets no badge
 - [Phase 15-slip-assignment]: Auto-print skip: check targetMeds.length before scheduling window.print(); empty slip skipped silently
 - [Phase 16-auto-print-toggle]: autoPrint defaults true when key absent from DB; page style injected regardless of autoPrint so manual print always works
+- [Phase 18-unified-medication-management]: isOverridden is optional on Drug interface for backward compatibility with existing records
+- [Phase 18-unified-medication-management]: backup.ts needs no changes: seed-once logic (count > 0 = skip) handles restore interaction
+- [Phase 18-unified-medication-management]: updateCustomDrug/deleteCustomDrug kept as deprecated wrappers; SEED_VERSION removed, seeding now count-based
+
+### Roadmap Evolution
+
+- Phase 17 added: Visit Vitals (optional vital signs per visit with history display)
+- Phase 18 added: Unified Medication Management (top-level medications page, override model for predefined drugs, hardened seeding)
 
 ### Pending Todos
 
@@ -59,8 +67,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T11:24:47.697Z
-Stopped at: Completed 16-01-PLAN.md
+Last session: 2026-03-19T11:57:29.226Z
+Stopped at: Completed 18-01-PLAN.md
 Resume file: None
 
 ---

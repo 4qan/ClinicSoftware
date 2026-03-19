@@ -120,7 +120,7 @@ Plans:
   3. Editing a predefined drug sets isOverridden flag; "Reset to default" reverts to seed values
   4. Seeding runs only on first-ever app use (empty drugs table), never re-seeds
   5. Settings medications tab is removed; DrugManagement component replaced by MedicationsPage
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 18-01-PLAN.md -- Data layer: Drug interface update, CRUD functions, seed-once logic
@@ -148,7 +148,7 @@ Plans:
 | 15. Slip Assignment | v1.4 | 2/2 | Complete | 2026-03-19 |
 | 16. Auto-Print Toggle | v1.4 | 1/1 | Complete | 2026-03-19 |
 | 17. Visit Vitals | v1.5 | 0/2 | Planned | - |
-| 18. Unified Medication Management | v1.6 | 0/2 | Planned | - |
+| 18. Unified Medication Management | 1/2 | In Progress|  | - |
 
 ---
 *Last updated: 2026-03-19 -- Phase 17 planned (Visit Vitals)*
