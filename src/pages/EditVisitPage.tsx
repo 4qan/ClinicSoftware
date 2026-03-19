@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useAuthContext } from '@/auth/AuthProvider'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { MedicationEntry } from '@/components/MedicationEntry'
@@ -16,6 +17,7 @@ import type { VitalsData } from '@/components/VitalsInput'
 export function EditVisitPage() {
   const navigate = useNavigate()
   const { id: visitId } = useParams<{ id: string }>()
+  const { role } = useAuthContext()
 
   const [patient, setPatient] = useState<Patient | null>(null)
   const [clinicalNotes, setClinicalNotes] = useState('')
@@ -234,15 +236,17 @@ export function EditVisitPage() {
         />
       </div>
 
-      {/* Prescription */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-3">Prescription</h3>
-        <MedicationEntry onAdd={handleAddMedication} />
-        <div className="mt-4">
-          <MedicationList medications={medications} onRemove={handleRemoveMedication} onToggleSlip={handleToggleSlip} />
+      {/* Prescription - visible for doctor only */}
+      {role !== 'nurse' && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-3">Prescription</h3>
+          <MedicationEntry onAdd={handleAddMedication} />
+          <div className="mt-4">
+            <MedicationList medications={medications} onRemove={handleRemoveMedication} onToggleSlip={handleToggleSlip} />
+          </div>
+          <RxNotesField value={rxNotes} onChange={setRxNotes} lang={rxNotesLang} onLangChange={setRxNotesLang} />
         </div>
-        <RxNotesField value={rxNotes} onChange={setRxNotes} lang={rxNotesLang} onLangChange={setRxNotesLang} />
-      </div>
+      )}
 
       {/* Action Bar */}
       <div className="flex items-center justify-between">
@@ -273,15 +277,17 @@ export function EditVisitPage() {
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
-          <button
-            type="button"
-            onClick={handleSaveAndPrint}
-            disabled={!canSave}
-            className="px-8 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-lg cursor-pointer transition-colors"
-            style={{ minHeight: '44px' }}
-          >
-            {saving ? 'Saving...' : 'Save & Print'}
-          </button>
+          {role !== 'nurse' && (
+            <button
+              type="button"
+              onClick={handleSaveAndPrint}
+              disabled={!canSave}
+              className="px-8 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-lg cursor-pointer transition-colors"
+              style={{ minHeight: '44px' }}
+            >
+              {saving ? 'Saving...' : 'Save & Print'}
+            </button>
+          )}
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
+import { useAuthContext } from '@/auth/AuthProvider'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { MedicationEntry } from '@/components/MedicationEntry'
@@ -21,6 +22,7 @@ import type { VitalsData } from '@/components/VitalsInput'
 export function NewVisitPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const { role } = useAuthContext()
   const preselectedPatientId = searchParams.get('patientId')
 
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
@@ -436,30 +438,34 @@ export function NewVisitPage() {
         </div>
       </fieldset>
 
-      {/* Prescription - always visible, disabled without patient */}
-      <fieldset disabled={isDisabled}>
-        <div className={`bg-white border border-gray-200 rounded-lg p-6${isDisabled ? ' opacity-50 pointer-events-none' : ''}`}>
-          <h3 className="text-lg font-bold text-gray-900 mb-3">Prescription</h3>
-          <MedicationEntry onAdd={handleAddMedication} />
-          <div className="mt-4">
-            <MedicationList medications={medications} onRemove={handleRemoveMedication} onToggleSlip={handleToggleSlip} />
+      {/* Prescription - visible for doctor only */}
+      {role !== 'nurse' && (
+        <fieldset disabled={isDisabled}>
+          <div className={`bg-white border border-gray-200 rounded-lg p-6${isDisabled ? ' opacity-50 pointer-events-none' : ''}`}>
+            <h3 className="text-lg font-bold text-gray-900 mb-3">Prescription</h3>
+            <MedicationEntry onAdd={handleAddMedication} />
+            <div className="mt-4">
+              <MedicationList medications={medications} onRemove={handleRemoveMedication} onToggleSlip={handleToggleSlip} />
+            </div>
+            <RxNotesField value={rxNotes} onChange={setRxNotes} lang={rxNotesLang} onLangChange={setRxNotesLang} />
           </div>
-          <RxNotesField value={rxNotes} onChange={setRxNotes} lang={rxNotesLang} onLangChange={setRxNotesLang} />
-        </div>
-      </fieldset>
+        </fieldset>
+      )}
 
       {/* Action Bar - always visible, disabled without patient */}
       <fieldset disabled={isDisabled}>
         <div className={`flex items-center justify-end gap-3${isDisabled ? ' opacity-50 pointer-events-none' : ''}`}>
-          <button
-            type="button"
-            onClick={handleSaveAndPrint}
-            disabled={!canSave}
-            className="px-8 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-lg cursor-pointer transition-colors"
-            style={{ minHeight: '44px' }}
-          >
-            {saving ? 'Saving...' : 'Save & Print'}
-          </button>
+          {role !== 'nurse' && (
+            <button
+              type="button"
+              onClick={handleSaveAndPrint}
+              disabled={!canSave}
+              className="px-8 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-lg cursor-pointer transition-colors"
+              style={{ minHeight: '44px' }}
+            >
+              {saving ? 'Saving...' : 'Save & Print'}
+            </button>
+          )}
           <button
             type="button"
             onClick={handleSave}
