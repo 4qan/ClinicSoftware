@@ -1,4 +1,4 @@
-import { db } from './index'
+import { getSetting, putSetting } from './pouchdb'
 
 export type PaperSize = 'A5' | 'A4' | 'Letter'
 
@@ -38,15 +38,15 @@ function coerceSize(raw: unknown): PaperSize {
 const DEFAULT_SIZE: PaperSize = 'A5'
 
 export async function getPrintSettings(): Promise<PrintSettings> {
-  const [prescriptionEntry, dispensaryEntry, autoPrintEntry] = await Promise.all([
-    db.settings.get('printPrescriptionSize'),
-    db.settings.get('printDispensarySize'),
-    db.settings.get('autoPrint'),
+  const [prescriptionRaw, dispensaryRaw, autoPrintRaw] = await Promise.all([
+    getSetting('printPrescriptionSize'),
+    getSetting('printDispensarySize'),
+    getSetting('autoPrint'),
   ])
   return {
-    prescriptionSize: coerceSize(prescriptionEntry?.value ?? DEFAULT_SIZE),
-    dispensarySize: coerceSize(dispensaryEntry?.value ?? DEFAULT_SIZE),
-    autoPrint: autoPrintEntry?.value !== false,
+    prescriptionSize: coerceSize(prescriptionRaw ?? DEFAULT_SIZE),
+    dispensarySize: coerceSize(dispensaryRaw ?? DEFAULT_SIZE),
+    autoPrint: autoPrintRaw !== false,
   }
 }
 
@@ -54,11 +54,11 @@ export async function savePrintSetting(
   key: 'printPrescriptionSize' | 'printDispensarySize',
   value: PaperSize
 ): Promise<void> {
-  await db.settings.put({ key, value })
+  await putSetting(key, value)
 }
 
 export async function saveAutoPrint(value: boolean): Promise<void> {
-  await db.settings.put({ key: 'autoPrint', value })
+  await putSetting('autoPrint', value)
 }
 
 // Proportional margin: A5 baseline = 148 * 210 = 31080, margin = 8mm

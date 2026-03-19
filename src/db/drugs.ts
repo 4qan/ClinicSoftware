@@ -1,30 +1,38 @@
-import { db } from '@/db/index'
+import { pouchDb } from '@/db/pouchdb'
 import type { Drug } from '@/db/index'
 import { SEED_DRUGS, buildSeedId } from '@/db/seedDrugs'
+
+function stripPouchFields<T>(doc: Record<string, unknown>): T {
+  const result = { ...doc }
+  delete result._id
+  delete result._rev
+  delete result.type
+  return result as T
+}
 
 export async function searchDrugs(query: string): Promise<Drug[]> {
   const lower = query.toLowerCase().trim()
   if (!lower) return []
 
-  const byBrand = await db.drugs
-    .where('brandNameLower').startsWith(lower)
-    .and(d => d.isActive)
-    .limit(15)
-    .toArray()
-
-  const bySalt = await db.drugs
-    .where('saltNameLower').startsWith(lower)
-    .and(d => d.isActive)
-    .limit(15)
-    .toArray()
+  const [byBrand, bySalt] = await Promise.all([
+    pouchDb.find({
+      selector: { type: 'drug', isActive: true, brandNameLower: { $gte: lower, $lte: lower + '\uffff' } },
+      limit: 15,
+    }),
+    pouchDb.find({
+      selector: { type: 'drug', isActive: true, saltNameLower: { $gte: lower, $lte: lower + '\uffff' } },
+      limit: 15,
+    }),
+  ])
 
   const seen = new Set<string>()
   const results: Drug[] = []
-  for (const d of [...byBrand, ...bySalt]) {
-    const key = `${d.brandNameLower}|${d.saltNameLower}|${d.form}|${d.strength}`
+  for (const d of [...byBrand.docs, ...bySalt.docs]) {
+    const drug = stripPouchFields<Drug>(d as Record<string, unknown>)
+    const key = `${drug.brandNameLower}|${drug.saltNameLower}|${drug.form}|${drug.strength}`
     if (!seen.has(key)) {
       seen.add(key)
-      results.push(d)
+      results.push(drug)
     }
     if (results.length >= 10) break
   }
@@ -49,7 +57,11 @@ export async function addCustomDrug(
     createdAt: now,
     updatedAt: now,
   }
-  await db.drugs.add(drug)
+  await pouchDb.put({
+    ...drug,
+    _id: 'drug:' + id,
+    type: 'drug',
+  } as PouchDB.Core.PutDocument<Record<string, unknown>>)
   return id
 }
 
@@ -57,10 +69,11 @@ export async function updateDrug(
   id: string,
   data: Partial<Pick<Drug, 'brandName' | 'saltName' | 'form' | 'strength'>>
 ): Promise<void> {
-  const existing = await db.drugs.get(id)
-  if (!existing) throw new Error('Drug not found')
+  const doc = await pouchDb.get('drug:' + id)
+  if (!doc) throw new Error('Drug not found')
 
-  const updates: Partial<Drug> = { ...data, updatedAt: new Date().toISOString() }
+  const existing = stripPouchFields<Drug>(doc as Record<string, unknown>)
+  const updates: Partial<Drug> & Record<string, unknown> = { ...data, updatedAt: new Date().toISOString() }
   if (!existing.isCustom) {
     updates.isOverridden = true
     if (!existing.seedKey) {
@@ -78,7 +91,11 @@ export async function updateDrug(
   if (data.saltName !== undefined) {
     updates.saltNameLower = data.saltName.toLowerCase()
   }
-  await db.drugs.update(id, updates)
+
+  await pouchDb.put({
+    ...(doc as Record<string, unknown>),
+    ...updates,
+  } as PouchDB.Core.PutDocument<Record<string, unknown>>)
 }
 
 /** @deprecated Use updateDrug instead */
@@ -90,18 +107,21 @@ export async function updateCustomDrug(
 }
 
 export async function toggleDrugActive(id: string): Promise<void> {
-  const existing = await db.drugs.get(id)
-  if (!existing) throw new Error('Drug not found')
-  await db.drugs.update(id, {
+  const doc = await pouchDb.get('drug:' + id)
+  if (!doc) throw new Error('Drug not found')
+
+  const existing = stripPouchFields<Drug>(doc as Record<string, unknown>)
+  await pouchDb.put({
+    ...(doc as Record<string, unknown>),
     isActive: !existing.isActive,
     updatedAt: new Date().toISOString(),
-  })
+  } as PouchDB.Core.PutDocument<Record<string, unknown>>)
 }
 
 export async function deleteDrug(id: string): Promise<void> {
-  const existing = await db.drugs.get(id)
-  if (!existing) throw new Error('Drug not found')
-  await db.drugs.delete(id)
+  const doc = await pouchDb.get('drug:' + id)
+  if (!doc) throw new Error('Drug not found')
+  await pouchDb.remove(doc as PouchDB.Core.RemoveDocument)
 }
 
 /** @deprecated Use deleteDrug instead */
@@ -110,18 +130,18 @@ export async function deleteCustomDrug(id: string): Promise<void> {
 }
 
 export async function resetDrugToDefault(id: string): Promise<void> {
-  const existing = await db.drugs.get(id)
-  if (!existing) throw new Error('Drug not found')
+  const doc = await pouchDb.get('drug:' + id)
+  if (!doc) throw new Error('Drug not found')
+
+  const existing = stripPouchFields<Drug>(doc as Record<string, unknown>)
   if (existing.isCustom) throw new Error('Custom drugs have no default to reset to')
 
-  // Match by: deterministic seed ID → stored seedKey → partial property match
-  // Needed because legacy drugs have UUID IDs from original crypto.randomUUID() seeding
+  // Match by: deterministic seed ID -> stored seedKey -> partial property match
   let seedEntry = SEED_DRUGS.find(entry => buildSeedId(entry) === id)
   if (!seedEntry && existing.seedKey) {
     seedEntry = SEED_DRUGS.find(entry => buildSeedId(entry) === existing.seedKey)
   }
   if (!seedEntry) {
-    // Last resort: match by brand + form + strength (unchanged fields for most edits)
     const matches = SEED_DRUGS.filter(entry =>
       entry.brandName.toLowerCase() === existing.brandNameLower &&
       entry.form === existing.form &&
@@ -131,7 +151,8 @@ export async function resetDrugToDefault(id: string): Promise<void> {
   }
   if (!seedEntry) throw new Error('No seed entry found for this drug')
 
-  await db.drugs.update(id, {
+  await pouchDb.put({
+    ...(doc as Record<string, unknown>),
     brandName: seedEntry.brandName,
     brandNameLower: seedEntry.brandName.toLowerCase(),
     saltName: seedEntry.saltName,
@@ -142,17 +163,32 @@ export async function resetDrugToDefault(id: string): Promise<void> {
     seedKey: undefined,
     isActive: true,
     updatedAt: new Date().toISOString(),
-  })
+  } as PouchDB.Core.PutDocument<Record<string, unknown>>)
 }
 
 export async function getCustomDrugs(): Promise<Drug[]> {
-  return db.drugs.filter(d => d.isCustom === true).toArray()
+  const result = await pouchDb.find({
+    selector: { type: 'drug', isCustom: true },
+    limit: 5000,
+  })
+  return result.docs.map(d => stripPouchFields<Drug>(d as Record<string, unknown>))
 }
 
 export async function getAllDrugs(): Promise<Drug[]> {
-  return db.drugs.filter(d => d.isActive).toArray()
+  const result = await pouchDb.find({
+    selector: { type: 'drug', isActive: true },
+    limit: 5000,
+  })
+  return result.docs.map(d => stripPouchFields<Drug>(d as Record<string, unknown>))
 }
 
 export async function getAllDrugsUnfiltered(): Promise<Drug[]> {
-  return db.drugs.toArray()
+  const result = await pouchDb.allDocs({
+    startkey: 'drug:',
+    endkey: 'drug:\uffff',
+    include_docs: true,
+  })
+  return result.rows
+    .filter(row => row.doc && !(row.doc as Record<string, unknown>)._deleted)
+    .map(row => stripPouchFields<Drug>(row.doc as Record<string, unknown>))
 }

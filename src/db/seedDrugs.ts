@@ -1,4 +1,4 @@
-import { db } from '@/db/index'
+import { pouchDb, putSetting, getSetting } from '@/db/pouchdb'
 import type { Drug } from '@/db/index'
 
 export type SeedEntry = Pick<Drug, 'brandName' | 'saltName' | 'form' | 'strength'>
@@ -177,30 +177,55 @@ function buildDrugRecord(entry: SeedEntry): Drug {
 }
 
 export async function seedDrugDatabase(): Promise<void> {
-  const count = await db.drugs.count()
-  if (count > 0) return
+  const drugs = SEED_DRUGS.map(entry => ({
+    ...buildDrugRecord(entry),
+    _id: 'drug:' + buildSeedId(entry),
+    type: 'drug' as const,
+  }))
 
-  const drugs = SEED_DRUGS.map(buildDrugRecord)
-  await db.drugs.bulkPut(drugs)
+  // Check which IDs already exist (idempotent: do not re-insert)
+  const existingResult = await pouchDb.allDocs({ keys: drugs.map(d => d._id) })
+  const existingIds = new Set(
+    existingResult.rows
+      .filter(row => !('error' in row))
+      .map(row => row.id)
+  )
+
+  const toInsert = drugs.filter(d => !existingIds.has(d._id))
+  if (toInsert.length > 0) {
+    await pouchDb.bulkDocs(toInsert as PouchDB.Core.PutDocument<Record<string, unknown>>[])
+  }
 }
 
 export async function deduplicateExistingDrugs(): Promise<void> {
-  const flag = await db.settings.get('drugsDeduped')
+  const flag = await getSetting('drugsDeduped')
   if (flag) return
 
-  const all = await db.drugs.toArray()
-  const seen = new Map<string, string>()
-  const toDelete: string[] = []
+  const result = await pouchDb.allDocs({
+    startkey: 'drug:',
+    endkey: 'drug:\uffff',
+    include_docs: true,
+  })
 
-  for (const d of all) {
-    const key = `${d.brandNameLower}|${d.saltNameLower}|${d.form}|${d.strength}`
+  const seen = new Map<string, string>()
+  const toDelete: PouchDB.Core.PutDocument<Record<string, unknown>>[] = []
+
+  for (const row of result.rows) {
+    if (!row.doc) continue
+    const doc = row.doc as Record<string, unknown>
+    if (doc._deleted) continue
+
+    const key = `${doc.brandNameLower}|${doc.saltNameLower}|${doc.form}|${doc.strength}`
     if (seen.has(key)) {
-      toDelete.push(d.id)
+      toDelete.push({ ...doc, _deleted: true } as PouchDB.Core.PutDocument<Record<string, unknown>>)
     } else {
-      seen.set(key, d.id)
+      seen.set(key, doc._id as string)
     }
   }
 
-  if (toDelete.length > 0) await db.drugs.bulkDelete(toDelete)
-  await db.settings.put({ key: 'drugsDeduped', value: true })
+  if (toDelete.length > 0) {
+    await pouchDb.bulkDocs(toDelete)
+  }
+
+  await putSetting('drugsDeduped', true)
 }

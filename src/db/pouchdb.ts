@@ -61,3 +61,32 @@ export async function resetPouchDb(): Promise<void> {
   await pouchDb.destroy()
   pouchDb = createDb()
 }
+
+/** Upsert a settings document by key. */
+export async function putSetting(key: string, value: unknown): Promise<void> {
+  const _id = `settings:${key}`
+  try {
+    const existing = await pouchDb.get(_id)
+    await pouchDb.put({
+      ...(existing as Record<string, unknown>),
+      value,
+      type: 'settings',
+      key,
+    } as PouchDB.Core.PutDocument<Record<string, unknown>>)
+  } catch (err: unknown) {
+    if ((err as PouchDB.Core.Error).status === 404) {
+      await pouchDb.put({ _id, type: 'settings', key, value } as PouchDB.Core.PutDocument<Record<string, unknown>>)
+    } else throw err
+  }
+}
+
+/** Get a settings value by key. Returns undefined if not found. */
+export async function getSetting(key: string): Promise<unknown> {
+  try {
+    const doc = await pouchDb.get(`settings:${key}`)
+    return (doc as Record<string, unknown>).value
+  } catch (err: unknown) {
+    if ((err as PouchDB.Core.Error).status === 404) return undefined
+    throw err
+  }
+}

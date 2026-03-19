@@ -1,4 +1,4 @@
-import { db } from './index'
+import { getSetting, putSetting } from './pouchdb'
 
 export interface ClinicInfo {
   doctorName: string
@@ -8,35 +8,31 @@ export interface ClinicInfo {
   footerText: string
 }
 
-const CLINIC_KEYS = [
-  'clinicDoctorName',
-  'clinicName',
-  'clinicAddress',
-  'clinicPhone',
-  'clinicFooterText',
-] as const
-
 const DEFAULT_FOOTER = 'This is a computer-generated prescription and does not require a signature'
 
 export async function getClinicInfo(): Promise<ClinicInfo> {
-  const entries = await Promise.all(
-    CLINIC_KEYS.map((key) => db.settings.get(key))
-  )
+  const [doctorName, clinicName, address, phone, footerText] = await Promise.all([
+    getSetting('clinicDoctorName'),
+    getSetting('clinicName'),
+    getSetting('clinicAddress'),
+    getSetting('clinicPhone'),
+    getSetting('clinicFooterText'),
+  ])
   return {
-    doctorName: (entries[0]?.value as string) || '',
-    clinicName: (entries[1]?.value as string) || '',
-    address: (entries[2]?.value as string) || '',
-    phone: (entries[3]?.value as string) || '',
-    footerText: (entries[4]?.value as string) ?? DEFAULT_FOOTER,
+    doctorName: (doctorName as string) || '',
+    clinicName: (clinicName as string) || '',
+    address: (address as string) || '',
+    phone: (phone as string) || '',
+    footerText: (footerText as string) ?? DEFAULT_FOOTER,
   }
 }
 
 export async function saveClinicInfo(info: ClinicInfo): Promise<void> {
-  await db.transaction('rw', db.settings, async () => {
-    await db.settings.put({ key: 'clinicDoctorName', value: info.doctorName })
-    await db.settings.put({ key: 'clinicName', value: info.clinicName })
-    await db.settings.put({ key: 'clinicAddress', value: info.address })
-    await db.settings.put({ key: 'clinicPhone', value: info.phone })
-    await db.settings.put({ key: 'clinicFooterText', value: info.footerText })
-  })
+  await Promise.all([
+    putSetting('clinicDoctorName', info.doctorName),
+    putSetting('clinicName', info.clinicName),
+    putSetting('clinicAddress', info.address),
+    putSetting('clinicPhone', info.phone),
+    putSetting('clinicFooterText', info.footerText),
+  ])
 }
