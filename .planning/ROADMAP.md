@@ -229,7 +229,7 @@ Plans:
 | 16. Auto-Print Toggle | v1.4 | 1/1 | Complete | 2026-03-19 |
 | 17. Visit Vitals | v1.5 | 2/2 | Complete | 2026-03-19 |
 | 18. Unified Medication Management | v1.6 | 2/2 | Complete | 2026-03-19 |
-| 19. PouchDB Migration | 3/3 | Complete   | 2026-03-19 | - |
+| 19. PouchDB Migration | 3/3 | Complete    | 2026-03-19 | - |
 | 20. CouchDB Infrastructure | v2.0 | 0/TBD | Not started | - |
 | 21. Auth and Role Enforcement | v2.0 | 0/TBD | Not started | - |
 | 22. Live Sync | v2.0 | 0/TBD | Not started | - |
