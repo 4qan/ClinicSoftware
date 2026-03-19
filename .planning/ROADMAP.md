@@ -79,7 +79,7 @@
 **Milestone Goal:** Nurse and doctor work on separate computers. Nurse creates patients and records vitals. Doctor sees everything and writes prescriptions. Data syncs over LAN via CouchDB/PouchDB, no internet required.
 
 - [x] **Phase 19: PouchDB Migration** - Replace Dexie with PouchDB and migrate all existing clinic data without loss (completed 2026-03-19)
-- [ ] **Phase 20: CouchDB Infrastructure** - CouchDB running as a secured Windows service on the doctor's machine, accessible from nurse's machine over LAN
+- [x] **Phase 20: CouchDB Infrastructure** - CouchDB running as a secured Windows service on the doctor's machine, accessible from nurse's machine over LAN (completed 2026-03-19)
 - [ ] **Phase 21: Auth and Role Enforcement** - Two-user login with CouchDB session auth and role-based access gating
 - [ ] **Phase 22: Live Sync** - Bidirectional real-time sync between machines with visible sync status
 - [ ] **Phase 23: Backup Redesign** - Backup and restore adapted for the synced multi-machine environment
@@ -170,7 +170,7 @@ Plans:
   2. From the nurse's machine, a browser can reach the CouchDB endpoint at the doctor's LAN IP on port 5984
   3. CouchDB rejects unauthenticated requests and requires valid credentials before allowing any data access
   4. A nurse-authenticated request to write a prescription document is rejected by CouchDB, even if attempted directly (not through the app UI)
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 20-01-PLAN.md -- CouchDB setup scripts, configuration, validate_doc_update, verification
 - [ ] 20-02-PLAN.md -- Manual verification on doctor's Windows machine (checkpoint)
@@ -233,7 +233,7 @@ Plans:
 | 17. Visit Vitals | v1.5 | 2/2 | Complete | 2026-03-19 |
 | 18. Unified Medication Management | v1.6 | 2/2 | Complete | 2026-03-19 |
 | 19. PouchDB Migration | v2.0 | 3/3 | Complete | 2026-03-19 |
-| 20. CouchDB Infrastructure | 1/2 | In Progress|  | - |
+| 20. CouchDB Infrastructure | 2/2 | Complete    | 2026-03-19 | - |
 | 21. Auth and Role Enforcement | v2.0 | 0/TBD | Not started | - |
 | 22. Live Sync | v2.0 | 0/TBD | Not started | - |
 | 23. Backup Redesign | v2.0 | 0/TBD | Not started | - |
