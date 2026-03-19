@@ -20,6 +20,7 @@ Instead of building a traditional client-server app, I went with a **zero-backen
 - **Browser-local storage**: All data lives in IndexedDB via Dexie.js. Nothing leaves the device.
 - **Local auth**: PBKDF2-hashed passwords stored client-side. No server to authenticate against.
 - **Manual backups**: JSON export/import instead of cloud sync. The user controls their data.
+- **Auto-print control**: Toggle automatic slip printing on/off from settings
 
 This eliminates infrastructure costs, removes network dependency, and keeps patient data physically on the clinic's machine.
 
@@ -35,6 +36,19 @@ This eliminates infrastructure costs, removes network dependency, and keeps pati
 - Form-aware quantity suggestions (tablets vs syrups vs topicals)
 - Custom drug entry for unlisted medications
 - Frequency and duration dropdowns with common clinical values
+- Per-medication slip assignment: tag each drug as dispensary or prescription
+- Each slip prints only its tagged medications
+
+**Vitals**
+- Optional vital signs per visit: temperature (F/C toggle), blood pressure, weight, SpO2
+- Compact badges in visit history cards for quick clinical reference
+- Collapsible input section, all fields optional
+
+**Medications Management**
+- Dedicated top-level page for managing all drugs (predefined and custom)
+- Full CRUD with search and filtering
+- Override model: edit predefined drugs with reset-to-default capability
+- Seed-once logic ensures predefined drugs load only on first use
 
 **Bilingual Printing (English + Urdu)**
 - Configurable paper sizes (A5, A4, Letter) for prescription and dispensary slips independently
