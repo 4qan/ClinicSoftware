@@ -30,3 +30,7 @@ dist-ssr
 dev-dist/
 playwright-report/
 test-results/
+
+# PouchDB local database directories (created at runtime)
+ClinicSoftware_v2/
+ClinicSoftware/
