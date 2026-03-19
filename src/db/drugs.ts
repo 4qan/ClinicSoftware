@@ -28,7 +28,7 @@ export async function searchDrugs(query: string): Promise<Drug[]> {
   const seen = new Set<string>()
   const results: Drug[] = []
   for (const d of [...byBrand.docs, ...bySalt.docs]) {
-    const drug = stripPouchFields<Drug>(d as Record<string, unknown>)
+    const drug = stripPouchFields<Drug>(d as unknown as Record<string, unknown>)
     const key = `${drug.brandNameLower}|${drug.saltNameLower}|${drug.form}|${drug.strength}`
     if (!seen.has(key)) {
       seen.add(key)
@@ -72,7 +72,7 @@ export async function updateDrug(
   const doc = await pouchDb.get('drug:' + id)
   if (!doc) throw new Error('Drug not found')
 
-  const existing = stripPouchFields<Drug>(doc as Record<string, unknown>)
+  const existing = stripPouchFields<Drug>(doc as unknown as Record<string, unknown>)
   const updates: Partial<Drug> & Record<string, unknown> = { ...data, updatedAt: new Date().toISOString() }
   if (!existing.isCustom) {
     updates.isOverridden = true
@@ -93,7 +93,7 @@ export async function updateDrug(
   }
 
   await pouchDb.put({
-    ...(doc as Record<string, unknown>),
+    ...(doc as unknown as Record<string, unknown>),
     ...updates,
   } as PouchDB.Core.PutDocument<Record<string, unknown>>)
 }
@@ -110,9 +110,9 @@ export async function toggleDrugActive(id: string): Promise<void> {
   const doc = await pouchDb.get('drug:' + id)
   if (!doc) throw new Error('Drug not found')
 
-  const existing = stripPouchFields<Drug>(doc as Record<string, unknown>)
+  const existing = stripPouchFields<Drug>(doc as unknown as Record<string, unknown>)
   await pouchDb.put({
-    ...(doc as Record<string, unknown>),
+    ...(doc as unknown as Record<string, unknown>),
     isActive: !existing.isActive,
     updatedAt: new Date().toISOString(),
   } as PouchDB.Core.PutDocument<Record<string, unknown>>)
@@ -133,7 +133,7 @@ export async function resetDrugToDefault(id: string): Promise<void> {
   const doc = await pouchDb.get('drug:' + id)
   if (!doc) throw new Error('Drug not found')
 
-  const existing = stripPouchFields<Drug>(doc as Record<string, unknown>)
+  const existing = stripPouchFields<Drug>(doc as unknown as Record<string, unknown>)
   if (existing.isCustom) throw new Error('Custom drugs have no default to reset to')
 
   // Match by: deterministic seed ID -> stored seedKey -> partial property match
@@ -152,7 +152,7 @@ export async function resetDrugToDefault(id: string): Promise<void> {
   if (!seedEntry) throw new Error('No seed entry found for this drug')
 
   await pouchDb.put({
-    ...(doc as Record<string, unknown>),
+    ...(doc as unknown as Record<string, unknown>),
     brandName: seedEntry.brandName,
     brandNameLower: seedEntry.brandName.toLowerCase(),
     saltName: seedEntry.saltName,
@@ -171,7 +171,7 @@ export async function getCustomDrugs(): Promise<Drug[]> {
     selector: { type: 'drug', isCustom: true },
     limit: 5000,
   })
-  return result.docs.map(d => stripPouchFields<Drug>(d as Record<string, unknown>))
+  return result.docs.map(d => stripPouchFields<Drug>(d as unknown as Record<string, unknown>))
 }
 
 export async function getAllDrugs(): Promise<Drug[]> {
@@ -179,7 +179,7 @@ export async function getAllDrugs(): Promise<Drug[]> {
     selector: { type: 'drug', isActive: true },
     limit: 5000,
   })
-  return result.docs.map(d => stripPouchFields<Drug>(d as Record<string, unknown>))
+  return result.docs.map(d => stripPouchFields<Drug>(d as unknown as Record<string, unknown>))
 }
 
 export async function getAllDrugsUnfiltered(): Promise<Drug[]> {
@@ -189,6 +189,6 @@ export async function getAllDrugsUnfiltered(): Promise<Drug[]> {
     include_docs: true,
   })
   return result.rows
-    .filter(row => row.doc && !(row.doc as Record<string, unknown>)._deleted)
-    .map(row => stripPouchFields<Drug>(row.doc as Record<string, unknown>))
+    .filter(row => row.doc && !(row.doc as unknown as Record<string, unknown>)._deleted)
+    .map(row => stripPouchFields<Drug>(row.doc as unknown as Record<string, unknown>))
 }

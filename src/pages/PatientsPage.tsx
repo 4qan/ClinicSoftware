@@ -16,7 +16,7 @@ export function PatientsPage() {
     }).then(result => {
       const pts = result.rows
         .map(r => r.doc as any)
-        .map(({ _id, _rev, type, ...rest }: { _id: string; _rev: string; type: string; [key: string]: unknown }) => rest as Patient)
+        .map(({ _id, _rev, type, ...rest }: { _id: string; _rev: string; type: string; [key: string]: unknown }) => rest as unknown as Patient)
         .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       setPatients(pts)
     })

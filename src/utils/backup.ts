@@ -49,7 +49,7 @@ export async function exportDatabase(): Promise<BackupFile> {
 
   for (const row of result.rows) {
     if (!row.doc || row.id.startsWith('_design/')) continue
-    const doc = row.doc as Record<string, unknown>
+    const doc = row.doc as unknown as Record<string, unknown>
     const typeName = doc.type as string
     if (!typeName) continue
 

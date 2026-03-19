@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { resetDatabase } from '@/db/index'
-import { pouchDb, putSetting } from '@/db/pouchdb'
+import { pouchDb } from '@/db/pouchdb'
 
 import {
   exportDatabase,

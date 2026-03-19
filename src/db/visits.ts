@@ -83,7 +83,7 @@ export async function updateVisit(visitId: string, data: UpdateVisitData): Promi
 
   // Update visit
   await pouchDb.put({
-    ...(existingDoc as Record<string, unknown>),
+    ...(existingDoc as unknown as Record<string, unknown>),
     clinicalNotes: data.clinicalNotes,
     rxNotes: data.rxNotes,
     rxNotesLang: data.rxNotesLang,
@@ -102,7 +102,7 @@ export async function updateVisit(visitId: string, data: UpdateVisitData): Promi
   })
   if (oldMedsResult.docs.length > 0) {
     await pouchDb.bulkDocs(
-      oldMedsResult.docs.map(m => ({ ...(m as Record<string, unknown>), _deleted: true })) as PouchDB.Core.PutDocument<Record<string, unknown>>[]
+      oldMedsResult.docs.map(m => ({ ...(m as unknown as Record<string, unknown>), _deleted: true })) as PouchDB.Core.PutDocument<Record<string, unknown>>[]
     )
   }
 
@@ -131,8 +131,8 @@ export async function deleteVisit(visitId: string): Promise<void> {
     limit: 1000,
   })
 
-  const deletedVisit = { ...(visitDoc as Record<string, unknown>), _deleted: true }
-  const deletedMeds = medsResult.docs.map(m => ({ ...(m as Record<string, unknown>), _deleted: true }))
+  const deletedVisit = { ...(visitDoc as unknown as Record<string, unknown>), _deleted: true }
+  const deletedMeds = medsResult.docs.map(m => ({ ...(m as unknown as Record<string, unknown>), _deleted: true }))
 
   await pouchDb.bulkDocs(
     [deletedVisit, ...deletedMeds] as PouchDB.Core.PutDocument<Record<string, unknown>>[]
@@ -144,7 +144,7 @@ export async function getVisit(
 ): Promise<{ visit: Visit; medications: VisitMedication[] } | null> {
   let visitDoc: Record<string, unknown>
   try {
-    visitDoc = await pouchDb.get('visit:' + visitId) as Record<string, unknown>
+    visitDoc = await pouchDb.get('visit:' + visitId) as unknown as Record<string, unknown>
   } catch (err: unknown) {
     if ((err as PouchDB.Core.Error).status === 404) return null
     throw err
@@ -156,7 +156,7 @@ export async function getVisit(
   })
 
   const medications = medsResult.docs
-    .map(m => stripPouchFields<VisitMedication>(m as Record<string, unknown>))
+    .map(m => stripPouchFields<VisitMedication>(m as unknown as Record<string, unknown>))
     .sort((a, b) => a.sortOrder - b.sortOrder)
 
   return {
@@ -175,7 +175,7 @@ export async function getPatientVisits(
 
   // Sort by createdAt descending
   const visitDocs = visitsResult.docs
-    .map(d => d as Record<string, unknown>)
+    .map(d => d as unknown as Record<string, unknown>)
     .sort((a, b) =>
       String(b.createdAt ?? '').localeCompare(String(a.createdAt ?? ''))
     )
@@ -190,7 +190,7 @@ export async function getPatientVisits(
     })
 
     const medications = medsResult.docs
-      .map(m => stripPouchFields<VisitMedication>(m as Record<string, unknown>))
+      .map(m => stripPouchFields<VisitMedication>(m as unknown as Record<string, unknown>))
       .sort((a, b) => a.sortOrder - b.sortOrder)
 
     results.push({

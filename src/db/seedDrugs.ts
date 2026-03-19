@@ -187,8 +187,8 @@ export async function seedDrugDatabase(): Promise<void> {
   const existingResult = await pouchDb.allDocs({ keys: drugs.map(d => d._id) })
   const existingIds = new Set(
     existingResult.rows
-      .filter(row => !('error' in row))
-      .map(row => row.id)
+      .filter(row => !('error' in row) && 'id' in row)
+      .map(row => (row as { id: string }).id)
   )
 
   const toInsert = drugs.filter(d => !existingIds.has(d._id))
@@ -212,7 +212,7 @@ export async function deduplicateExistingDrugs(): Promise<void> {
 
   for (const row of result.rows) {
     if (!row.doc) continue
-    const doc = row.doc as Record<string, unknown>
+    const doc = row.doc as unknown as Record<string, unknown>
     if (doc._deleted) continue
 
     const key = `${doc.brandNameLower}|${doc.saltNameLower}|${doc.form}|${doc.strength}`

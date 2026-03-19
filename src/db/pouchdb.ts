@@ -112,7 +112,7 @@ export async function putSetting(key: string, value: unknown): Promise<void> {
   try {
     const existing = await pouchDb.get(_id)
     await pouchDb.put({
-      ...(existing as Record<string, unknown>),
+      ...(existing as unknown as Record<string, unknown>),
       value,
       type: 'settings',
       key,
@@ -128,7 +128,7 @@ export async function putSetting(key: string, value: unknown): Promise<void> {
 export async function getSetting(key: string): Promise<unknown> {
   try {
     const doc = await pouchDb.get(`settings:${key}`)
-    return (doc as Record<string, unknown>).value
+    return (doc as unknown as Record<string, unknown>).value
   } catch (err: unknown) {
     if ((err as PouchDB.Core.Error).status === 404) return undefined
     throw err

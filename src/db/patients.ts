@@ -29,8 +29,8 @@ export async function generatePatientId(): Promise<string> {
 
       try {
         const existing = await pouchDb.get('settings:patientCounter')
-        existingRev = (existing as Record<string, unknown>)._rev as string
-        currentCounter = (existing as Record<string, unknown>).value as number
+        existingRev = (existing as unknown as Record<string, unknown>)._rev as string
+        currentCounter = (existing as unknown as Record<string, unknown>).value as number
       } catch (err: unknown) {
         if ((err as PouchDB.Core.Error).status !== 404) throw err
       }
@@ -63,7 +63,7 @@ export async function getNextPatientId(): Promise<string> {
   let currentCounter = 0
   try {
     const existing = await pouchDb.get('settings:patientCounter')
-    currentCounter = (existing as Record<string, unknown>).value as number
+    currentCounter = (existing as unknown as Record<string, unknown>).value as number
   } catch (err: unknown) {
     if ((err as PouchDB.Core.Error).status !== 404) throw err
   }
@@ -102,7 +102,7 @@ export async function registerPatient(data: PatientInput): Promise<Patient> {
     let recentRev: string | undefined
     try {
       const existing = await pouchDb.get('recent:' + id)
-      recentRev = (existing as Record<string, unknown>)._rev as string
+      recentRev = (existing as unknown as Record<string, unknown>)._rev as string
     } catch (err: unknown) {
       if ((err as PouchDB.Core.Error).status !== 404) throw err
     }
@@ -127,7 +127,7 @@ export async function registerPatient(data: PatientInput): Promise<Patient> {
 export async function getPatient(id: string): Promise<Patient | undefined> {
   try {
     const doc = await pouchDb.get('patient:' + id)
-    return stripPouchFields<Patient>(doc as Record<string, unknown>)
+    return stripPouchFields<Patient>(doc as unknown as Record<string, unknown>)
   } catch (err: unknown) {
     if ((err as PouchDB.Core.Error).status === 404) return undefined
     throw err
@@ -149,10 +149,10 @@ export async function updatePatient(id: string, changes: Partial<PatientInput>):
   }
   const withUpdate = withTimestamps(update, false)
   await pouchDb.put({
-    ...(doc as Record<string, unknown>),
+    ...(doc as unknown as Record<string, unknown>),
     ...withUpdate,
-    _id: (doc as Record<string, unknown>)._id,
-    _rev: (doc as Record<string, unknown>)._rev,
+    _id: (doc as unknown as Record<string, unknown>)._id,
+    _rev: (doc as unknown as Record<string, unknown>)._rev,
     type: 'patient',
   } as PouchDB.Core.PutDocument<Record<string, unknown>>)
 }
@@ -169,7 +169,7 @@ export async function searchPatients(query: string): Promise<Patient[]> {
       selector: { type: 'patient', patientId: { $gte: trimmed, $lte: trimmed + '\uffff' } },
       limit: 10,
     })
-    const patients = result.docs.map(d => stripPouchFields<Patient>(d as Record<string, unknown>))
+    const patients = result.docs.map(d => stripPouchFields<Patient>(d as unknown as Record<string, unknown>))
     if (patients.length > 0) return patients
   }
 
@@ -179,7 +179,7 @@ export async function searchPatients(query: string): Promise<Patient[]> {
       selector: { type: 'patient', contact: { $gte: trimmed, $lte: trimmed + '\uffff' } },
       limit: 10,
     })
-    return result.docs.map(d => stripPouchFields<Patient>(d as Record<string, unknown>))
+    return result.docs.map(d => stripPouchFields<Patient>(d as unknown as Record<string, unknown>))
   }
 
   // Pure digits that didn't match patient ID: try both patientId and contact
@@ -188,14 +188,14 @@ export async function searchPatients(query: string): Promise<Patient[]> {
       selector: { type: 'patient', patientId: { $gte: trimmed, $lte: trimmed + '\uffff' } },
       limit: 10,
     })
-    const byIdPatients = byId.docs.map(d => stripPouchFields<Patient>(d as Record<string, unknown>))
+    const byIdPatients = byId.docs.map(d => stripPouchFields<Patient>(d as unknown as Record<string, unknown>))
     if (byIdPatients.length > 0) return byIdPatients
 
     const byContact = await pouchDb.find({
       selector: { type: 'patient', contact: { $gte: trimmed, $lte: trimmed + '\uffff' } },
       limit: 10,
     })
-    return byContact.docs.map(d => stripPouchFields<Patient>(d as Record<string, unknown>))
+    return byContact.docs.map(d => stripPouchFields<Patient>(d as unknown as Record<string, unknown>))
   }
 
   // Otherwise: search by name prefix, deduplicate
@@ -213,7 +213,7 @@ export async function searchPatients(query: string): Promise<Patient[]> {
   const seen = new Set<string>()
   const results: Patient[] = []
   for (const doc of [...byFirstName.docs, ...byLastName.docs]) {
-    const p = stripPouchFields<Patient>(doc as Record<string, unknown>)
+    const p = stripPouchFields<Patient>(doc as unknown as Record<string, unknown>)
     if (!seen.has(p.id)) {
       seen.add(p.id)
       results.push(p)
@@ -234,7 +234,7 @@ export async function getRecentPatients(limit: number = 10): Promise<Patient[]> 
   // Sort by viewedAt descending, take first `limit`
   const sorted = result.rows
     .filter(row => row.doc)
-    .map(row => row.doc as Record<string, unknown>)
+    .map(row => row.doc as unknown as Record<string, unknown>)
     .sort((a, b) =>
       String(b.viewedAt ?? '').localeCompare(String(a.viewedAt ?? ''))
     )
@@ -245,7 +245,7 @@ export async function getRecentPatients(limit: number = 10): Promise<Patient[]> 
     const id = recentDoc.id as string
     try {
       const patientDoc = await pouchDb.get('patient:' + id)
-      patients.push(stripPouchFields<Patient>(patientDoc as Record<string, unknown>))
+      patients.push(stripPouchFields<Patient>(patientDoc as unknown as Record<string, unknown>))
     } catch (err: unknown) {
       if ((err as PouchDB.Core.Error).status !== 404) throw err
       // Patient deleted, skip
@@ -259,7 +259,7 @@ export async function addToRecent(patientId: string): Promise<void> {
   let existingRev: string | undefined
   try {
     const existing = await pouchDb.get('recent:' + patientId)
-    existingRev = (existing as Record<string, unknown>)._rev as string
+    existingRev = (existing as unknown as Record<string, unknown>)._rev as string
   } catch (err: unknown) {
     if ((err as PouchDB.Core.Error).status !== 404) throw err
   }
