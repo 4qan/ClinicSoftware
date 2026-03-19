@@ -63,6 +63,14 @@ export async function updateDrug(
   const updates: Partial<Drug> = { ...data, updatedAt: new Date().toISOString() }
   if (!existing.isCustom) {
     updates.isOverridden = true
+    if (!existing.seedKey) {
+      updates.seedKey = buildSeedId({
+        brandName: existing.brandName,
+        saltName: existing.saltName,
+        form: existing.form,
+        strength: existing.strength,
+      })
+    }
   }
   if (data.brandName !== undefined) {
     updates.brandNameLower = data.brandName.toLowerCase()
@@ -106,7 +114,21 @@ export async function resetDrugToDefault(id: string): Promise<void> {
   if (!existing) throw new Error('Drug not found')
   if (existing.isCustom) throw new Error('Custom drugs have no default to reset to')
 
-  const seedEntry = SEED_DRUGS.find(entry => buildSeedId(entry) === id)
+  // Match by: deterministic seed ID → stored seedKey → partial property match
+  // Needed because legacy drugs have UUID IDs from original crypto.randomUUID() seeding
+  let seedEntry = SEED_DRUGS.find(entry => buildSeedId(entry) === id)
+  if (!seedEntry && existing.seedKey) {
+    seedEntry = SEED_DRUGS.find(entry => buildSeedId(entry) === existing.seedKey)
+  }
+  if (!seedEntry) {
+    // Last resort: match by brand + form + strength (unchanged fields for most edits)
+    const matches = SEED_DRUGS.filter(entry =>
+      entry.brandName.toLowerCase() === existing.brandNameLower &&
+      entry.form === existing.form &&
+      entry.strength === existing.strength
+    )
+    if (matches.length === 1) seedEntry = matches[0]
+  }
   if (!seedEntry) throw new Error('No seed entry found for this drug')
 
   await db.drugs.update(id, {
@@ -117,6 +139,7 @@ export async function resetDrugToDefault(id: string): Promise<void> {
     form: seedEntry.form,
     strength: seedEntry.strength,
     isOverridden: false,
+    seedKey: undefined,
     isActive: true,
     updatedAt: new Date().toISOString(),
   })

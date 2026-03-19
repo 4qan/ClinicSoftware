@@ -24,7 +24,7 @@ export function MedicationsPage() {
   const [filter, setFilter] = useState<FilterType>('all')
   const [modalOpen, setModalOpen] = useState(false)
   const [editingDrug, setEditingDrug] = useState<Drug | undefined>(undefined)
-  const [confirm, setConfirm] = useState<ConfirmState | null>(null)
+  const [confirmAction, setConfirmAction] = useState<ConfirmState | null>(null)
   const [loading, setLoading] = useState(true)
 
   async function loadDrugs() {
@@ -79,22 +79,27 @@ export function MedicationsPage() {
   }
 
   function requestDelete(drug: Drug) {
-    setConfirm({ type: 'delete', drugId: drug.id })
+    setConfirmAction({ type: 'delete', drugId: drug.id })
   }
 
   function requestReset(drug: Drug) {
-    setConfirm({ type: 'reset', drugId: drug.id })
+    setConfirmAction({ type: 'reset', drugId: drug.id })
   }
 
   async function handleConfirm() {
-    if (!confirm) return
-    if (confirm.type === 'delete') {
-      await deleteDrug(confirm.drugId)
-    } else {
-      await resetDrugToDefault(confirm.drugId)
+    if (!confirmAction) return
+    try {
+      if (confirmAction.type === 'delete') {
+        await deleteDrug(confirmAction.drugId)
+      } else {
+        await resetDrugToDefault(confirmAction.drugId)
+      }
+      setConfirmAction(null)
+      await loadDrugs()
+    } catch (err) {
+      alert(`Operation failed: ${err instanceof Error ? err.message : String(err)}`)
+      setConfirmAction(null)
     }
-    setConfirm(null)
-    await loadDrugs()
   }
 
   const filterLabels: { key: FilterType; label: string }[] = [
@@ -170,7 +175,7 @@ export function MedicationsPage() {
             </thead>
             <tbody>
               {filtered.map((drug) => {
-                const isConfirming = confirm?.drugId === drug.id
+                const isConfirming = confirmAction?.drugId === drug.id
                 return (
                   <tr
                     key={drug.id}
@@ -213,13 +218,13 @@ export function MedicationsPage() {
                       {isConfirming ? (
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-xs text-gray-700">
-                            {confirm?.type === 'delete'
+                            {confirmAction?.type === 'delete'
                               ? 'Delete this medication? This cannot be undone.'
                               : 'This will revert all changes to the original predefined values. This cannot be undone.'}
                           </span>
                           <button
                             type="button"
-                            onClick={() => setConfirm(null)}
+                            onClick={() => setConfirmAction(null)}
                             className="text-xs px-2 py-1 border border-gray-300 rounded hover:bg-gray-50"
                           >
                             Cancel
@@ -228,12 +233,12 @@ export function MedicationsPage() {
                             type="button"
                             onClick={handleConfirm}
                             className={`text-xs px-2 py-1 rounded text-white ${
-                              confirm?.type === 'delete'
+                              confirmAction?.type === 'delete'
                                 ? 'bg-red-600 hover:bg-red-700'
                                 : 'bg-amber-600 hover:bg-amber-700'
                             }`}
                           >
-                            {confirm?.type === 'delete' ? 'Delete' : 'Reset'}
+                            {confirmAction?.type === 'delete' ? 'Delete' : 'Reset'}
                           </button>
                         </div>
                       ) : (

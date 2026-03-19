@@ -36,6 +36,7 @@ export interface Drug {
   isCustom: boolean
   isActive: boolean
   isOverridden?: boolean
+  seedKey?: string
   createdAt: string
   updatedAt: string
 }
