@@ -185,7 +185,11 @@ Plans:
   3. Logging in as nurse restricts navigation to patient search, patient creation, and vitals recording only
   4. Nurse attempting to navigate to a doctor-only route is redirected to an accessible page
   5. App header shows the logged-in user's role label ("Doctor" or "Nurse")
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 21-01-PLAN.md -- CouchDB auth foundation: useCouchAuth hook, LoginPage rewrite, tests
+- [ ] 21-02-PLAN.md -- Role enforcement UI: ProtectedRoute, sidebar filtering, visit form restrictions
+- [ ] 21-03-PLAN.md -- Password management, install script defaults, old auth cleanup
 
 ### Phase 22: Live Sync
 **Goal**: Data created or edited on one machine appears on the other within seconds; both machines keep working if the network drops and sync resumes automatically when connectivity returns
@@ -197,7 +201,11 @@ Plans:
   3. After WiFi is restored, changes made offline on either machine sync automatically without user intervention
   4. Settings page shows current sync state (syncing / synced / disconnected) and is accurate when the network is toggled
   5. If the doctor's machine is off, nurse keeps working; her data appears on the doctor's machine once it comes back online
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 21-01-PLAN.md -- CouchDB auth foundation: useCouchAuth hook, LoginPage rewrite, tests
+- [ ] 21-02-PLAN.md -- Role enforcement UI: ProtectedRoute, sidebar filtering, visit form restrictions
+- [ ] 21-03-PLAN.md -- Password management, install script defaults, old auth cleanup
 
 ### Phase 23: Backup Redesign
 **Goal**: Manual export still produces a downloadable backup file; restore pushes data to the shared CouchDB so both machines reflect the restored state via sync; auto-snapshots continue working
@@ -207,7 +215,11 @@ Plans:
   1. Doctor can export a backup file from Settings; the file contains all clinic data in a downloadable format
   2. After a restore, both the doctor's and nurse's machines show the restored data without manual steps on the nurse's machine
   3. Auto-snapshots continue to trigger and rotate (24h interval, 3-copy rotation) after the PouchDB migration
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 21-01-PLAN.md -- CouchDB auth foundation: useCouchAuth hook, LoginPage rewrite, tests
+- [ ] 21-02-PLAN.md -- Role enforcement UI: ProtectedRoute, sidebar filtering, visit form restrictions
+- [ ] 21-03-PLAN.md -- Password management, install script defaults, old auth cleanup
 
 ## Progress
 
@@ -234,9 +246,9 @@ Plans:
 | 18. Unified Medication Management | v1.6 | 2/2 | Complete | 2026-03-19 |
 | 19. PouchDB Migration | v2.0 | 3/3 | Complete | 2026-03-19 |
 | 20. CouchDB Infrastructure | 2/2 | Complete    | 2026-03-19 | - |
-| 21. Auth and Role Enforcement | v2.0 | 0/TBD | Not started | - |
+| 21. Auth and Role Enforcement | v2.0 | 0/3 | Not started | - |
 | 22. Live Sync | v2.0 | 0/TBD | Not started | - |
 | 23. Backup Redesign | v2.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-03-19 -- Phase 20 plans created (2 plans, 2 waves)*
+*Last updated: 2026-03-19 -- Phase 21 plans created (3 plans, 2 waves)*

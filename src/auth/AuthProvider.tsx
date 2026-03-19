@@ -1,7 +1,7 @@
 import { createContext, useContext, type ReactNode } from 'react'
-import { useAuth } from './useAuth'
+import { useCouchAuth } from './useCouchAuth'
 
-type AuthContextType = ReturnType<typeof useAuth>
+type AuthContextType = ReturnType<typeof useCouchAuth>
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
@@ -18,6 +18,6 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const auth = useAuth()
+  const auth = useCouchAuth()
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
 }
