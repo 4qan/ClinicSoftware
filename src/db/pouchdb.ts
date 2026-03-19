@@ -4,6 +4,14 @@ import type { Patient, Drug, Visit, VisitMedication, AppSettings, RecentPatient 
 
 PouchDB.plugin(PouchDBFind)
 
+// Register memory adapter in test environment to avoid LevelDB lock contention
+if (import.meta.env.VITEST) {
+  // Dynamic import is not available at module level; use require-style approach
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const memoryAdapter = require('pouchdb-adapter-memory')
+  PouchDB.plugin(memoryAdapter)
+}
+
 export interface PouchPatient extends Patient {
   _id: string
   _rev?: string
@@ -41,6 +49,9 @@ export interface PouchRecentPatient extends RecentPatient {
 }
 
 function createDb(): PouchDB.Database {
+  if (import.meta.env.VITEST) {
+    return new PouchDB('ClinicSoftware_v2', { adapter: 'memory' })
+  }
   return new PouchDB('ClinicSoftware_v2')
 }
 

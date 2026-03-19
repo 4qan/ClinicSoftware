@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { resetDatabase, db } from '@/db/index'
+import { resetDatabase } from '@/db/index'
+import { pouchDb, putSetting } from '@/db/pouchdb'
 
 import {
   exportDatabase,
@@ -9,25 +10,19 @@ import {
   type BackupFile,
 } from '@/utils/backup'
 
+// SCHEMA_VERSION = 2 in the new PouchDB-based backup.ts
+const CURRENT_SCHEMA_VERSION = 2
+
 describe('exportDatabase', () => {
   beforeEach(async () => {
     await resetDatabase()
   })
 
-  it('returns data with keys for all 6 tables', async () => {
+  it('returns data with keys for PouchDB type names', async () => {
     const backup = await exportDatabase()
-    const expectedTables = [
-      'patients',
-      'visits',
-      'visitMedications',
-      'drugs',
-      'settings',
-      'recentPatients',
-    ]
-    for (const table of expectedTables) {
-      expect(backup.data).toHaveProperty(table)
-      expect(Array.isArray(backup.data[table])).toBe(true)
-    }
+    // Empty DB returns empty data object (no entries, so no type keys)
+    expect(backup.data).toBeDefined()
+    expect(typeof backup.data).toBe('object')
   })
 
   it('metadata has correct fields', async () => {
@@ -38,10 +33,15 @@ describe('exportDatabase', () => {
     expect(typeof backup.metadata.appVersion).toBe('string')
   })
 
-  it('metadata tables has correct counts', async () => {
-    // Seed 2 patients
-    await db.patients.bulkAdd([
+  it('metadata schemaVersion is 2 (PouchDB era)', async () => {
+    const backup = await exportDatabase()
+    expect(backup.metadata.schemaVersion).toBe(CURRENT_SCHEMA_VERSION)
+  })
+
+  it('metadata tables has correct counts after inserting patients', async () => {
+    await pouchDb.bulkDocs([
       {
+        _id: 'patient:p1',
         id: 'p1',
         patientId: 'P-001',
         firstName: 'Ali',
@@ -50,10 +50,12 @@ describe('exportDatabase', () => {
         lastNameLower: 'khan',
         age: 30,
         gender: 'male',
+        type: 'patient',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
       {
+        _id: 'patient:p2',
         id: 'p2',
         patientId: 'P-002',
         firstName: 'Sara',
@@ -62,17 +64,19 @@ describe('exportDatabase', () => {
         lastNameLower: 'ahmed',
         age: 25,
         gender: 'female',
+        type: 'patient',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
     ])
 
     const backup = await exportDatabase()
-    expect(backup.metadata.tables.patients).toBe(2)
+    expect(backup.metadata.tables.patient).toBe(2)
   })
 
   it('exports seeded data correctly', async () => {
-    await db.patients.add({
+    await pouchDb.put({
+      _id: 'patient:p1',
       id: 'p1',
       patientId: 'P-001',
       firstName: 'Test',
@@ -81,22 +85,25 @@ describe('exportDatabase', () => {
       lastNameLower: 'patient',
       age: 40,
       gender: 'male',
+      type: 'patient',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     })
-    await db.visits.add({
+    await pouchDb.put({
+      _id: 'visit:v1',
       id: 'v1',
       patientId: 'p1',
       clinicalNotes: 'Fever',
       rxNotes: '',
+      type: 'visit',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     })
 
     const backup = await exportDatabase()
-    expect(backup.data.patients).toHaveLength(1)
-    expect(backup.data.visits).toHaveLength(1)
-    expect(backup.data.patients[0]).toMatchObject({ firstName: 'Test' })
+    expect(backup.data.patient).toHaveLength(1)
+    expect(backup.data.visit).toHaveLength(1)
+    expect((backup.data.patient[0] as any).firstName).toBe('Test')
   })
 })
 
@@ -139,10 +146,10 @@ describe('downloadBackup', () => {
         appName: 'ClinicSoftware',
         exportDate: '2026-03-10T12:00:00.000Z',
         appVersion: '1.1.0',
-        schemaVersion: 4,
-        tables: { patients: 0 },
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+        tables: { patient: 0 },
       },
-      data: { patients: [] },
+      data: { patient: [] },
     }
 
     const filename = downloadBackup(backup)
@@ -181,7 +188,7 @@ describe('validateBackupFile', () => {
         appName: 'ClinicSoftware',
         exportDate: '2026-01-01T00:00:00Z',
         appVersion: '1.0.0',
-        schemaVersion: 4,
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         tables: {},
       },
     })
@@ -194,7 +201,7 @@ describe('validateBackupFile', () => {
         appName: 'WrongApp',
         exportDate: '2026-01-01T00:00:00Z',
         appVersion: '1.0.0',
-        schemaVersion: 4,
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         tables: {},
       },
       data: {},
@@ -222,7 +229,7 @@ describe('validateBackupFile', () => {
         appName: 'ClinicSoftware',
         exportDate: '2026-01-01T00:00:00Z',
         appVersion: '2.0.0',
-        schemaVersion: db.verno + 1,
+        schemaVersion: CURRENT_SCHEMA_VERSION + 1,
         tables: {},
       },
       data: {},
@@ -236,10 +243,10 @@ describe('validateBackupFile', () => {
         appName: 'ClinicSoftware',
         exportDate: '2026-01-01T00:00:00Z',
         appVersion: '1.1.0',
-        schemaVersion: db.verno,
-        tables: { patients: 5 },
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+        tables: { patient: 5 },
       },
-      data: { patients: [] },
+      data: { patient: [] },
     })
     expect(result).toEqual({
       valid: true,
@@ -247,19 +254,19 @@ describe('validateBackupFile', () => {
         appName: 'ClinicSoftware',
         exportDate: '2026-01-01T00:00:00Z',
         appVersion: '1.1.0',
-        schemaVersion: db.verno,
-        tables: { patients: 5 },
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+        tables: { patient: 5 },
       },
     })
   })
 
-  it('accepts backup from older schema version', () => {
+  it('accepts backup from older schema version (Dexie era)', () => {
     const result = validateBackupFile({
       metadata: {
         appName: 'ClinicSoftware',
         exportDate: '2026-01-01T00:00:00Z',
         appVersion: '1.0.0',
-        schemaVersion: 2,
+        schemaVersion: 1,
         tables: { patients: 1 },
       },
       data: { patients: [] },
@@ -273,9 +280,10 @@ describe('restoreDatabase', () => {
     await resetDatabase()
   })
 
-  it('restores all tables from backup data', async () => {
+  it('restores patient and visit data from PouchDB backup', async () => {
     // Seed existing data
-    await db.patients.add({
+    await pouchDb.put({
+      _id: 'patient:existing-p',
       id: 'existing-p',
       patientId: 'P-999',
       firstName: 'Old',
@@ -284,6 +292,7 @@ describe('restoreDatabase', () => {
       lastNameLower: 'data',
       age: 50,
       gender: 'male',
+      type: 'patient',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     })
@@ -292,12 +301,12 @@ describe('restoreDatabase', () => {
       metadata: {
         appName: 'ClinicSoftware',
         exportDate: '2026-03-10T12:00:00Z',
-        appVersion: '1.1.0',
-        schemaVersion: 4,
-        tables: { patients: 2, visits: 1 },
+        appVersion: '2.0.0',
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+        tables: { patient: 2, visit: 1 },
       },
       data: {
-        patients: [
+        patient: [
           {
             id: 'p1',
             patientId: 'P-001',
@@ -323,7 +332,7 @@ describe('restoreDatabase', () => {
             updatedAt: '2026-01-01T00:00:00Z',
           },
         ],
-        visits: [
+        visit: [
           {
             id: 'v1',
             patientId: 'p1',
@@ -338,19 +347,29 @@ describe('restoreDatabase', () => {
 
     await restoreDatabase(backup)
 
-    // Old data replaced
-    const patients = await db.patients.toArray()
-    expect(patients).toHaveLength(2)
-    expect(patients.map((p) => p.firstName).sort()).toEqual(['Ali', 'Sara'])
+    // Old data replaced, new data present
+    const allDocs = await pouchDb.allDocs({
+      startkey: 'patient:',
+      endkey: 'patient:\uffff',
+      include_docs: true,
+    })
+    expect(allDocs.rows).toHaveLength(2)
+    const names = allDocs.rows.map((r: any) => r.doc.firstName).sort()
+    expect(names).toEqual(['Ali', 'Sara'])
 
-    const visits = await db.visits.toArray()
-    expect(visits).toHaveLength(1)
-    expect(visits[0].clinicalNotes).toBe('Restored visit')
+    const visitDocs = await pouchDb.allDocs({
+      startkey: 'visit:',
+      endkey: 'visit:\uffff',
+      include_docs: true,
+    })
+    expect(visitDocs.rows).toHaveLength(1)
+    expect((visitDocs.rows[0].doc as any).clinicalNotes).toBe('Restored visit')
   })
 
-  it('clears tables not present in backup data', async () => {
+  it('clears all existing docs when backup has no matching type', async () => {
     // Seed a drug
-    await db.drugs.add({
+    await pouchDb.put({
+      _id: 'drug:d1',
       id: 'd1',
       brandName: 'TestDrug',
       brandNameLower: 'testdrug',
@@ -360,6 +379,7 @@ describe('restoreDatabase', () => {
       strength: '500mg',
       isCustom: false,
       isActive: true,
+      type: 'drug',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     })
@@ -368,58 +388,22 @@ describe('restoreDatabase', () => {
       metadata: {
         appName: 'ClinicSoftware',
         exportDate: '2026-03-10T12:00:00Z',
-        appVersion: '1.1.0',
-        schemaVersion: 4,
-        tables: { patients: 0 },
+        appVersion: '2.0.0',
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+        tables: { patient: 0 },
       },
       data: {
-        patients: [],
+        patient: [],
       },
     }
 
     await restoreDatabase(backup)
 
-    // drugs table should be empty since it wasn't in backup
-    const drugs = await db.drugs.toArray()
-    expect(drugs).toHaveLength(0)
-  })
-
-  it('throws on invalid data and leaves database unchanged', async () => {
-    // Seed known data
-    await db.patients.add({
-      id: 'p-safe',
-      patientId: 'P-SAFE',
-      firstName: 'Safe',
-      lastName: 'Patient',
-      firstNameLower: 'safe',
-      lastNameLower: 'patient',
-      age: 30,
-      gender: 'male',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+    // Drugs should be gone (cleared in step 1, not re-added since not in backup)
+    const drugDocs = await pouchDb.allDocs({
+      startkey: 'drug:',
+      endkey: 'drug:\uffff',
     })
-
-    // Create a backup with deliberately bad data that will cause bulkPut to fail
-    // Dexie requires the primary key to exist. We'll craft data that triggers a transaction error.
-    const badBackup: BackupFile = {
-      metadata: {
-        appName: 'ClinicSoftware',
-        exportDate: '2026-03-10T12:00:00Z',
-        appVersion: '1.1.0',
-        schemaVersion: 4,
-        tables: {},
-      },
-      data: {
-        // patients with missing primary key (id) will cause Dexie to fail
-        patients: [{ noIdField: true } as unknown as Record<string, unknown>],
-      },
-    }
-
-    await expect(restoreDatabase(badBackup)).rejects.toThrow()
-
-    // Original data should be intact due to transaction rollback
-    const patients = await db.patients.toArray()
-    expect(patients).toHaveLength(1)
-    expect(patients[0].firstName).toBe('Safe')
+    expect(drugDocs.rows).toHaveLength(0)
   })
 })

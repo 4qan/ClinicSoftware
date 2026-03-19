@@ -1,9 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { ClinicDatabase } from '@/db/index'
+import { resetDatabase } from '@/db/index'
+import { pouchDb, putSetting, getSetting } from '@/db/pouchdb'
 import type { Patient } from '@/db/index'
 
-function makePatient(overrides: Partial<Patient> = {}): Patient {
+function makePatient(overrides: Partial<Patient> = {}): Patient & { _id: string; type: 'patient' } {
   return {
+    _id: 'patient:test-uuid-1',
     id: 'test-uuid-1',
     patientId: '2026-0001',
     firstName: 'Ahmed',
@@ -15,54 +17,44 @@ function makePatient(overrides: Partial<Patient> = {}): Patient {
     contact: '03001234567',
     createdAt: '2026-03-05T10:00:00.000Z',
     updatedAt: '2026-03-05T10:00:00.000Z',
+    type: 'patient',
     ...overrides,
   }
 }
 
-describe('ClinicDatabase', () => {
-  let db: ClinicDatabase
-
+describe('PouchDB connectivity', () => {
   beforeEach(async () => {
-    db = new ClinicDatabase()
-    await db.delete()
-    db = new ClinicDatabase()
+    await resetDatabase()
   })
 
-  it('initializes without error', async () => {
-    expect(db.isOpen()).toBe(false)
-    await db.open()
-    expect(db.isOpen()).toBe(true)
-  })
-
-  it('can add and retrieve a patient record', async () => {
+  it('can add and retrieve a patient document', async () => {
     const patient = makePatient()
-    await db.patients.add(patient)
+    await pouchDb.put(patient)
 
-    const retrieved = await db.patients.get('test-uuid-1')
-    expect(retrieved).toEqual(patient)
+    const retrieved = await pouchDb.get('patient:test-uuid-1') as any
+    expect(retrieved.firstName).toBe('Ahmed')
+    expect(retrieved.age).toBe(35)
   })
 
-  it('indexes work: query by patientId', async () => {
-    await db.patients.add(makePatient())
-    const result = await db.patients.where('patientId').equals('2026-0001').first()
-    expect(result?.firstName).toBe('Ahmed')
+  it('can query by prefix using allDocs', async () => {
+    await pouchDb.put(makePatient())
+    const result = await pouchDb.allDocs({
+      startkey: 'patient:',
+      endkey: 'patient:\uffff',
+      include_docs: true,
+    })
+    expect(result.rows).toHaveLength(1)
+    expect((result.rows[0].doc as any).firstName).toBe('Ahmed')
   })
 
-  it('indexes work: query by firstNameLower', async () => {
-    await db.patients.add(makePatient())
-    const result = await db.patients.where('firstNameLower').equals('ahmed').first()
-    expect(result?.patientId).toBe('2026-0001')
+  it('settings roundtrip via putSetting/getSetting', async () => {
+    await putSetting('testKey', 'testValue')
+    const value = await getSetting('testKey')
+    expect(value).toBe('testValue')
   })
 
-  it('indexes work: query by contact', async () => {
-    await db.patients.add(makePatient())
-    const result = await db.patients.where('contact').equals('03001234567').first()
-    expect(result?.lastName).toBe('Khan')
-  })
-
-  it('has all v2 schema tables', async () => {
-    await db.open()
-    const tableNames = db.tables.map((t) => t.name).sort()
-    expect(tableNames).toEqual(['drugs', 'patients', 'recentPatients', 'settings', 'visitMedications', 'visits'])
+  it('getSetting returns undefined for missing key', async () => {
+    const value = await getSetting('nonexistent')
+    expect(value).toBeUndefined()
   })
 })

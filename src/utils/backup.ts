@@ -1,6 +1,29 @@
-import { db } from '@/db/index'
+import { pouchDb } from '@/db/pouchdb'
 
 declare const __APP_VERSION__: string
+
+// v2 = PouchDB era. Distinguishes from old Dexie backups (schemaVersion 1-7).
+const SCHEMA_VERSION = 2
+
+// Map from old Dexie table names to new PouchDB type names
+const LEGACY_TABLE_MAP: Record<string, string> = {
+  patients: 'patient',
+  visits: 'visit',
+  visitMedications: 'visitmed',
+  drugs: 'drug',
+  settings: 'settings',
+  recentPatients: 'recent',
+}
+
+// Map from PouchDB type name to _id prefix
+const TYPE_TO_PREFIX: Record<string, string> = {
+  patient: 'patient',
+  visit: 'visit',
+  visitmed: 'visitmed',
+  drug: 'drug',
+  settings: 'settings',
+  recent: 'recent',
+}
 
 export interface BackupMetadata {
   appName: string
@@ -20,13 +43,26 @@ export type ValidationResult =
   | { valid: false; error: 'invalid_format' | 'newer_schema' }
 
 export async function exportDatabase(): Promise<BackupFile> {
+  const result = await pouchDb.allDocs({ include_docs: true })
   const data: Record<string, unknown[]> = {}
   const tables: Record<string, number> = {}
 
-  for (const table of db.tables) {
-    const rows = await table.toArray()
-    data[table.name] = rows
-    tables[table.name] = rows.length
+  for (const row of result.rows) {
+    if (!row.doc || row.id.startsWith('_design/')) continue
+    const doc = row.doc as Record<string, unknown>
+    const typeName = doc.type as string
+    if (!typeName) continue
+
+    // Strip PouchDB internal fields for clean export
+    const { _id, _rev, type, ...cleanDoc } = doc
+    void _id; void _rev; void type
+    if (!data[typeName]) data[typeName] = []
+    data[typeName].push(cleanDoc)
+  }
+
+  // Count per type
+  for (const [typeName, docs] of Object.entries(data)) {
+    tables[typeName] = docs.length
   }
 
   return {
@@ -34,7 +70,7 @@ export async function exportDatabase(): Promise<BackupFile> {
       appName: 'ClinicSoftware',
       exportDate: new Date().toISOString(),
       appVersion: __APP_VERSION__,
-      schemaVersion: db.verno,
+      schemaVersion: SCHEMA_VERSION,
       tables,
     },
     data,
@@ -97,7 +133,7 @@ export function validateBackupFile(data: unknown): ValidationResult {
     return { valid: false, error: 'invalid_format' }
   }
 
-  if (metadata.schemaVersion > db.verno) {
+  if (metadata.schemaVersion > SCHEMA_VERSION) {
     return { valid: false, error: 'newer_schema' }
   }
 
@@ -108,18 +144,47 @@ export function validateBackupFile(data: unknown): ValidationResult {
 }
 
 export async function restoreDatabase(backup: BackupFile): Promise<void> {
-  await db.transaction('rw', db.tables, async () => {
-    // Clear all tables
-    for (const table of db.tables) {
-      await table.clear()
-    }
+  // 1. Delete all existing docs
+  const existing = await pouchDb.allDocs()
+  const deletes = existing.rows
+    .filter(r => !r.id.startsWith('_design/'))
+    .map(r => ({ _id: r.id, _rev: r.value.rev, _deleted: true as const }))
+  if (deletes.length > 0) {
+    await pouchDb.bulkDocs(deletes)
+  }
 
-    // Repopulate from backup data
-    for (const table of db.tables) {
-      const rows = backup.data[table.name]
-      if (rows && rows.length > 0) {
-        await table.bulkPut(rows)
-      }
+  // 2. Determine if this is an old Dexie backup (schemaVersion <= 1) or new PouchDB backup
+  const isLegacyBackup = backup.metadata.schemaVersion <= 1
+
+  // 3. Insert backup data with prefixed _ids
+  const allDocs: Record<string, unknown>[] = []
+
+  for (const [tableName, rows] of Object.entries(backup.data)) {
+    // Map table name to type name
+    const typeName = isLegacyBackup
+      ? (LEGACY_TABLE_MAP[tableName] ?? tableName)
+      : tableName
+
+    const prefix = TYPE_TO_PREFIX[typeName] ?? typeName
+
+    for (const row of rows as Record<string, unknown>[]) {
+      // Determine the id field to use for _id construction
+      const idField = typeName === 'settings' ? (row.key as string) : (row.id as string)
+      if (!idField) continue
+
+      allDocs.push({
+        ...row,
+        _id: `${prefix}:${idField}`,
+        type: typeName,
+      })
     }
-  })
+  }
+
+  if (allDocs.length > 0) {
+    const results = await pouchDb.bulkDocs(allDocs)
+    const errors = results.filter(r => 'error' in r && (r as PouchDB.Core.Error).error)
+    if (errors.length > 0) {
+      throw new Error(`Restore failed with ${errors.length} error(s): ${JSON.stringify(errors[0])}`)
+    }
+  }
 }

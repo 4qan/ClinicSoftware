@@ -3,7 +3,8 @@ import { render, screen, waitFor, cleanup, fireEvent } from '@testing-library/re
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { PrintVisitPage } from '@/pages/PrintVisitPage'
-import { db, resetDatabase } from '@/db/index'
+import { resetDatabase } from '@/db/index'
+import { putSetting } from '@/db/pouchdb'
 import { registerPatient } from '@/db/patients'
 import { createVisit } from '@/db/visits'
 import { saveClinicInfo } from '@/db/settings'
@@ -276,7 +277,7 @@ describe('PrintVisitPage - size badge', () => {
   })
 
   it('shows A5 badge when stored size is A6 (fallback)', async () => {
-    await db.settings.put({ key: 'printDispensarySize', value: 'A6' })
+    await putSetting('printDispensarySize', 'A6')
 
     renderPrintPage(testVisitId)
 

@@ -22,16 +22,13 @@ vi.mock('@/components/ToastProvider', () => ({
   useToast: () => ({ showToast: mockShowToast }),
 }))
 
-// Mock db.settings
-const mockSettingsGet = vi.fn()
-const mockSettingsPut = vi.fn()
-vi.mock('@/db/index', () => ({
-  db: {
-    settings: {
-      get: (...args: unknown[]) => mockSettingsGet(...args),
-      put: (...args: unknown[]) => mockSettingsPut(...args),
-    },
-  },
+// Mock pouchdb settings helpers
+const mockGetSetting = vi.fn()
+const mockPutSetting = vi.fn()
+vi.mock('@/db/pouchdb', () => ({
+  getSetting: (...args: unknown[]) => mockGetSetting(...args),
+  putSetting: (...args: unknown[]) => mockPutSetting(...args),
+  pouchDb: {},
 }))
 
 const fakeBackup: BackupFile = {
@@ -55,7 +52,8 @@ const fakeBackup: BackupFile = {
 describe('DataSettings', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockSettingsGet.mockResolvedValue(undefined)
+    mockGetSetting.mockResolvedValue(undefined)
+    mockPutSetting.mockResolvedValue(undefined)
     mockExportDatabase.mockResolvedValue(fakeBackup)
     mockDownloadBackup.mockReturnValue('ClinicSoftware-backup-2026-03-10.json')
   })
@@ -156,18 +154,13 @@ describe('DataSettings', () => {
     await user.click(screen.getByRole('button', { name: /export backup/i }))
 
     await waitFor(() => {
-      expect(mockSettingsPut).toHaveBeenCalledWith({
-        key: 'lastBackupDate',
-        value: expect.any(String),
-      })
+      expect(mockPutSetting).toHaveBeenCalledWith('lastBackupDate', expect.any(String))
     })
   })
 
   it('shows persisted last backup date on mount', async () => {
-    mockSettingsGet.mockResolvedValue({
-      key: 'lastBackupDate',
-      value: '2026-03-09T15:30:00.000Z',
-    })
+    // Both settings return a date so neither shows "Never"
+    mockGetSetting.mockResolvedValue('2026-03-09T15:30:00.000Z')
 
     render(<DataSettings />)
 
@@ -281,9 +274,9 @@ describe('DataSettings', () => {
       metadata: fakeBackup.metadata,
     })
     mockRestoreDatabase.mockResolvedValue(undefined)
-    // Mock db.settings.get for auth hash check (called during restore)
-    mockSettingsGet.mockImplementation((key: string) => {
-      if (key === 'auth') return Promise.resolve({ key: 'auth', value: { hash: 'abc', salt: 'xyz' } })
+    // Mock getSetting for auth hash check (called during restore)
+    mockGetSetting.mockImplementation((key: string) => {
+      if (key === 'auth') return Promise.resolve({ hash: 'abc', salt: 'xyz' })
       return Promise.resolve(undefined)
     })
 
@@ -316,10 +309,7 @@ describe('DataSettings', () => {
       metadata: fakeBackup.metadata,
     })
     mockRestoreDatabase.mockRejectedValue(new Error('DB write failed'))
-    mockSettingsGet.mockImplementation((key: string) => {
-      if (key === 'auth') return Promise.resolve(undefined)
-      return Promise.resolve(undefined)
-    })
+    mockGetSetting.mockResolvedValue(undefined)
 
     const user = userEvent.setup()
     render(<DataSettings />)

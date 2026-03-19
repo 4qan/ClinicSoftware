@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { db, resetDatabase } from '@/db/index'
+import { resetDatabase } from '@/db/index'
+import { putSetting } from '@/db/pouchdb'
 import {
   getPrintSettings,
   savePrintSetting,
@@ -46,14 +47,14 @@ describe('printSettings data layer', () => {
 
     it('returns A5 when DB contains A6 for prescriptionSize (fallback)', async () => {
       // Directly write 'A6' to the DB to simulate a legacy stored value
-      await db.settings.put({ key: 'printPrescriptionSize', value: 'A6' })
+      await putSetting('printPrescriptionSize', 'A6')
       const settings = await getPrintSettings()
       expect(settings.prescriptionSize).toBe('A5')
     })
 
     it('returns A5 when DB contains A6 for dispensarySize (fallback)', async () => {
       // Directly write 'A6' to the DB to simulate a legacy stored value
-      await db.settings.put({ key: 'printDispensarySize', value: 'A6' })
+      await putSetting('printDispensarySize', 'A6')
       const settings = await getPrintSettings()
       expect(settings.dispensarySize).toBe('A5')
     })

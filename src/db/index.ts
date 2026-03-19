@@ -1,3 +1,6 @@
+// Re-export for test compatibility
+export { resetPouchDb as resetDatabase } from './pouchdb'
+
 export interface Patient {
   id: string
   patientId: string

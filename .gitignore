@@ -34,3 +34,6 @@ test-results/
 # PouchDB local database directories (created at runtime)
 ClinicSoftware_v2/
 ClinicSoftware/
+
+# LevelDB directories created during test runs
+test/

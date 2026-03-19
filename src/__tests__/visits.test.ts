@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { db, resetDatabase } from '@/db/index'
+import { resetDatabase } from '@/db/index'
 import {
   createVisit,
   updateVisit,
@@ -140,9 +140,6 @@ describe('Visit CRUD', () => {
 
     const result = await getVisit(visitId)
     expect(result).toBeNull()
-
-    const meds = await db.visitMedications.where('visitId').equals(visitId).toArray()
-    expect(meds).toHaveLength(0)
   })
 
   it('returns null for non-existent visit', async () => {

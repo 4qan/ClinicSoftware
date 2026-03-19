@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { db } from '@/db/index'
+import { getSetting, putSetting } from '@/db/pouchdb'
 import {
   exportDatabase,
   downloadBackup,
@@ -35,16 +35,12 @@ export function DataSettings() {
   const { showToast } = useToast()
 
   useEffect(() => {
-    db.settings.get('lastBackupDate').then((entry) => {
-      if (entry) {
-        setLastBackup(entry.value as string)
-      }
+    getSetting('lastBackupDate').then((value) => {
+      if (value) setLastBackup(value as string)
     })
 
-    db.settings.get('lastAutoSnapshotDate').then((entry) => {
-      if (entry) {
-        setAutoBackupDate(entry.value as string)
-      }
+    getSetting('lastAutoSnapshotDate').then((value) => {
+      if (value) setAutoBackupDate(value as string)
     })
 
     listSnapshots().then(setSnapshots)
@@ -57,13 +53,13 @@ export function DataSettings() {
       const filename = downloadBackup(backup)
 
       const now = new Date().toISOString()
-      await db.settings.put({ key: 'lastBackupDate', value: now })
-      await db.settings.put({ key: 'lastAutoSnapshotDate', value: now })
+      await putSetting('lastBackupDate', now)
+      await putSetting('lastAutoSnapshotDate', now)
       setLastBackup(now)
       setAutoBackupDate(now)
 
-      const patients = backup.metadata.tables.patients ?? 0
-      const visits = backup.metadata.tables.visits ?? 0
+      const patients = backup.metadata.tables.patient ?? backup.metadata.tables.patients ?? 0
+      const visits = backup.metadata.tables.visit ?? backup.metadata.tables.visits ?? 0
       showToast('success', `Backup saved: ${filename} (${patients} patients, ${visits} visits)`)
     } catch {
       showToast('error', 'Backup failed. Please try again.')
@@ -122,18 +118,14 @@ export function DataSettings() {
     setIsRestoring(true)
     try {
       // Read current auth hash before restore
-      const currentAuthEntry = await db.settings.get('auth')
-      const currentHash = currentAuthEntry
-        ? (currentAuthEntry.value as { hash: string })?.hash
-        : null
+      const currentAuthValue = await getSetting('auth') as { hash: string } | undefined
+      const currentHash = currentAuthValue?.hash ?? null
 
       await restoreDatabase(pendingBackup)
 
       // Read new auth hash after restore
-      const newAuthEntry = await db.settings.get('auth')
-      const newHash = newAuthEntry
-        ? (newAuthEntry.value as { hash: string })?.hash
-        : null
+      const newAuthValue = await getSetting('auth') as { hash: string } | undefined
+      const newHash = newAuthValue?.hash ?? null
 
       // Smart re-login: clear session if auth hash changed or was removed
       if (currentHash !== newHash) {
@@ -160,18 +152,14 @@ export function DataSettings() {
     setIsRestoring(true)
     try {
       // Read current auth hash before restore
-      const currentAuthEntry = await db.settings.get('auth')
-      const currentHash = currentAuthEntry
-        ? (currentAuthEntry.value as { hash: string })?.hash
-        : null
+      const currentAuthValue = await getSetting('auth') as { hash: string } | undefined
+      const currentHash = currentAuthValue?.hash ?? null
 
       await restoreDatabase(pendingSnapshot.data)
 
       // Read new auth hash after restore
-      const newAuthEntry = await db.settings.get('auth')
-      const newHash = newAuthEntry
-        ? (newAuthEntry.value as { hash: string })?.hash
-        : null
+      const newAuthValue = await getSetting('auth') as { hash: string } | undefined
+      const newHash = newAuthValue?.hash ?? null
 
       // Smart re-login: clear session if auth hash changed or was removed
       if (currentHash !== newHash) {
@@ -180,7 +168,7 @@ export function DataSettings() {
 
       // Reset auto-snapshot timer after restore
       const now = new Date().toISOString()
-      await db.settings.put({ key: 'lastAutoSnapshotDate', value: now })
+      await putSetting('lastAutoSnapshotDate', now)
 
       showToast('success', `Data restored from ${formatBackupDate(pendingSnapshot.createdAt)} auto-backup`)
       setPendingSnapshot(null)

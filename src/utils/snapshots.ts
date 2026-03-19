@@ -1,7 +1,7 @@
 import Dexie, { type Table } from 'dexie'
 import type { BackupFile } from './backup'
 import { exportDatabase } from './backup'
-import { db } from '@/db/index'
+import { getSetting, putSetting } from '@/db/pouchdb'
 
 export interface Snapshot {
   id?: number
@@ -43,8 +43,7 @@ export async function checkAndCreateSnapshot(): Promise<void> {
     if (count >= HARD_CAP) return
 
     // Check 24h timer
-    const entry = await db.settings.get('lastAutoSnapshotDate')
-    const lastSnapshot = entry?.value as string | undefined
+    const lastSnapshot = await getSetting('lastAutoSnapshotDate') as string | undefined
 
     if (lastSnapshot) {
       const elapsed = Date.now() - new Date(lastSnapshot).getTime()
@@ -68,10 +67,7 @@ export async function createSnapshot(): Promise<void> {
     createdAt: new Date().toISOString(),
     data: backup,
   })
-  await db.settings.put({
-    key: 'lastAutoSnapshotDate',
-    value: new Date().toISOString(),
-  })
+  await putSetting('lastAutoSnapshotDate', new Date().toISOString())
 }
 
 /** Rotate snapshots: keep only MAX_SNAPSHOTS, delete oldest by createdAt. */

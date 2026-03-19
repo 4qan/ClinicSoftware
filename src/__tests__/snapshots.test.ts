@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { resetDatabase, db } from '@/db/index'
+import { resetDatabase } from '@/db/index'
+import { getSetting, putSetting } from '@/db/pouchdb'
 
 // We'll import from the module under test once it exists
 // For RED phase, these imports will fail until GREEN phase
@@ -47,7 +48,7 @@ describe('checkAndCreateSnapshot', () => {
   it('skips if less than 24 hours', async () => {
     // Set lastAutoSnapshotDate to 12 hours ago
     const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
-    await db.settings.put({ key: 'lastAutoSnapshotDate', value: twelveHoursAgo })
+    await putSetting('lastAutoSnapshotDate', twelveHoursAgo)
 
     await checkAndCreateSnapshot()
 
@@ -58,7 +59,7 @@ describe('checkAndCreateSnapshot', () => {
   it('creates snapshot after 24 hours', async () => {
     // Set lastAutoSnapshotDate to 25 hours ago
     const twentyFiveHoursAgo = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString()
-    await db.settings.put({ key: 'lastAutoSnapshotDate', value: twentyFiveHoursAgo })
+    await putSetting('lastAutoSnapshotDate', twentyFiveHoursAgo)
 
     await checkAndCreateSnapshot()
 
@@ -71,9 +72,9 @@ describe('checkAndCreateSnapshot', () => {
     await checkAndCreateSnapshot()
     const after = Date.now()
 
-    const entry = await db.settings.get('lastAutoSnapshotDate')
-    expect(entry).toBeDefined()
-    const timestamp = new Date(entry!.value as string).getTime()
+    const value = await getSetting('lastAutoSnapshotDate')
+    expect(value).toBeDefined()
+    const timestamp = new Date(value as string).getTime()
     expect(timestamp).toBeGreaterThanOrEqual(before)
     expect(timestamp).toBeLessThanOrEqual(after)
   })

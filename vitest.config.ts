@@ -20,5 +20,10 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/__tests__/setup.ts'],
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    // Run test files sequentially to prevent LevelDB lock contention between workers
+    pool: 'forks',
+    forks: {
+      singleFork: true,
+    },
   },
 })
