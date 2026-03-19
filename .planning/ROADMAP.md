@@ -148,7 +148,7 @@ Plans:
 | 15. Slip Assignment | v1.4 | 2/2 | Complete | 2026-03-19 |
 | 16. Auto-Print Toggle | v1.4 | 1/1 | Complete | 2026-03-19 |
 | 17. Visit Vitals | v1.5 | 0/2 | Planned | - |
-| 18. Unified Medication Management | 2/2 | Complete   | 2026-03-19 | - |
+| 18. Unified Medication Management | 2/2 | Complete    | 2026-03-19 | - |
 
 ---
 *Last updated: 2026-03-19 -- Phase 17 planned (Visit Vitals)*

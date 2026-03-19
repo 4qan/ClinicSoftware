@@ -33,6 +33,21 @@ Requirements for v1.5 Visit Vitals. Maps to Phase 17.
 - [ ] **VIT-05**: Vitals display in NewVisitPage inline visit history preview, same format as VisitCard
 - [ ] **VIT-06**: Vitals persist via DB migration (v6), survive save/reload, and do NOT appear on printed slips
 
+## v1.6 Requirements
+
+Requirements for v1.6 Unified Medication Management. Maps to Phase 18.
+
+### Medication Management
+
+- [x] **MED-01**: Top-level Medications page accessible from sidebar shows all drugs in a searchable, filterable table
+- [x] **MED-02**: Search bar filters across brand and salt name
+- [x] **MED-03**: Filter pills for All, Predefined, Custom, Disabled views
+- [x] **MED-04**: All drugs (predefined and custom) are fully editable via modal form
+- [x] **MED-05**: All drugs (predefined and custom) are deletable
+- [x] **MED-06**: Editing a predefined drug sets isOverridden flag; "Reset to default" reverts to seed values
+- [x] **MED-07**: Seeding runs only on first-ever app use (empty drugs table), never re-seeds
+- [x] **MED-08**: Settings medications tab is removed; link to Medications page provided
+
 ## Future Requirements
 
 None currently deferred.
@@ -65,10 +80,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VIT-04 | Phase 17 | Planned |
 | VIT-05 | Phase 17 | Planned |
 | VIT-06 | Phase 17 | Planned |
+| MED-01 | Phase 18 | Complete |
+| MED-02 | Phase 18 | Complete |
+| MED-03 | Phase 18 | Complete |
+| MED-04 | Phase 18 | Complete |
+| MED-05 | Phase 18 | Complete |
+| MED-06 | Phase 18 | Complete |
+| MED-07 | Phase 18 | Complete |
+| MED-08 | Phase 18 | Complete |
 
 **Coverage:**
 - v1.4 requirements: 7 total, mapped: 7, unmapped: 0
 - v1.5 requirements: 6 total, mapped: 6, unmapped: 0
+- v1.6 requirements: 8 total, mapped: 8, unmapped: 0
 
 ---
 *Requirements defined: 2026-03-19*
