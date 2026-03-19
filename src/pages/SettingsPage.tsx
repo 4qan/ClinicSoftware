@@ -1,17 +1,16 @@
 import { useState, useEffect, type FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 import { ChangePassword } from '@/auth/ChangePassword'
 import { useAuthContext } from '@/auth/AuthProvider'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
-import { DrugManagement } from '@/components/DrugManagement'
 import { ClinicInfoSettings } from '@/components/ClinicInfoSettings'
 import { DataSettings } from '@/components/DataSettings'
 import { PrintSettings } from '@/components/PrintSettings'
 
-type SettingsCategory = 'account' | 'medications' | 'clinic' | 'data' | 'print'
+type SettingsCategory = 'account' | 'clinic' | 'data' | 'print'
 
 const TABS: { key: SettingsCategory; label: string }[] = [
   { key: 'account', label: 'Account' },
-  { key: 'medications', label: 'Medications' },
   { key: 'clinic', label: 'Clinic Info' },
   { key: 'data', label: 'Data' },
   { key: 'print', label: 'Print' },
@@ -159,17 +158,21 @@ export function SettingsPage() {
         ))}
       </div>
 
+      {/* Medications link */}
+      <div className="mb-5 px-4 py-3 bg-blue-50 border border-blue-100 rounded-lg text-sm text-gray-700">
+        Manage medications from the{' '}
+        <Link to="/medications" className="text-blue-600 hover:underline font-medium">
+          Medications page
+        </Link>
+        .
+      </div>
+
       {/* Account Tab */}
       {activeCategory === 'account' && (
         <div>
           <RecoveryCodeSection />
           <ChangePassword />
         </div>
-      )}
-
-      {/* Medications Tab */}
-      {activeCategory === 'medications' && (
-        <DrugManagement />
       )}
 
       {/* Clinic Info Tab */}
