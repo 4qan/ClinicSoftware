@@ -35,7 +35,13 @@ The doctor can see a patient, write a prescription with medication autocomplete,
 
 ### Active
 
-(No active requirements. Next milestone not yet planned.)
+#### Current Milestone: v1.4 Slip Assignment & Print Settings
+
+**Goal:** Let the doctor control which medicines appear on which printed slip, and toggle auto-print behavior.
+
+**Target features:**
+- Per-medication slip assignment (dispensary default, prescription option)
+- Auto-print on/off toggle in Print Management
 
 ### Out of Scope
 
@@ -110,4 +116,4 @@ Clinic is in an area with unreliable internet. Doctor uses an old Windows system
 | document-level Escape listener | Handles Escape when focus is on unmounted button (inline patient form) | Good |
 
 ---
-*Last updated: 2026-03-15 after v1.3 milestone*
+*Last updated: 2026-03-19 after v1.4 milestone start*

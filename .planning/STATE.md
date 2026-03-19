@@ -1,60 +1,42 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: Keyboard Navigation
-status: completed
-stopped_at: Milestone v1.3 completed and archived
-last_updated: "2026-03-15T02:00:00Z"
-last_activity: 2026-03-15 -- v1.3 Keyboard Navigation shipped
+milestone: v1.4
+milestone_name: Slip Assignment & Print Settings
+status: planning
+stopped_at: Defining requirements
+last_updated: "2026-03-19T00:00:00Z"
+last_activity: 2026-03-19 -- Milestone v1.4 started
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State: ClinicSoftware
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-15)
+See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** The doctor can see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even with no internet.
-**Current focus:** Planning next milestone
+**Current focus:** v1.4 Slip Assignment & Print Settings
 
 ## Current Position
 
-Phase: All complete
-Plan: All complete
-Status: Milestone v1.3 shipped
-Last activity: 2026-03-15 -- v1.3 Keyboard Navigation shipped
+Phase: Not started (defining requirements)
+Plan: --
+Status: Defining requirements
+Last activity: 2026-03-19 -- Milestone v1.4 started
 
-Progress: [████████████████████] 100% (v1.0 + v1.1 + v1.2 + v1.3 shipped)
-
-## Performance Metrics
-
-**Velocity (v1.3):**
-- Total plans completed: 6
-- Commits: 10
-- Timeline: 1 day
-
-**By Phase (v1.3):**
-
-| Phase | Plans | Tasks | Files |
-|-------|-------|-------|-------|
-| Phase 12-focus-foundation-and-form-submission P01 | 6 | 2 tasks | 15 files |
-| Phase 12-focus-foundation-and-form-submission P02 | 4 min | 2 tasks | 6 files |
-| Phase 13-keyboard-interactions P01 | 4 | 2 tasks | 6 files |
-| Phase 13-keyboard-interactions P02 | 3 | 1 tasks | 2 files |
-| Phase 13-keyboard-interactions P03 | 8 | 1 tasks | 2 files |
-| Phase 14-print-flow P01 | 146 | 2 tasks | 4 files |
+Progress: [░░░░░░░░░░░░░░░░░░░░] 0%
 
 ## Accumulated Context
 
 ### Decisions
 
-- v1.0 + v1.1 + v1.2 + v1.3 decisions logged in PROJECT.md Key Decisions table
+- v1.0 through v1.3 decisions logged in PROJECT.md Key Decisions table
 
 ### Pending Todos
 
@@ -66,9 +48,9 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15
-Stopped at: Milestone v1.3 completed and archived
+Last session: 2026-03-19
+Stopped at: Defining requirements for v1.4
 Resume file: None
 
 ---
-*Last updated: 2026-03-15 -- v1.3 milestone completed*
+*Last updated: 2026-03-19 -- v1.4 milestone started*
