@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuthContext } from '@/auth/AuthProvider'
 import { ChangePassword } from '@/auth/ChangePassword'
+import { ResetNursePassword } from '@/auth/ResetNursePassword'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { ClinicInfoSettings } from '@/components/ClinicInfoSettings'
 import { DataSettings } from '@/components/DataSettings'
@@ -16,6 +18,7 @@ const TABS: { key: SettingsCategory; label: string }[] = [
 ]
 
 export function SettingsPage() {
+  const { role } = useAuthContext()
   const [activeCategory, setActiveCategory] = useState<SettingsCategory>('account')
 
   return (
@@ -54,6 +57,11 @@ export function SettingsPage() {
       {activeCategory === 'account' && (
         <div>
           <ChangePassword />
+          {role === 'doctor' && (
+            <div className="mt-6">
+              <ResetNursePassword />
+            </div>
+          )}
         </div>
       )}
 

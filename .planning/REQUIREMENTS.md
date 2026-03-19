@@ -15,8 +15,8 @@ Requirements for v2.0 Multi-User Sync. Nurse and doctor on separate computers, d
 
 ### Authentication & Roles
 
-- [ ] **AUTH-01**: Login screen shows a username field alongside the existing password field
-- [ ] **AUTH-02**: Doctor and nurse accounts are pre-created; no setup wizard needed
+- [x] **AUTH-01**: Login screen shows a username field alongside the existing password field
+- [x] **AUTH-02**: Doctor and nurse accounts are pre-created; no setup wizard needed
 - [ ] **AUTH-03**: Doctor has full access to all features (unchanged from today)
 - [ ] **AUTH-04**: Nurse can only access patient search/creation and vitals recording
 - [ ] **AUTH-05**: Nurse cannot access prescriptions, medications, print, settings, or backup
@@ -81,8 +81,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-02 | Phase 20 | Complete |
 | INFRA-03 | Phase 20 | Complete |
 | INFRA-04 | Phase 20 | Complete |
-| AUTH-01 | Phase 21 | Pending |
-| AUTH-02 | Phase 21 | Pending |
+| AUTH-01 | Phase 21 | Complete |
+| AUTH-02 | Phase 21 | Complete |
 | AUTH-03 | Phase 21 | Pending |
 | AUTH-04 | Phase 21 | Pending |
 | AUTH-05 | Phase 21 | Pending |

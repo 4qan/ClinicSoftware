@@ -114,30 +114,10 @@ Write-Banner "ClinicSoftware CouchDB Installer"
 Write-Host "  This will install and configure CouchDB on this machine."
 Write-Host "  The nurse's machine needs nothing installed (just the same WiFi)."
 Write-Host ""
-Write-Host "  You need to choose 3 passwords:" -ForegroundColor Yellow
-Write-Host "    1. Admin password   (for CouchDB maintenance, not used by the app)"
-Write-Host "    2. Doctor password  (used by the app on the doctor's machine)"
-Write-Host "    3. Nurse password   (used by the app on the nurse's machine)"
-Write-Host ""
-Write-Host "  Write these down on paper. You will need them when configuring the app."
-Write-Host ""
-
-$AdminPwSecure  = Read-Host "Enter ADMIN password" -AsSecureString
-$DoctorPwSecure = Read-Host "Enter DOCTOR password" -AsSecureString
-$NursePwSecure  = Read-Host "Enter NURSE password" -AsSecureString
-
-# Convert SecureString to plaintext for API calls
-$AdminPw  = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($AdminPwSecure))
-$DoctorPw = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($DoctorPwSecure))
-$NursePw  = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($NursePwSecure))
-
-if ([string]::IsNullOrWhiteSpace($AdminPw) -or [string]::IsNullOrWhiteSpace($DoctorPw) -or [string]::IsNullOrWhiteSpace($NursePw)) {
-    Write-Fail "All three passwords are required."
-    exit 1
-}
-
-$InstallPath = Read-Host "Install path (press Enter for $DefaultInstall)"
-if ([string]::IsNullOrWhiteSpace($InstallPath)) { $InstallPath = $DefaultInstall }
+$AdminPw  = "admin123"
+$DoctorPw = "doctor123"
+$NursePw  = "nurse123"
+$InstallPath = $DefaultInstall
 
 if ($InstallPath -match ' ') {
     Write-Fail "Install path '$InstallPath' contains spaces. Erlang cannot handle spaces in paths. Use something like C:\CouchDB"
