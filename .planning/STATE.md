@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Visit Vitals
 status: planning
-stopped_at: Completed 18-01-PLAN.md
-last_updated: "2026-03-19T11:57:29.228Z"
+stopped_at: Completed 18-02-PLAN.md (awaiting human-verify checkpoint)
+last_updated: "2026-03-19T12:01:47.694Z"
 last_activity: 2026-03-19 -- Roadmap created
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -51,6 +51,8 @@ Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (v1.
 - [Phase 18-unified-medication-management]: isOverridden is optional on Drug interface for backward compatibility with existing records
 - [Phase 18-unified-medication-management]: backup.ts needs no changes: seed-once logic (count > 0 = skip) handles restore interaction
 - [Phase 18-unified-medication-management]: updateCustomDrug/deleteCustomDrug kept as deprecated wrappers; SEED_VERSION removed, seeding now count-based
+- [Phase 18-unified-medication-management]: Inline row confirm for delete/reset in MedicationsPage: avoids double-modal pattern
+- [Phase 18-unified-medication-management]: Settings page: persistent blue banner linking to /medications replaces medications tab
 
 ### Roadmap Evolution
 
@@ -67,8 +69,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T11:57:29.226Z
-Stopped at: Completed 18-01-PLAN.md
+Last session: 2026-03-19T12:01:41.168Z
+Stopped at: Completed 18-02-PLAN.md (awaiting human-verify checkpoint)
 Resume file: None
 
 ---
