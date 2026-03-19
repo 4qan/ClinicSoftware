@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import {
   getPrintSettings,
   savePrintSetting,
+  saveAutoPrint,
   PAPER_SIZE_ORDER,
   PAPER_SIZES,
 } from '@/db/printSettings'
@@ -10,11 +11,13 @@ import type { PaperSize } from '@/db/printSettings'
 export function PrintSettings() {
   const [prescriptionSize, setPrescriptionSize] = useState<PaperSize>('A5')
   const [dispensarySize, setDispensarySize] = useState<PaperSize>('A5')
+  const [autoPrint, setAutoPrint] = useState<boolean>(true)
 
   useEffect(() => {
     getPrintSettings().then((settings) => {
       setPrescriptionSize(settings.prescriptionSize)
       setDispensarySize(settings.dispensarySize)
+      setAutoPrint(settings.autoPrint)
     })
   }, [])
 
@@ -26,6 +29,12 @@ export function PrintSettings() {
   async function handleDispensaryChange(value: PaperSize) {
     setDispensarySize(value)
     await savePrintSetting('printDispensarySize', value)
+  }
+
+  async function handleAutoPrintToggle() {
+    const next = !autoPrint
+    setAutoPrint(next)
+    await saveAutoPrint(next)
   }
 
   return (
@@ -78,6 +87,34 @@ export function PrintSettings() {
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Auto-Print on Save */}
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Auto-Print on Save</p>
+              <p className="text-sm text-gray-500 mt-0.5">
+                When on, prescription prints automatically after saving a visit.
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={autoPrint}
+              aria-label="Auto-Print on Save"
+              onClick={handleAutoPrintToggle}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none cursor-pointer ${
+                autoPrint ? 'bg-blue-600' : 'bg-gray-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                  autoPrint ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
         </div>
       </div>
     </div>

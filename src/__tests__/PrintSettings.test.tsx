@@ -35,9 +35,11 @@ vi.mock('@/components/DataSettings', () => ({
 // Mock print settings DB functions
 const mockGetPrintSettings = vi.fn()
 const mockSavePrintSetting = vi.fn()
+const mockSaveAutoPrint = vi.fn()
 vi.mock('@/db/printSettings', () => ({
   getPrintSettings: (...args: unknown[]) => mockGetPrintSettings(...args),
   savePrintSetting: (...args: unknown[]) => mockSavePrintSetting(...args),
+  saveAutoPrint: (...args: unknown[]) => mockSaveAutoPrint(...args),
   PAPER_SIZE_ORDER: ['A5', 'A4', 'Letter'],
   PAPER_SIZES: {
     A5: { width: 148, height: 210, label: 'A5 (148 x 210 mm)' },
@@ -57,8 +59,9 @@ function renderSettings() {
 describe('SettingsPage - Print tab', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockGetPrintSettings.mockResolvedValue({ prescriptionSize: 'A5', dispensarySize: 'A5' })
+    mockGetPrintSettings.mockResolvedValue({ prescriptionSize: 'A5', dispensarySize: 'A5', autoPrint: true })
     mockSavePrintSetting.mockResolvedValue(undefined)
+    mockSaveAutoPrint.mockResolvedValue(undefined)
   })
 
   it('renders a Print pill tab button', () => {
@@ -81,8 +84,9 @@ describe('SettingsPage - Print tab', () => {
 describe('PrintSettings component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockGetPrintSettings.mockResolvedValue({ prescriptionSize: 'A5', dispensarySize: 'A5' })
+    mockGetPrintSettings.mockResolvedValue({ prescriptionSize: 'A5', dispensarySize: 'A5', autoPrint: true })
     mockSavePrintSetting.mockResolvedValue(undefined)
+    mockSaveAutoPrint.mockResolvedValue(undefined)
   })
 
   async function openPrintTab() {
@@ -183,5 +187,45 @@ describe('PrintSettings component', () => {
     await waitFor(() => screen.getAllByRole('combobox'))
 
     expect(screen.queryByRole('button', { name: /save/i })).not.toBeInTheDocument()
+  })
+
+  it('shows Auto-Print on Save toggle card', async () => {
+    await openPrintTab()
+    await waitFor(() => {
+      expect(screen.getByText('Auto-Print on Save')).toBeInTheDocument()
+    })
+  })
+
+  it('auto-print toggle is on by default', async () => {
+    await openPrintTab()
+    await waitFor(() => {
+      const toggle = screen.getByRole('switch', { name: /auto-print on save/i })
+      expect(toggle).toHaveAttribute('aria-checked', 'true')
+    })
+  })
+
+  it('clicking auto-print toggle calls saveAutoPrint(false)', async () => {
+    const user = await openPrintTab()
+    await waitFor(() => screen.getByRole('switch', { name: /auto-print on save/i }))
+
+    const toggle = screen.getByRole('switch', { name: /auto-print on save/i })
+    await user.click(toggle)
+
+    await waitFor(() => {
+      expect(mockSaveAutoPrint).toHaveBeenCalledWith(false)
+    })
+  })
+
+  it('clicking auto-print toggle twice calls saveAutoPrint(true)', async () => {
+    const user = await openPrintTab()
+    await waitFor(() => screen.getByRole('switch', { name: /auto-print on save/i }))
+
+    const toggle = screen.getByRole('switch', { name: /auto-print on save/i })
+    await user.click(toggle)
+    await user.click(toggle)
+
+    await waitFor(() => {
+      expect(mockSaveAutoPrint).toHaveBeenLastCalledWith(true)
+    })
   })
 })

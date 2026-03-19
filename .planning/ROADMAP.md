@@ -81,7 +81,9 @@ Plans:
   2. With auto-print on, slips print automatically on visit save (existing behavior preserved)
   3. With auto-print off, slips do not auto-print; doctor triggers print manually
   4. Auto-print preference persists after page refresh and browser restart
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 16-01-PLAN.md -- Auto-print toggle in settings UI, persistence, and print gate
 
 ## Progress
 
@@ -102,8 +104,8 @@ Plans:
 | 12. Focus Foundation and Form Submission | v1.3 | 2/2 | Complete | 2026-03-14 |
 | 13. Keyboard Interactions | v1.3 | 3/3 | Complete | 2026-03-14 |
 | 14. Print Flow | v1.3 | 1/1 | Complete | 2026-03-14 |
-| 15. Slip Assignment | 2/2 | Complete   | 2026-03-19 | - |
-| 16. Auto-Print Toggle | v1.4 | 0/? | Not started | - |
+| 15. Slip Assignment | v1.4 | 2/2 | Complete | 2026-03-19 |
+| 16. Auto-Print Toggle | v1.4 | 0/1 | Not started | - |
 
 ---
-*Last updated: 2026-03-19 -- Phase 15 planned (2 plans)*
+*Last updated: 2026-03-19 -- Phase 16 planned (1 plan)*

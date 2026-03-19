@@ -11,6 +11,7 @@ export interface PaperDimensions {
 export interface PrintSettings {
   prescriptionSize: PaperSize
   dispensarySize: PaperSize
+  autoPrint: boolean
 }
 
 export const PAPER_SIZES: Record<PaperSize, PaperDimensions> = {
@@ -37,13 +38,15 @@ function coerceSize(raw: unknown): PaperSize {
 const DEFAULT_SIZE: PaperSize = 'A5'
 
 export async function getPrintSettings(): Promise<PrintSettings> {
-  const [prescriptionEntry, dispensaryEntry] = await Promise.all([
+  const [prescriptionEntry, dispensaryEntry, autoPrintEntry] = await Promise.all([
     db.settings.get('printPrescriptionSize'),
     db.settings.get('printDispensarySize'),
+    db.settings.get('autoPrint'),
   ])
   return {
     prescriptionSize: coerceSize(prescriptionEntry?.value ?? DEFAULT_SIZE),
     dispensarySize: coerceSize(dispensaryEntry?.value ?? DEFAULT_SIZE),
+    autoPrint: autoPrintEntry?.value !== false,
   }
 }
 
@@ -52,6 +55,10 @@ export async function savePrintSetting(
   value: PaperSize
 ): Promise<void> {
   await db.settings.put({ key, value })
+}
+
+export async function saveAutoPrint(value: boolean): Promise<void> {
+  await db.settings.put({ key: 'autoPrint', value })
 }
 
 // Proportional margin: A5 baseline = 148 * 210 = 31080, margin = 8mm
