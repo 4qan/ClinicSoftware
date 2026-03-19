@@ -246,7 +246,7 @@ Plans:
 | 18. Unified Medication Management | v1.6 | 2/2 | Complete | 2026-03-19 |
 | 19. PouchDB Migration | v2.0 | 3/3 | Complete | 2026-03-19 |
 | 20. CouchDB Infrastructure | 2/2 | Complete    | 2026-03-19 | - |
-| 21. Auth and Role Enforcement | 3/3 | Complete   | 2026-03-19 | - |
+| 21. Auth and Role Enforcement | 3/3 | Complete    | 2026-03-19 | - |
 | 22. Live Sync | v2.0 | 0/TBD | Not started | - |
 | 23. Backup Redesign | v2.0 | 0/TBD | Not started | - |
 

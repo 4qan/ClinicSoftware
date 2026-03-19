@@ -18,8 +18,8 @@ Instead of building a traditional client-server app, I went with a **zero-backen
 
 - **Offline-first PWA**: Service worker caches everything on first load. No internet needed after that.
 - **Browser-local storage**: All data lives in IndexedDB via PouchDB. Nothing leaves the local network.
-- **LAN sync (in progress)**: Doctor and nurse machines sync over the local network via CouchDB, with role-based write restrictions. No cloud, no internet required.
-- **Local auth**: PBKDF2-hashed passwords stored client-side. No server to authenticate against.
+- **LAN sync (in progress)**: Doctor and nurse machines sync over the local network via CouchDB. Role-based write restrictions enforced at the database level. No cloud, no internet required.
+- **CouchDB auth**: Username/password login against CouchDB session API. Doctor gets full access, nurse gets patient and vitals only.
 - **Manual backups**: JSON export/import for data portability. The user controls their data.
 - **Auto-print control**: Toggle automatic slip printing on/off from settings
 
@@ -72,9 +72,18 @@ This eliminates infrastructure costs, removes network dependency, and keeps pati
 - Escape to dismiss dropdowns, inline forms, and overlays
 - Tab directly to Print button, Enter to print, focus restores after print dialog
 
+**Multi-User Access**
+- Two roles: Doctor (full access) and Nurse (patients + vitals only)
+- CouchDB session auth with role extraction
+- Route guards redirect unauthorized access silently
+- Sidebar and header adapt to logged-in role
+- Prescription sections hidden from nurse in visit forms
+- Doctor can reset nurse password from Settings
+
 **Security**
-- Local password authentication (PBKDF2, 100k iterations, random salt)
-- Zero data transmission, no cloud, no server
+- CouchDB session authentication (username/password against `/_session`)
+- All data stays on the clinic LAN, no cloud, no external calls
+- Database-level write restrictions: nurse cannot modify prescriptions, visits, or drugs even via direct API
 - See [SECURITY.md](SECURITY.md) for details
 
 ## Design Decisions
