@@ -3,63 +3,70 @@
 **Defined:** 2026-03-19
 **Core Value:** The doctor can see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even with no internet.
 
-## v1.4 Requirements
+## v2.0 Requirements
 
-Requirements for v1.4 Slip Assignment & Print Settings. Each maps to roadmap phases.
+Requirements for v2.0 Multi-User Sync. Nurse and doctor on separate computers, data syncs over LAN.
 
-### Slip Assignment
+### Data Migration
 
-- [x] **SLIP-01**: User can designate each medication as "dispensary" or "prescription" when adding it
-- [x] **SLIP-02**: New medications default to "dispensary"
-- [x] **SLIP-03**: Prescription slip only prints medications tagged as "prescription"
-- [x] **SLIP-04**: Dispensary slip only prints medications tagged as "dispensary"
-- [x] **SLIP-05**: Slip assignment is stored with the medication snapshot (persists with the encounter)
+- [x] **MIGR-01**: App migrates all existing patient, visit, prescription, medication, and settings data from the old storage format to the new one on first launch after upgrade, without data loss
+- [x] **MIGR-02**: Drug records use stable identifiers so the same drug is never duplicated when both machines start up for the first time
+- [x] **MIGR-03**: Migration runs once and never re-runs on subsequent app launches
 
-### Print Settings
+### Authentication & Roles
 
-- [x] **PRSET-05**: User can toggle auto-print on/off in Print Management settings
-- [x] **PRSET-06**: Auto-print preference persists across sessions
+- [ ] **AUTH-01**: Login screen shows a username field alongside the existing password field
+- [ ] **AUTH-02**: Doctor and nurse accounts are pre-created; no setup wizard needed
+- [ ] **AUTH-03**: Doctor has full access to all features (unchanged from today)
+- [ ] **AUTH-04**: Nurse can only access patient search/creation and vitals recording
+- [ ] **AUTH-05**: Nurse cannot access prescriptions, medications, print, settings, or backup
+- [ ] **AUTH-06**: App header shows the logged-in user's role ("Doctor" or "Nurse")
 
-## v1.5 Requirements
+### Sync
 
-Requirements for v1.5 Visit Vitals. Maps to Phase 17.
+- [ ] **SYNC-01**: Data created or edited on one machine appears on the other machine automatically within seconds when both are on the same network
+- [ ] **SYNC-02**: If the network drops, both users keep working normally; data syncs automatically when the network returns
+- [ ] **SYNC-03**: Sync status (connected/disconnected/last synced) is visible in Settings
+- [ ] **SYNC-04**: If the doctor's computer is off, the nurse keeps working; data syncs when the doctor's computer comes back on
 
-### Visit Vitals
+### CouchDB Infrastructure
 
-- [x] **VIT-01**: NewVisitPage and EditVisitPage show a collapsible "Vitals" section above clinical notes with a 2x2 grid (temperature, BP, weight, SpO2)
-- [x] **VIT-02**: Temperature input supports Fahrenheit (default) and Celsius with a toggle that converts the displayed value
-- [x] **VIT-03**: Blood pressure captured as systolic/diastolic (mmHg); weight in kg; SpO2 as percentage; all fields optional with no validation
-- [ ] **VIT-04**: Vitals display in VisitCard collapsed state as compact inline badges (Temp: X | BP: X/X | Wt: X | SpO2: X)
-- [ ] **VIT-05**: Vitals display in NewVisitPage inline visit history preview, same format as VisitCard
-- [x] **VIT-06**: Vitals persist via DB migration (v6), survive save/reload, and do NOT appear on printed slips
+- [ ] **INFRA-01**: CouchDB runs as a Windows service on the doctor's machine, starts automatically on boot
+- [ ] **INFRA-02**: Nurse's browser connects to CouchDB over the clinic's local network
+- [ ] **INFRA-03**: CouchDB is secured with admin credentials before LAN access is enabled
+- [ ] **INFRA-04**: Nurse is prevented from writing prescriptions or modifying medications at the database level (not just UI)
 
-## v1.6 Requirements
+### Backup & Restore
 
-Requirements for v1.6 Unified Medication Management. Maps to Phase 18.
+- [ ] **BKUP-01**: Manual database export still works, produces a downloadable file
+- [ ] **BKUP-02**: Restore uploads data to the shared database; both machines receive the restored data via sync
+- [ ] **BKUP-03**: Auto-snapshot system continues to function after the migration
 
-### Medication Management
+## Previous Milestone Requirements
 
-- [x] **MED-01**: Top-level Medications page accessible from sidebar shows all drugs in a searchable, filterable table
-- [x] **MED-02**: Search bar filters across brand and salt name
-- [x] **MED-03**: Filter pills for All, Predefined, Custom, Disabled views
-- [x] **MED-04**: All drugs (predefined and custom) are fully editable via modal form
-- [x] **MED-05**: All drugs (predefined and custom) are deletable
-- [x] **MED-06**: Editing a predefined drug sets isOverridden flag; "Reset to default" reverts to seed values
-- [x] **MED-07**: Seeding runs only on first-ever app use (empty drugs table), never re-seeds
-- [x] **MED-08**: Settings medications tab is removed; link to Medications page provided
+### v1.4 Slip Assignment & Print Settings (Complete)
 
-## Future Requirements
+- [x] **SLIP-01** through **SLIP-05**: Per-medication slip assignment
+- [x] **PRSET-05**, **PRSET-06**: Auto-print toggle
 
-None currently deferred.
+### v1.5 Visit Vitals (Complete)
+
+- [x] **VIT-01** through **VIT-06**: Optional vitals per visit
+
+### v1.6 Unified Medication Management (Complete)
+
+- [x] **MED-01** through **MED-08**: Top-level medications page, override model
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Both-slips option per medication | Doctor confirmed each med is one slip or the other, never both |
-| Per-visit print settings | Global settings sufficient for single-doctor clinic |
-| Vitals validation / color coding | Doctor interprets the numbers, not the UI |
-| Vitals on printed slips | Not needed per user decision |
+| Cloud sync / Firebase / Supabase | LAN CouchDB chosen for internet independence |
+| Multi-clinic sync | Single clinic, LAN-only sync sufficient |
+| Additional roles (receptionist, pharmacist) | Only doctor and nurse needed |
+| In-app user management UI | Accounts pre-created during development |
+| Manual conflict resolution UI | 2-person role-separated workflow makes conflicts near-zero frequency |
+| Sync status on every page | Sync status in Settings only per user decision |
 
 ## Traceability
 
@@ -67,33 +74,32 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SLIP-01 | Phase 15 | Complete |
-| SLIP-02 | Phase 15 | Complete |
-| SLIP-03 | Phase 15 | Complete |
-| SLIP-04 | Phase 15 | Complete |
-| SLIP-05 | Phase 15 | Complete |
-| PRSET-05 | Phase 16 | Complete |
-| PRSET-06 | Phase 16 | Complete |
-| VIT-01 | Phase 17 | Planned |
-| VIT-02 | Phase 17 | Planned |
-| VIT-03 | Phase 17 | Planned |
-| VIT-04 | Phase 17 | Planned |
-| VIT-05 | Phase 17 | Planned |
-| VIT-06 | Phase 17 | Planned |
-| MED-01 | Phase 18 | Complete |
-| MED-02 | Phase 18 | Complete |
-| MED-03 | Phase 18 | Complete |
-| MED-04 | Phase 18 | Complete |
-| MED-05 | Phase 18 | Complete |
-| MED-06 | Phase 18 | Complete |
-| MED-07 | Phase 18 | Complete |
-| MED-08 | Phase 18 | Complete |
+| MIGR-01 | Phase 19 | Complete |
+| MIGR-02 | Phase 19 | Complete |
+| MIGR-03 | Phase 19 | Complete |
+| INFRA-01 | Phase 20 | Pending |
+| INFRA-02 | Phase 20 | Pending |
+| INFRA-03 | Phase 20 | Pending |
+| INFRA-04 | Phase 20 | Pending |
+| AUTH-01 | Phase 21 | Pending |
+| AUTH-02 | Phase 21 | Pending |
+| AUTH-03 | Phase 21 | Pending |
+| AUTH-04 | Phase 21 | Pending |
+| AUTH-05 | Phase 21 | Pending |
+| AUTH-06 | Phase 21 | Pending |
+| SYNC-01 | Phase 22 | Pending |
+| SYNC-02 | Phase 22 | Pending |
+| SYNC-03 | Phase 22 | Pending |
+| SYNC-04 | Phase 22 | Pending |
+| BKUP-01 | Phase 23 | Pending |
+| BKUP-02 | Phase 23 | Pending |
+| BKUP-03 | Phase 23 | Pending |
 
 **Coverage:**
-- v1.4 requirements: 7 total, mapped: 7, unmapped: 0
-- v1.5 requirements: 6 total, mapped: 6, unmapped: 0
-- v1.6 requirements: 8 total, mapped: 8, unmapped: 0
+- v2.0 requirements: 20 total
+- Mapped to phases: 20
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-19*
-*Last updated: 2026-03-19 -- v1.5 VIT requirements added*
+*Last updated: 2026-03-19 -- traceability complete (Phases 19-23)*
