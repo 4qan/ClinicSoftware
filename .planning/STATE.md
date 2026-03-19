@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Multi-User Sync
 status: unknown
-stopped_at: Completed 19-03-PLAN.md
-last_updated: "2026-03-19T16:16:31.218Z"
+stopped_at: Completed 20-01-PLAN.md
+last_updated: "2026-03-19T16:46:22.759Z"
 progress:
   total_phases: 9
   completed_phases: 5
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 12
+  completed_plans: 11
 ---
 
 # Project State: ClinicSoftware
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** The doctor can see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even with no internet.
-**Current focus:** Phase 20+ — sync infrastructure (Phase 19 complete)
+**Current focus:** Phase 20 — couchdb-infrastructure
 
 ## Current Position
 
-Phase: 19 (pouchdb-migration) — COMPLETE
-Plan: 3 of 3
+Phase: 20 (couchdb-infrastructure) — EXECUTING
+Plan: 1 of 2
 
 ## Accumulated Context
 
@@ -43,6 +43,9 @@ Plan: 3 of 3
 - [Phase 19]: timestamps.ts deprecated helpers removed; timestamps.test.ts updated in Plan 03 to test only withTimestamps
 - [Phase 19]: PouchDB memory adapter via import.meta.env.VITEST prevents LevelDB lock contention in parallel test workers
 - [Phase 19]: SCHEMA_VERSION=2 constant in backup.ts distinguishes PouchDB backups from Dexie era (v1-7); restore handles both formats
+- [Phase 20-couchdb-infrastructure]: [Phase 20-01]: require_valid_user_except_for_up keeps /_up open for Phase 22 connectivity checks
+- [Phase 20-couchdb-infrastructure]: [Phase 20-01]: credentials=false with origins=* in CouchDB CORS -- PouchDB uses Basic auth headers not cookies
+- [Phase 20-couchdb-infrastructure]: [Phase 20-01]: validate_doc_update blocks nurse on visit/visitmed/drug; allows patient/recent/settings -- matches PouchDB type discriminators
 
 ### Pending Todos
 
@@ -56,8 +59,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T16:12:32.936Z
-Stopped at: Completed 19-03-PLAN.md
+Last session: 2026-03-19T16:46:22.757Z
+Stopped at: Completed 20-01-PLAN.md
 Resume file: None
 
 ---

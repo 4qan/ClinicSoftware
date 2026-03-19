@@ -31,10 +31,10 @@ Requirements for v2.0 Multi-User Sync. Nurse and doctor on separate computers, d
 
 ### CouchDB Infrastructure
 
-- [ ] **INFRA-01**: CouchDB runs as a Windows service on the doctor's machine, starts automatically on boot
-- [ ] **INFRA-02**: Nurse's browser connects to CouchDB over the clinic's local network
-- [ ] **INFRA-03**: CouchDB is secured with admin credentials before LAN access is enabled
-- [ ] **INFRA-04**: Nurse is prevented from writing prescriptions or modifying medications at the database level (not just UI)
+- [x] **INFRA-01**: CouchDB runs as a Windows service on the doctor's machine, starts automatically on boot
+- [x] **INFRA-02**: Nurse's browser connects to CouchDB over the clinic's local network
+- [x] **INFRA-03**: CouchDB is secured with admin credentials before LAN access is enabled
+- [x] **INFRA-04**: Nurse is prevented from writing prescriptions or modifying medications at the database level (not just UI)
 
 ### Backup & Restore
 
@@ -77,10 +77,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MIGR-01 | Phase 19 | Complete |
 | MIGR-02 | Phase 19 | Complete |
 | MIGR-03 | Phase 19 | Complete |
-| INFRA-01 | Phase 20 | Pending |
-| INFRA-02 | Phase 20 | Pending |
-| INFRA-03 | Phase 20 | Pending |
-| INFRA-04 | Phase 20 | Pending |
+| INFRA-01 | Phase 20 | Complete |
+| INFRA-02 | Phase 20 | Complete |
+| INFRA-03 | Phase 20 | Complete |
+| INFRA-04 | Phase 20 | Complete |
 | AUTH-01 | Phase 21 | Pending |
 | AUTH-02 | Phase 21 | Pending |
 | AUTH-03 | Phase 21 | Pending |
