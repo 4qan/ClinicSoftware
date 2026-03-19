@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { db } from '@/db/index'
+import { getSetting, putSetting } from '@/db/pouchdb'
 import {
   generateSalt,
   hashPassword,
@@ -20,12 +20,12 @@ interface AuthRecord {
 }
 
 async function getAuthRecord(): Promise<AuthRecord | undefined> {
-  const setting = await db.settings.get('auth')
-  return setting?.value as AuthRecord | undefined
+  const value = await getSetting('auth')
+  return value as AuthRecord | undefined
 }
 
 async function setAuthRecord(record: AuthRecord): Promise<void> {
-  await db.settings.put({ key: 'auth', value: record })
+  await putSetting('auth', record)
 }
 
 export function useAuth() {

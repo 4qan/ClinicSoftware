@@ -1,11 +1,26 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useLiveQuery } from 'dexie-react-hooks'
-import { db } from '@/db/index'
+import { pouchDb } from '@/db/pouchdb'
+import type { Patient } from '@/db/index'
 import { PatientTable } from '@/components/PatientTable'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 
 export function PatientsPage() {
-  const patients = useLiveQuery(() => db.patients.orderBy('createdAt').reverse().toArray()) ?? []
+  const [patients, setPatients] = useState<Patient[]>([])
+
+  useEffect(() => {
+    pouchDb.allDocs({
+      startkey: 'patient:',
+      endkey: 'patient:\uffff',
+      include_docs: true,
+    }).then(result => {
+      const pts = result.rows
+        .map(r => r.doc as any)
+        .map(({ _id, _rev, type, ...rest }: { _id: string; _rev: string; type: string; [key: string]: unknown }) => rest as Patient)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      setPatients(pts)
+    })
+  }, [])
 
   return (
     <div>

@@ -7,7 +7,7 @@ import { MedicationList } from '@/components/MedicationList'
 import { RxNotesField } from '@/components/RxNotesField'
 import { getPatient } from '@/db/patients'
 import { getVisit, updateVisit, deleteVisit } from '@/db/visits'
-import { db } from '@/db/index'
+import { putSetting } from '@/db/pouchdb'
 import type { Patient } from '@/db/index'
 import type { MedicationFormData } from '@/components/MedicationEntry'
 import { VitalsInput, celsiusToFahrenheit } from '@/components/VitalsInput'
@@ -119,7 +119,7 @@ export function EditVisitPage() {
           slipType: med.slipType,
         })),
       })
-      await db.settings.put({ key: 'rxNotesDefaultLang', value: rxNotesLang })
+      await putSetting('rxNotesDefaultLang', rxNotesLang)
       return true
     } catch {
       setSaving(false)

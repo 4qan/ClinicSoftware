@@ -11,7 +11,7 @@ import { usePatientSearch } from '@/hooks/usePatientSearch'
 import { useAutocompleteKeyboard } from '@/hooks/useAutocompleteKeyboard'
 import { createVisit } from '@/db/visits'
 import { getPatientVisits } from '@/db/visits'
-import { db } from '@/db/index'
+import { getSetting, putSetting } from '@/db/pouchdb'
 import type { Patient } from '@/db/index'
 import type { PatientInput } from '@/db/patients'
 import type { MedicationFormData } from '@/components/MedicationEntry'
@@ -64,9 +64,9 @@ export function NewVisitPage() {
 
   // Load sticky language preference
   useEffect(() => {
-    db.settings.get('rxNotesDefaultLang').then((setting) => {
-      if (setting && (setting.value === 'en' || setting.value === 'ur')) {
-        setRxNotesLang(setting.value)
+    getSetting('rxNotesDefaultLang').then((value) => {
+      if (value === 'en' || value === 'ur') {
+        setRxNotesLang(value)
       }
     })
   }, [])
@@ -217,7 +217,7 @@ export function NewVisitPage() {
           slipType: med.slipType,
         })),
       })
-      await db.settings.put({ key: 'rxNotesDefaultLang', value: rxNotesLang })
+      await putSetting('rxNotesDefaultLang', rxNotesLang)
       return visitId
     } catch {
       setSaving(false)

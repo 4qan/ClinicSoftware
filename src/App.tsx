@@ -5,6 +5,8 @@ import { ToastProvider } from './components/ToastProvider'
 import { LoginPage } from './auth/LoginPage'
 import { seedDrugDatabase, deduplicateExistingDrugs } from './db/seedDrugs'
 import { checkAndCreateSnapshot } from './utils/snapshots'
+import { runMigrationIfNeeded } from './db/migration'
+import { ensureIndexes } from './db/pouchdb'
 import { AppLayout } from './components/AppLayout'
 import { HomePage } from './pages/HomePage'
 import { PatientsPage } from './pages/PatientsPage'
@@ -21,7 +23,9 @@ function AppContent() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      seedDrugDatabase()
+      runMigrationIfNeeded()
+        .then(() => ensureIndexes())
+        .then(() => seedDrugDatabase())
         .then(() => deduplicateExistingDrugs())
         .catch(console.error)
 
