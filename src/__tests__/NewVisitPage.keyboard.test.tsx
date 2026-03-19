@@ -5,6 +5,22 @@ import { MemoryRouter } from 'react-router-dom'
 import { NewVisitPage } from '@/pages/NewVisitPage'
 import type { Patient } from '@/db/index'
 
+// Mock auth provider (NewVisitPage now uses useAuthContext for role)
+vi.mock('@/auth/AuthProvider', () => ({
+  useAuthContext: () => ({
+    isAuthenticated: true,
+    isLoading: false,
+    role: 'doctor' as const,
+    username: 'doctor',
+    credentials: null,
+    login: vi.fn(),
+    logout: vi.fn(),
+    changePassword: vi.fn(),
+    resetNursePassword: vi.fn(),
+  }),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}))
+
 // Mock all db modules to prevent IndexedDB access in jsdom
 vi.mock('@/db/patients', () => ({
   registerPatient: vi.fn(),
@@ -15,6 +31,15 @@ vi.mock('@/db/patients', () => ({
 vi.mock('@/db/visits', () => ({
   createVisit: vi.fn(),
   getPatientVisits: vi.fn().mockResolvedValue([]),
+}))
+
+vi.mock('@/db/pouchdb', () => ({
+  getSetting: vi.fn().mockResolvedValue(undefined),
+  putSetting: vi.fn(),
+  pouchDb: {},
+  ensureIndexes: vi.fn(),
+  migrateDbName: vi.fn(),
+  resetPouchDb: vi.fn(),
 }))
 
 vi.mock('@/db/index', () => ({
