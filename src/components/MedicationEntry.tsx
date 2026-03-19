@@ -15,6 +15,7 @@ export interface MedicationFormData {
   quantity: string
   frequency: string
   duration: string
+  slipType: 'dispensary' | 'prescription'
 }
 
 interface MedicationEntryProps {
@@ -29,6 +30,7 @@ const emptyForm: MedicationFormData = {
   quantity: '',
   frequency: '',
   duration: '',
+  slipType: 'dispensary',
 }
 
 export function MedicationEntry({ onAdd }: MedicationEntryProps) {

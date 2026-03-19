@@ -67,7 +67,10 @@
   2. Prescription slip prints only medications tagged as "prescription"
   3. Dispensary slip prints only medications tagged as "dispensary"
   4. Slip assignment persists when the encounter is saved and reopened
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 15-01-PLAN.md -- Data model (slipType field) and toggle UI in medication list
+- [ ] 15-02-PLAN.md -- Print filtering by slip type, empty slip handling, Rx badge in visit history
 
 ### Phase 16: Auto-Print Toggle
 **Goal**: Doctor can enable or disable auto-print from Print Management settings, and the preference survives sessions
@@ -99,8 +102,8 @@
 | 12. Focus Foundation and Form Submission | v1.3 | 2/2 | Complete | 2026-03-14 |
 | 13. Keyboard Interactions | v1.3 | 3/3 | Complete | 2026-03-14 |
 | 14. Print Flow | v1.3 | 1/1 | Complete | 2026-03-14 |
-| 15. Slip Assignment | v1.4 | 0/? | Not started | - |
+| 15. Slip Assignment | v1.4 | 0/2 | Not started | - |
 | 16. Auto-Print Toggle | v1.4 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-03-19 -- v1.4 roadmap created*
+*Last updated: 2026-03-19 -- Phase 15 planned (2 plans)*

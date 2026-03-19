@@ -61,6 +61,7 @@ export interface VisitMedication {
   frequency: string
   duration: string
   sortOrder: number
+  slipType?: 'dispensary' | 'prescription'
 }
 
 export class ClinicDatabase extends Dexie {
@@ -118,6 +119,17 @@ export class ClinicDatabase extends Dexie {
           visit.rxNotesLang = 'en'
         }
       })
+    })
+
+    // v5: adds slipType field to VisitMedication (no new indexes needed)
+    // Missing slipType is treated as 'dispensary' by convention at read time
+    this.version(5).stores({
+      patients: 'id, patientId, firstNameLower, lastNameLower, contact, createdAt',
+      settings: 'key',
+      recentPatients: 'id, viewedAt',
+      drugs: 'id, brandNameLower, saltNameLower, isCustom',
+      visits: 'id, patientId, createdAt',
+      visitMedications: 'id, visitId',
     })
   }
 }
