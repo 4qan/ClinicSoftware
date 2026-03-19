@@ -185,7 +185,7 @@ Plans:
   3. Logging in as nurse restricts navigation to patient search, patient creation, and vitals recording only
   4. Nurse attempting to navigate to a doctor-only route is redirected to an accessible page
   5. App header shows the logged-in user's role label ("Doctor" or "Nurse")
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 Plans:
 - [ ] 21-01-PLAN.md -- CouchDB auth foundation: useCouchAuth hook, LoginPage rewrite, tests
 - [ ] 21-02-PLAN.md -- Role enforcement UI: ProtectedRoute, sidebar filtering, visit form restrictions
@@ -246,7 +246,7 @@ Plans:
 | 18. Unified Medication Management | v1.6 | 2/2 | Complete | 2026-03-19 |
 | 19. PouchDB Migration | v2.0 | 3/3 | Complete | 2026-03-19 |
 | 20. CouchDB Infrastructure | 2/2 | Complete    | 2026-03-19 | - |
-| 21. Auth and Role Enforcement | v2.0 | 0/3 | Not started | - |
+| 21. Auth and Role Enforcement | 1/3 | In Progress|  | - |
 | 22. Live Sync | v2.0 | 0/TBD | Not started | - |
 | 23. Backup Redesign | v2.0 | 0/TBD | Not started | - |
 

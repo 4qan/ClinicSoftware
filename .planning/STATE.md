@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Multi-User Sync
 status: unknown
-stopped_at: Completed 20-01-PLAN.md
-last_updated: "2026-03-19T17:04:00.397Z"
+stopped_at: Completed 21-01-PLAN.md
+last_updated: "2026-03-19T18:37:38.423Z"
 progress:
   total_phases: 9
   completed_phases: 6
-  total_plans: 12
-  completed_plans: 12
+  total_plans: 15
+  completed_plans: 13
 ---
 
 # Project State: ClinicSoftware
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** The doctor can see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even with no internet.
-**Current focus:** Phase 20 — couchdb-infrastructure
+**Current focus:** Phase 21 — auth-and-role-enforcement
 
 ## Current Position
 
-Phase: 20 (couchdb-infrastructure) — EXECUTING
-Plan: 1 of 2
+Phase: 21 (auth-and-role-enforcement) — EXECUTING
+Plan: 2 of 3
 
 ## Accumulated Context
 
@@ -46,6 +46,9 @@ Plan: 1 of 2
 - [Phase 20-couchdb-infrastructure]: [Phase 20-01]: require_valid_user_except_for_up keeps /_up open for Phase 22 connectivity checks
 - [Phase 20-couchdb-infrastructure]: [Phase 20-01]: credentials=false with origins=* in CouchDB CORS -- PouchDB uses Basic auth headers not cookies
 - [Phase 20-couchdb-infrastructure]: [Phase 20-01]: validate_doc_update blocks nurse on visit/visitmed/drug; allows patient/recent/settings -- matches PouchDB type discriminators
+- [Phase 21-01]: useCouchAuth reads couchUrl from PouchDB settings on mount; if not set login returns not_configured
+- [Phase 21-01]: Recovery code flow (PBKDF2) deleted entirely; RecoveryCodeSection removed from SettingsPage
+- [Phase 21-01]: Session verified against CouchDB on mount; unreachable CouchDB clears session rather than trusting it
 
 ### Pending Todos
 
@@ -55,12 +58,12 @@ None.
 
 - Phase 22: Verify Workbox `networkOnly` exclusion syntax for current `vite-plugin-pwa` API before writing sync config
 - Phase 23: Restore flow (stop sync, destroy local PouchDB, restore to CouchDB, restart sync) needs explicit end-to-end test
-- Carried: login.test.tsx 4 pre-existing failures from v1.3 (BrowserRouter basename mismatch in jsdom)
+- (Resolved in 21-01) login.test.tsx pre-existing failures fixed: MemoryRouter replaces BrowserRouter in tests
 
 ## Session Continuity
 
-Last session: 2026-03-19T16:46:22.757Z
-Stopped at: Completed 20-01-PLAN.md
+Last session: 2026-03-19T18:37:38.420Z
+Stopped at: Completed 21-01-PLAN.md
 Resume file: None
 
 ---
