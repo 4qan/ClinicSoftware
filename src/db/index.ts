@@ -35,6 +35,7 @@ export interface Drug {
   strength: string
   isCustom: boolean
   isActive: boolean
+  isOverridden?: boolean
   createdAt: string
   updatedAt: string
 }
@@ -130,6 +131,23 @@ export class ClinicDatabase extends Dexie {
       drugs: 'id, brandNameLower, saltNameLower, isCustom',
       visits: 'id, patientId, createdAt',
       visitMedications: 'id, visitId',
+    })
+
+    // v6: adds isOverridden field to Drug (no new indexes needed)
+    // Existing records without isOverridden are treated as false
+    this.version(6).stores({
+      patients: 'id, patientId, firstNameLower, lastNameLower, contact, createdAt',
+      settings: 'key',
+      recentPatients: 'id, viewedAt',
+      drugs: 'id, brandNameLower, saltNameLower, isCustom',
+      visits: 'id, patientId, createdAt',
+      visitMedications: 'id, visitId',
+    }).upgrade(tx => {
+      return tx.table('drugs').toCollection().modify(drug => {
+        if (drug.isOverridden === undefined) {
+          drug.isOverridden = false
+        }
+      })
     })
   }
 }

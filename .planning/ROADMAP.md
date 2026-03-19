@@ -6,7 +6,8 @@
 - v1.1 Urdu & Backup -- 7 phases (shipped 2026-03-11)
 - v1.2 Print Customization -- 2 phases (shipped 2026-03-12)
 - v1.3 Keyboard Navigation -- 3 phases (shipped 2026-03-15)
-- v1.4 Slip Assignment & Print Settings -- Phases 15-16 (in progress)
+- v1.4 Slip Assignment & Print Settings -- Phases 15-16 (shipped 2026-03-19)
+- v1.5 Visit Vitals -- Phase 17 (in progress)
 
 ## Phases
 
@@ -49,12 +50,19 @@
 
 </details>
 
-### v1.4 Slip Assignment & Print Settings (In Progress)
+<details>
+<summary>v1.4 Slip Assignment & Print Settings (Phases 15-16) -- SHIPPED 2026-03-19</summary>
 
-**Milestone Goal:** Let the doctor control which medicines appear on which printed slip, and toggle auto-print behavior.
+- [x] Phase 15: Slip Assignment (2/2 plans) -- completed 2026-03-19
+- [x] Phase 16: Auto-Print Toggle (1/1 plan) -- completed 2026-03-19
 
-- [x] **Phase 15: Slip Assignment** - Per-medication slip designation with print filtering (completed 2026-03-19)
-- [x] **Phase 16: Auto-Print Toggle** - Auto-print on/off setting with persistent preference (completed 2026-03-19)
+</details>
+
+### v1.5 Visit Vitals (In Progress)
+
+**Milestone Goal:** Record optional vital signs per visit (temperature, blood pressure, weight, SpO2) and surface them in visit history for quick clinical reference.
+
+- [ ] **Phase 17: Visit Vitals** - Vital signs data model, input UI, and visit history display
 
 ## Phase Details
 
@@ -85,6 +93,39 @@ Plans:
 Plans:
 - [ ] 16-01-PLAN.md -- Auto-print toggle in settings UI, persistence, and print gate
 
+### Phase 17: Visit Vitals
+**Goal**: Doctor can record optional vital signs (temperature, BP, weight, SpO2) per visit; vitals display prominently in visit history cards for quick clinical reference
+**Depends on**: Phase 16
+**Requirements**: VIT-01 through VIT-06
+**Success Criteria** (what must be TRUE):
+  1. NewVisitPage and EditVisitPage show a collapsible "Vitals" section above clinical notes with a compact 2x2 grid layout
+  2. Temperature input supports Fahrenheit (default) and Celsius with a toggle that converts the value
+  3. Blood pressure captured as systolic/diastolic (mmHg) in side-by-side inputs
+  4. Weight input in kg, SpO2 input as percentage, all fields optional
+  5. Vitals display in VisitCard collapsed state (compact inline badges) and in NewVisitPage inline visit history preview
+  6. Vitals persist via DB migration (v6) and survive save/reload cycle
+  7. Vitals do NOT appear on printed slips
+**Plans:** 2 plans
+Plans:
+- [ ] 17-01-PLAN.md -- Data model (Visit interface + DB v6), VitalsInput component, wire into NewVisitPage and EditVisitPage
+- [ ] 17-02-PLAN.md -- Vitals display in VisitCard badges and inline visit history, verify no print impact
+
+### Phase 18: Unified Medication Management
+**Goal**: Doctor can manage all medications (predefined and custom) from a dedicated top-level page with full CRUD, search, filtering, and an override model that tracks edits to predefined drugs with reset capability
+**Depends on:** Phase 17
+**Requirements**: MED-01, MED-02, MED-03, MED-04, MED-05, MED-06, MED-07, MED-08
+**Success Criteria** (what must be TRUE):
+  1. Top-level Medications page accessible from sidebar shows all drugs in a searchable, filterable table
+  2. All drugs (predefined and custom) are fully editable and deletable
+  3. Editing a predefined drug sets isOverridden flag; "Reset to default" reverts to seed values
+  4. Seeding runs only on first-ever app use (empty drugs table), never re-seeds
+  5. Settings medications tab is removed; DrugManagement component replaced by MedicationsPage
+**Plans:** 2 plans
+
+Plans:
+- [ ] 18-01-PLAN.md -- Data layer: Drug interface update, CRUD functions, seed-once logic
+- [ ] 18-02-PLAN.md -- Medications page UI, navigation, routing, settings cleanup
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -105,7 +146,9 @@ Plans:
 | 13. Keyboard Interactions | v1.3 | 3/3 | Complete | 2026-03-14 |
 | 14. Print Flow | v1.3 | 1/1 | Complete | 2026-03-14 |
 | 15. Slip Assignment | v1.4 | 2/2 | Complete | 2026-03-19 |
-| 16. Auto-Print Toggle | 1/1 | Complete   | 2026-03-19 | - |
+| 16. Auto-Print Toggle | v1.4 | 1/1 | Complete | 2026-03-19 |
+| 17. Visit Vitals | v1.5 | 0/2 | Planned | - |
+| 18. Unified Medication Management | v1.6 | 0/2 | Planned | - |
 
 ---
-*Last updated: 2026-03-19 -- Phase 16 planned (1 plan)*
+*Last updated: 2026-03-19 -- Phase 17 planned (Visit Vitals)*

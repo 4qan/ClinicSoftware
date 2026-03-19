@@ -20,6 +20,19 @@ Requirements for v1.4 Slip Assignment & Print Settings. Each maps to roadmap pha
 - [x] **PRSET-05**: User can toggle auto-print on/off in Print Management settings
 - [x] **PRSET-06**: Auto-print preference persists across sessions
 
+## v1.5 Requirements
+
+Requirements for v1.5 Visit Vitals. Maps to Phase 17.
+
+### Visit Vitals
+
+- [ ] **VIT-01**: NewVisitPage and EditVisitPage show a collapsible "Vitals" section above clinical notes with a 2x2 grid (temperature, BP, weight, SpO2)
+- [ ] **VIT-02**: Temperature input supports Fahrenheit (default) and Celsius with a toggle that converts the displayed value
+- [ ] **VIT-03**: Blood pressure captured as systolic/diastolic (mmHg); weight in kg; SpO2 as percentage; all fields optional with no validation
+- [ ] **VIT-04**: Vitals display in VisitCard collapsed state as compact inline badges (Temp: X | BP: X/X | Wt: X | SpO2: X)
+- [ ] **VIT-05**: Vitals display in NewVisitPage inline visit history preview, same format as VisitCard
+- [ ] **VIT-06**: Vitals persist via DB migration (v6), survive save/reload, and do NOT appear on printed slips
+
 ## Future Requirements
 
 None currently deferred.
@@ -30,6 +43,8 @@ None currently deferred.
 |---------|--------|
 | Both-slips option per medication | Doctor confirmed each med is one slip or the other, never both |
 | Per-visit print settings | Global settings sufficient for single-doctor clinic |
+| Vitals validation / color coding | Doctor interprets the numbers, not the UI |
+| Vitals on printed slips | Not needed per user decision |
 
 ## Traceability
 
@@ -44,12 +59,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SLIP-05 | Phase 15 | Complete |
 | PRSET-05 | Phase 16 | Complete |
 | PRSET-06 | Phase 16 | Complete |
+| VIT-01 | Phase 17 | Planned |
+| VIT-02 | Phase 17 | Planned |
+| VIT-03 | Phase 17 | Planned |
+| VIT-04 | Phase 17 | Planned |
+| VIT-05 | Phase 17 | Planned |
+| VIT-06 | Phase 17 | Planned |
 
 **Coverage:**
-- v1.4 requirements: 7 total
-- Mapped to phases: 7
-- Unmapped: 0
+- v1.4 requirements: 7 total, mapped: 7, unmapped: 0
+- v1.5 requirements: 6 total, mapped: 6, unmapped: 0
 
 ---
 *Requirements defined: 2026-03-19*
-*Last updated: 2026-03-19 -- traceability updated after roadmap creation*
+*Last updated: 2026-03-19 -- v1.5 VIT requirements added*
