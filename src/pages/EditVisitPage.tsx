@@ -52,6 +52,7 @@ export function EditVisitPage() {
           quantity: m.quantity,
           frequency: m.frequency,
           duration: m.duration,
+          slipType: m.slipType ?? 'dispensary',
         })),
       )
       setLoading(false)
@@ -66,6 +67,16 @@ export function EditVisitPage() {
 
   function handleRemoveMedication(index: number) {
     setMedications((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  function handleToggleSlip(index: number) {
+    setMedications((prev) =>
+      prev.map((med, i) =>
+        i === index
+          ? { ...med, slipType: med.slipType === 'prescription' ? 'dispensary' : 'prescription' }
+          : med,
+      ),
+    )
   }
 
   async function saveVisit(): Promise<boolean> {
@@ -86,6 +97,7 @@ export function EditVisitPage() {
           frequency: med.frequency,
           duration: med.duration,
           sortOrder: index,
+          slipType: med.slipType,
         })),
       })
       await db.settings.put({ key: 'rxNotesDefaultLang', value: rxNotesLang })
@@ -203,7 +215,7 @@ export function EditVisitPage() {
         <h3 className="text-lg font-bold text-gray-900 mb-3">Prescription</h3>
         <MedicationEntry onAdd={handleAddMedication} />
         <div className="mt-4">
-          <MedicationList medications={medications} onRemove={handleRemoveMedication} />
+          <MedicationList medications={medications} onRemove={handleRemoveMedication} onToggleSlip={handleToggleSlip} />
         </div>
         <RxNotesField value={rxNotes} onChange={setRxNotes} lang={rxNotesLang} onLangChange={setRxNotesLang} />
       </div>
