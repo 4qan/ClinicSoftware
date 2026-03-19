@@ -218,13 +218,31 @@ if (-not $ready) {
 Write-Success "CouchDB is accepting connections at $BaseUrl"
 
 # -----------------------------------------------------------------------
-# Step 7: Create the ClinicSoftware_v2 database
+# Step 7a: Create system databases (required for CouchDB 3.x)
 # -----------------------------------------------------------------------
-Write-Step "Creating database: ClinicSoftware_v2"
+Write-Step "Creating system databases"
+
+foreach ($sysDb in @("_users", "_replicator", "_global_changes")) {
+    try {
+        Invoke-RestMethod -Method Put -Uri "$AdminUrl/$sysDb" | Out-Null
+        Write-Success "$sysDb created"
+    } catch {
+        if ($_.Exception.Response.StatusCode.value__ -eq 412) {
+            Write-Host "    $sysDb already exists (skipping)" -ForegroundColor Yellow
+        } else {
+            Write-Host "    $sysDb returned error (non-fatal): $_" -ForegroundColor Yellow
+        }
+    }
+}
+
+# -----------------------------------------------------------------------
+# Step 7b: Create the clinicsoftware_v2 database
+# -----------------------------------------------------------------------
+Write-Step "Creating database: clinicsoftware_v2"
 
 try {
-    Invoke-RestMethod -Method Put -Uri "$AdminUrl/ClinicSoftware_v2" | Out-Null
-    Write-Success "Database ClinicSoftware_v2 created"
+    Invoke-RestMethod -Method Put -Uri "$AdminUrl/clinicsoftware_v2" | Out-Null
+    Write-Success "Database clinicsoftware_v2 created"
 } catch {
     if ($_.Exception.Response.StatusCode.value__ -eq 412) {
         Write-Host "    Database already exists (skipping)" -ForegroundColor Yellow
@@ -301,7 +319,7 @@ $securityDoc = @{
 } | ConvertTo-Json -Compress
 
 Invoke-RestMethod -Method Put `
-    -Uri "$AdminUrl/ClinicSoftware_v2/_security" `
+    -Uri "$AdminUrl/clinicsoftware_v2/_security" `
     -ContentType "application/json" `
     -Body $securityDoc | Out-Null
 
@@ -322,7 +340,7 @@ $designDocBody = Get-Content $designDocPath -Raw
 
 try {
     Invoke-RestMethod -Method Put `
-        -Uri "$AdminUrl/ClinicSoftware_v2/_design/roles" `
+        -Uri "$AdminUrl/clinicsoftware_v2/_design/roles" `
         -ContentType "application/json" `
         -Body $designDocBody | Out-Null
     Write-Success "Design document deployed (_design/roles with validate_doc_update)"
@@ -345,7 +363,7 @@ Write-Host "======================================================" -ForegroundC
 Write-Host ""
 Write-Host "  Service:   Apache_CouchDB (auto-starts on boot)"
 Write-Host "  Endpoint:  $BaseUrl"
-Write-Host "  Database:  ClinicSoftware_v2"
+Write-Host "  Database:  clinicsoftware_v2"
 Write-Host "  Users:     doctor (role: doctor), nurse (role: nurse)"
 Write-Host "  Firewall:  Port 5984 open (Domain/Private profiles)"
 Write-Host ""

@@ -45,7 +45,7 @@ $BaseUrl    = "http://localhost:5984"
 $AdminUrl   = "http://admin:${AdminPassword}@localhost:5984"
 $DoctorUrl  = "http://doctor:${DoctorPassword}@localhost:5984"
 $NurseUrl   = "http://nurse:${NursePassword}@localhost:5984"
-$DbPath     = "ClinicSoftware_v2"
+$DbPath     = "clinicsoftware_v2"
 
 $PassCount  = 0
 $TotalCount = 6

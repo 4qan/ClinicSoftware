@@ -66,7 +66,7 @@ The verify script prints a URL in the form `http://192.168.X.Y:5984/_up`. Open t
 - Windows Firewall inbound rule for port 5984 (Domain and Private network profiles only, not Public)
 - Authentication required for all data endpoints (`/_up` remains open for connectivity checks)
 - CORS enabled for all origins with Basic auth headers (no cookies)
-- Database: `ClinicSoftware_v2` (matches the local PouchDB database name)
+- Database: `clinicsoftware_v2` (matches the local PouchDB database name)
 - Users: `doctor` (full read/write access), `nurse` (read all, write patients and settings only)
 - Nurse role blocked at the database level from writing: visits, visit medications, drugs
 
@@ -92,7 +92,7 @@ This means `require_valid_user = true` was used instead of `require_valid_user_e
 
 Confirm the `validate_doc_update` design doc is deployed correctly:
 ```powershell
-Invoke-RestMethod -Uri "http://admin:ADMIN_PW@localhost:5984/ClinicSoftware_v2/_design/roles"
+Invoke-RestMethod -Uri "http://admin:ADMIN_PW@localhost:5984/clinicsoftware_v2/_design/roles"
 ```
 The response should contain the `validate_doc_update` key. If not, re-run `setup.ps1`.
 
