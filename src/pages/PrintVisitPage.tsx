@@ -92,6 +92,12 @@ export function PrintVisitPage() {
     if (auto === 'prescription' || auto === 'dispensary') {
       setPreviewMode(auto)
       setPrintMode(auto)
+      // Determine filtered meds for the target slip
+      const targetMeds = auto === 'prescription'
+        ? medications.filter((m) => m.slipType === 'prescription')
+        : medications.filter((m) => (m.slipType ?? 'dispensary') === 'dispensary')
+      // Skip auto-print if the target slip has no medications
+      if (targetMeds.length === 0) return
       if (printSettings) {
         const size = auto === 'prescription' ? printSettings.prescriptionSize : printSettings.dispensarySize
         injectPageStyle(size, calcMargin(size))
@@ -105,7 +111,7 @@ export function PrintVisitPage() {
         autoPrintTimer.current = null
       }
     }
-  }, [loading, searchParams, printSettings])
+  }, [loading, searchParams, printSettings, medications])
 
   const handleAfterPrint = useCallback(() => {
     setPrintMode(null)
@@ -155,6 +161,11 @@ export function PrintVisitPage() {
     { label: `${patient.firstName} ${patient.lastName}`, path: `/patient/${patient.id}` },
     { label: 'Print Prescription' },
   ]
+
+  const prescriptionMeds = medications.filter((m) => m.slipType === 'prescription')
+  const dispensaryMeds = medications.filter((m) => (m.slipType ?? 'dispensary') === 'dispensary')
+
+  const activeSlipMeds = previewMode === 'prescription' ? prescriptionMeds : dispensaryMeds
 
   const activeSize: PaperSize = printSettings
     ? (previewMode === 'prescription' ? printSettings.prescriptionSize : printSettings.dispensarySize)
@@ -210,7 +221,8 @@ export function PrintVisitPage() {
               type="button"
               autoFocus
               onClick={() => handlePrint(previewMode)}
-              className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer transition-colors"
+              disabled={activeSlipMeds.length === 0}
+              className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-lg cursor-pointer transition-colors"
             >
               Print {previewMode === 'prescription' ? 'Prescription' : 'Dispensary Slip'}
             </button>
@@ -228,21 +240,33 @@ export function PrintVisitPage() {
             style={{ width: `${widthPx}px`, minHeight: `${heightPx}px` }}
           >
             {previewMode === 'prescription' && visit && patient && clinicInfo && (
-              <PrescriptionSlip
-                visit={visit}
-                medications={medications}
-                patient={patient}
-                clinicInfo={clinicInfo}
-                paperSize={activeSize}
-              />
+              prescriptionMeds.length === 0 ? (
+                <div className="flex items-center justify-center h-full min-h-40 text-gray-400 text-sm">
+                  No medications for this slip
+                </div>
+              ) : (
+                <PrescriptionSlip
+                  visit={visit}
+                  medications={prescriptionMeds}
+                  patient={patient}
+                  clinicInfo={clinicInfo}
+                  paperSize={activeSize}
+                />
+              )
             )}
             {previewMode === 'dispensary' && visit && patient && (
-              <DispensarySlip
-                visit={visit}
-                medications={medications}
-                patient={patient}
-                paperSize={activeSize}
-              />
+              dispensaryMeds.length === 0 ? (
+                <div className="flex items-center justify-center h-full min-h-40 text-gray-400 text-sm">
+                  No medications for this slip
+                </div>
+              ) : (
+                <DispensarySlip
+                  visit={visit}
+                  medications={dispensaryMeds}
+                  patient={patient}
+                  paperSize={activeSize}
+                />
+              )
             )}
           </div>
         )
@@ -253,7 +277,7 @@ export function PrintVisitPage() {
         <div className="hidden print:block">
           <PrescriptionSlip
             visit={visit}
-            medications={medications}
+            medications={prescriptionMeds}
             patient={patient}
             clinicInfo={clinicInfo}
             paperSize={printSettings?.prescriptionSize ?? 'A5'}
@@ -264,7 +288,7 @@ export function PrintVisitPage() {
         <div className="hidden print:block">
           <DispensarySlip
             visit={visit}
-            medications={medications}
+            medications={dispensaryMeds}
             patient={patient}
             paperSize={printSettings?.dispensarySize ?? 'A5'}
           />

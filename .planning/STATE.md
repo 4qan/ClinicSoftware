@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Slip Assignment & Print Settings
 status: planning
-stopped_at: Phase 15 context gathered
-last_updated: "2026-03-19T10:17:35.537Z"
+stopped_at: Completed 15-01-PLAN.md
+last_updated: "2026-03-19T10:31:14.924Z"
 last_activity: 2026-03-19 -- Roadmap created
 progress:
   total_phases: 2
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
   percent: 0
 ---
 
@@ -40,6 +40,8 @@ Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (v1.
 - Medications stored as snapshots: SLIP-05 (slip assignment) stores with snapshot, follows existing pattern
 - Print settings in Dexie settings table: PRSET-06 (auto-print persistence) follows same pattern as paper size settings
 - Auto-print double-fire guard uses useRef: relevant context for PRSET-05 toggle behavior
+- [Phase 15-slip-assignment]: slipType optional on VisitMedication, not indexed; missing value = dispensary by convention
+- [Phase 15-slip-assignment]: Toggle lives in MedicationList next to Actions, not in MedicationEntry form
 
 ### Pending Todos
 
@@ -51,9 +53,9 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T10:17:35.534Z
-Stopped at: Phase 15 context gathered
-Resume file: .planning/phases/15-slip-assignment/15-CONTEXT.md
+Last session: 2026-03-19T10:31:14.922Z
+Stopped at: Completed 15-01-PLAN.md
+Resume file: None
 
 ---
 *Last updated: 2026-03-19 -- v1.4 roadmap created*
