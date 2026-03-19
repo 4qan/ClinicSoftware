@@ -1,5 +1,6 @@
 import { db } from '@/db/index'
 import type { Drug } from '@/db/index'
+import { SEED_DRUGS, buildSeedId } from '@/db/seedDrugs'
 
 export async function searchDrugs(query: string): Promise<Drug[]> {
   const lower = query.toLowerCase().trim()
@@ -52,16 +53,17 @@ export async function addCustomDrug(
   return id
 }
 
-export async function updateCustomDrug(
+export async function updateDrug(
   id: string,
   data: Partial<Pick<Drug, 'brandName' | 'saltName' | 'form' | 'strength'>>
 ): Promise<void> {
   const existing = await db.drugs.get(id)
-  if (!existing || !existing.isCustom) {
-    throw new Error('Can only edit custom drugs')
-  }
+  if (!existing) throw new Error('Drug not found')
 
   const updates: Partial<Drug> = { ...data, updatedAt: new Date().toISOString() }
+  if (!existing.isCustom) {
+    updates.isOverridden = true
+  }
   if (data.brandName !== undefined) {
     updates.brandNameLower = data.brandName.toLowerCase()
   }
@@ -69,6 +71,14 @@ export async function updateCustomDrug(
     updates.saltNameLower = data.saltName.toLowerCase()
   }
   await db.drugs.update(id, updates)
+}
+
+/** @deprecated Use updateDrug instead */
+export async function updateCustomDrug(
+  id: string,
+  data: Partial<Pick<Drug, 'brandName' | 'saltName' | 'form' | 'strength'>>
+): Promise<void> {
+  return updateDrug(id, data)
 }
 
 export async function toggleDrugActive(id: string): Promise<void> {
@@ -80,12 +90,36 @@ export async function toggleDrugActive(id: string): Promise<void> {
   })
 }
 
-export async function deleteCustomDrug(id: string): Promise<void> {
+export async function deleteDrug(id: string): Promise<void> {
   const existing = await db.drugs.get(id)
-  if (!existing || !existing.isCustom) {
-    throw new Error('Can only delete custom drugs')
-  }
+  if (!existing) throw new Error('Drug not found')
   await db.drugs.delete(id)
+}
+
+/** @deprecated Use deleteDrug instead */
+export async function deleteCustomDrug(id: string): Promise<void> {
+  return deleteDrug(id)
+}
+
+export async function resetDrugToDefault(id: string): Promise<void> {
+  const existing = await db.drugs.get(id)
+  if (!existing) throw new Error('Drug not found')
+  if (existing.isCustom) throw new Error('Custom drugs have no default to reset to')
+
+  const seedEntry = SEED_DRUGS.find(entry => buildSeedId(entry) === id)
+  if (!seedEntry) throw new Error('No seed entry found for this drug')
+
+  await db.drugs.update(id, {
+    brandName: seedEntry.brandName,
+    brandNameLower: seedEntry.brandName.toLowerCase(),
+    saltName: seedEntry.saltName,
+    saltNameLower: seedEntry.saltName.toLowerCase(),
+    form: seedEntry.form,
+    strength: seedEntry.strength,
+    isOverridden: false,
+    isActive: true,
+    updatedAt: new Date().toISOString(),
+  })
 }
 
 export async function getCustomDrugs(): Promise<Drug[]> {
@@ -94,4 +128,8 @@ export async function getCustomDrugs(): Promise<Drug[]> {
 
 export async function getAllDrugs(): Promise<Drug[]> {
   return db.drugs.filter(d => d.isActive).toArray()
+}
+
+export async function getAllDrugsUnfiltered(): Promise<Drug[]> {
+  return db.drugs.toArray()
 }

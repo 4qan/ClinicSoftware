@@ -1,11 +1,9 @@
 import { db } from '@/db/index'
 import type { Drug } from '@/db/index'
 
-const SEED_VERSION = 1
+export type SeedEntry = Pick<Drug, 'brandName' | 'saltName' | 'form' | 'strength'>
 
-type SeedEntry = Pick<Drug, 'brandName' | 'saltName' | 'form' | 'strength'>
-
-const SEED_DRUGS: SeedEntry[] = [
+export const SEED_DRUGS: SeedEntry[] = [
   // Antibiotics
   { brandName: 'Amoxil', saltName: 'Amoxicillin', form: 'Capsule', strength: '500mg' },
   { brandName: 'Amoxil', saltName: 'Amoxicillin', form: 'Syrup', strength: '125mg/5ml' },
@@ -155,11 +153,15 @@ const SEED_DRUGS: SeedEntry[] = [
   { brandName: 'Relaxon', saltName: 'Cyclobenzaprine', form: 'Tablet', strength: '10mg' },
 ]
 
+export function buildSeedId(entry: SeedEntry): string {
+  return `seed-${entry.brandName}-${entry.saltName}-${entry.form}-${entry.strength}`
+    .toLowerCase().replace(/[^a-z0-9-]/g, '_')
+}
+
 function buildDrugRecord(entry: SeedEntry): Drug {
   const now = new Date().toISOString()
   return {
-    id: `seed-${entry.brandName}-${entry.saltName}-${entry.form}-${entry.strength}`
-      .toLowerCase().replace(/[^a-z0-9-]/g, '_'),
+    id: buildSeedId(entry),
     brandName: entry.brandName,
     brandNameLower: entry.brandName.toLowerCase(),
     saltName: entry.saltName,
@@ -168,22 +170,18 @@ function buildDrugRecord(entry: SeedEntry): Drug {
     strength: entry.strength,
     isCustom: false,
     isActive: true,
+    isOverridden: false,
     createdAt: now,
     updatedAt: now,
   }
 }
 
 export async function seedDrugDatabase(): Promise<void> {
-  const setting = await db.settings.get('drugsSeedVersion')
-  const currentVersion = setting ? (setting.value as number) : 0
+  const count = await db.drugs.count()
+  if (count > 0) return
 
-  if (currentVersion >= SEED_VERSION) return
-
-  await db.transaction('rw', db.drugs, db.settings, async () => {
-    const drugs = SEED_DRUGS.map(buildDrugRecord)
-    await db.drugs.bulkPut(drugs)
-    await db.settings.put({ key: 'drugsSeedVersion', value: SEED_VERSION })
-  })
+  const drugs = SEED_DRUGS.map(buildDrugRecord)
+  await db.drugs.bulkPut(drugs)
 }
 
 export async function deduplicateExistingDrugs(): Promise<void> {
