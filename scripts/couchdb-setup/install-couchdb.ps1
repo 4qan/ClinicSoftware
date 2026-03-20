@@ -166,7 +166,7 @@ $msiArgs = @(
     "INSTALLSERVICE=1",
     "ADMINUSER=admin",
     "ADMINPASSWORD=$AdminPw",
-    "INSTALLDIR=$InstallPath",
+    "APPLICATIONFOLDER=$InstallPath",
     "/norestart",
     "/l*", (Join-Path $env:TEMP "couchdb-install.log")
 )
