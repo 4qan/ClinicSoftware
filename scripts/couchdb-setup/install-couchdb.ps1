@@ -29,7 +29,7 @@ $ErrorActionPreference = 'Stop'
 # Configuration
 # -----------------------------------------------------------------------
 $CouchDbVersion  = "3.5.1"
-$CouchDbMsiUrl   = "https://couchdb.apache.org/release/installer/win/apache-couchdb-$CouchDbVersion.msi"
+$CouchDbMsiUrl   = "https://couchdb.neighbourhood.ie/downloads/$CouchDbVersion/win/apache-couchdb-$CouchDbVersion.msi"
 $DefaultInstall   = "C:\CouchDB"
 $DbName          = "clinicsoftware_v2"
 
@@ -134,10 +134,11 @@ Write-Banner "Downloading CouchDB $CouchDbVersion"
 
 $MsiPath = Join-Path $env:TEMP "apache-couchdb-$CouchDbVersion.msi"
 
-if (Test-Path $MsiPath) {
+if ((Test-Path $MsiPath) -and (Get-Item $MsiPath).Length -gt 50MB) {
     Write-Warn "MSI already exists at $MsiPath (reusing)"
 } else {
-    Write-Step "Downloading from couchdb.apache.org (this may take a few minutes)"
+    if (Test-Path $MsiPath) { Remove-Item $MsiPath -Force }
+    Write-Step "Downloading CouchDB (this may take a few minutes)"
     try {
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         $webClient = New-Object System.Net.WebClient
