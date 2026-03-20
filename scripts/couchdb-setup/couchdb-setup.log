@@ -1,0 +1,74 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260320150423
+Username: LAPTOP-NN9BNH3O\furqa
+RunAs User: LAPTOP-NN9BNH3O\furqa
+Configuration Name: 
+Machine: LAPTOP-NN9BNH3O (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+Process ID: 25420
+PSVersion: 5.1.26100.7920
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.7920
+BuildVersion: 10.0.26100.7920
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+  Log file: C:\Users\furqa\Desktop\couchdb-setup.log
+
+========================================================
+  ClinicSoftware CouchDB Installer
+========================================================
+
+  This will install and configure CouchDB on this machine.
+  The nurse's machine needs nothing installed (just the same WiFi).
+
+
+========================================================
+  CouchDB Already Installed
+========================================================
+
+    [OK] Service 'Apache CouchDB' found (Status: Running)
+  Skipping download and install. Will re-apply configuration.
+    [OK] Found C:\CouchDB\etc\local.ini
+
+========================================================
+  Configuring CouchDB
+========================================================
+
+
+==> Applying local.ini (LAN binding, auth, CORS)
+    [OK] local.ini written to C:\CouchDB\etc\local.ini
+
+==> Opening Windows Firewall port 5984 (LAN only)
+    [!] Removed existing rule
+    [OK] Firewall rule created (Domain/Private profiles only, not Public)
+
+========================================================
+  Starting CouchDB Service
+========================================================
+
+    [OK] Service running (auto-starts on boot)
+
+==> Waiting for CouchDB HTTP
+    [OK] CouchDB accepting connections
+
+========================================================
+  Setting Up Database
+========================================================
+
+
+==> Creating system databases
+PS C:\Users\furqa\Downloads> TerminatingError(Invoke-RestMethod): "{"error":"unauthorized","reason":"You are not a server admin."}
+"
+>> TerminatingError(Invoke-RestMethod): "{"error":"unauthorized","reason":"You are not a server admin."}
+"
+>> TerminatingError(Invoke-RestMethod): "{"error":"unauthorized","reason":"You are not a server admin."}
+"
+
+==> Creating database: clinicsoftware_v2
+PS C:\Users\furqa\Downloads> TerminatingError(Invoke-RestMethod): "{"error":"unauthorized","reason":"You are not a server admin."}
+"
+    [FAIL] Failed to create database: {"error":"unauthorized","reason":"You are not a server admin."}
