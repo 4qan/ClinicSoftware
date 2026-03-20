@@ -133,7 +133,11 @@ if ($InstallPath -match ' ') {
 }
 
 $BaseUrl  = "http://localhost:5984"
-$AdminUrl = "http://admin:${AdminPw}@localhost:5984"
+
+# PowerShell 5.1 does NOT extract credentials from URLs — must use explicit Authorization header
+$AdminAuth = @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("admin:${AdminPw}")) }
+$DoctorAuth = @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("doctor:${DoctorPw}")) }
+$NurseAuth = @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("nurse:${NursePw}")) }
 
 # =====================================================================
 #  CHECK FOR EXISTING INSTALLATION
@@ -317,7 +321,7 @@ try {
         bind_address = "0.0.0.0"
         port         = 5984
     } | ConvertTo-Json -Compress
-    Invoke-RestMethod -Method Post -Uri "$AdminUrl/_cluster_setup" `
+    Invoke-RestMethod -Method Post -Uri "$BaseUrl/_cluster_setup" -Headers $AdminAuth `
         -ContentType "application/json" -Body $setupBody | Out-Null
     Write-OK "Single-node setup complete"
 } catch {
@@ -333,9 +337,15 @@ try {
 Write-Step "Verifying admin credentials"
 try {
     $ErrorActionPreference = 'Stop'
-    Invoke-RestMethod -Uri "$AdminUrl/_session" | Out-Null
+    $session = Invoke-RestMethod -Uri "$BaseUrl/_session" -Headers $AdminAuth
     $ErrorActionPreference = 'Stop'
-    Write-OK "Admin authenticated successfully"
+    $roles = ($session.userCtx.roles -join ", ")
+    if ($session.userCtx.roles -contains "_admin") {
+        Write-OK "Admin authenticated (roles: $roles)"
+    } else {
+        Write-Fail "Authenticated as '$($session.userCtx.name)' but missing _admin role (roles: $roles)"
+        exit 1
+    }
 } catch {
     $ErrorActionPreference = 'Stop'
     Write-Fail "Admin authentication failed: $_"
@@ -352,7 +362,7 @@ Write-Banner "Setting Up Database"
 Write-Step "Creating system databases"
 foreach ($sysDb in @("_users", "_replicator", "_global_changes")) {
     try {
-        Invoke-RestMethod -Method Put -Uri "$AdminUrl/$sysDb" | Out-Null
+        Invoke-RestMethod -Method Put -Uri "$BaseUrl/$sysDb" -Headers $AdminAuth | Out-Null
         Write-OK "$sysDb created"
     } catch {
         if ($_.Exception.Response.StatusCode.value__ -eq 412) {
@@ -364,7 +374,7 @@ foreach ($sysDb in @("_users", "_replicator", "_global_changes")) {
 # Application database
 Write-Step "Creating database: $DbName"
 try {
-    Invoke-RestMethod -Method Put -Uri "$AdminUrl/$DbName" | Out-Null
+    Invoke-RestMethod -Method Put -Uri "$BaseUrl/$DbName" -Headers $AdminAuth | Out-Null
     Write-OK "Database created"
 } catch {
     if ($_.Exception.Response.StatusCode.value__ -eq 412) {
@@ -386,7 +396,7 @@ $doctorDoc = @{
 } | ConvertTo-Json -Compress
 
 try {
-    Invoke-RestMethod -Method Put -Uri "$AdminUrl/_users/org.couchdb.user:doctor" `
+    Invoke-RestMethod -Method Put -Uri "$BaseUrl/_users/org.couchdb.user:doctor" -Headers $AdminAuth `
         -ContentType "application/json" -Body $doctorDoc | Out-Null
     Write-OK "Doctor user created (role: doctor)"
 } catch {
@@ -408,7 +418,7 @@ $nurseDoc = @{
 } | ConvertTo-Json -Compress
 
 try {
-    Invoke-RestMethod -Method Put -Uri "$AdminUrl/_users/org.couchdb.user:nurse" `
+    Invoke-RestMethod -Method Put -Uri "$BaseUrl/_users/org.couchdb.user:nurse" -Headers $AdminAuth `
         -ContentType "application/json" -Body $nurseDoc | Out-Null
     Write-OK "Nurse user created (role: nurse)"
 } catch {
@@ -426,14 +436,14 @@ $securityDoc = @{
     members = @{ names = @(); roles = @("doctor", "nurse") }
 } | ConvertTo-Json -Compress
 
-Invoke-RestMethod -Method Put -Uri "$AdminUrl/$DbName/_security" `
+Invoke-RestMethod -Method Put -Uri "$BaseUrl/$DbName/_security" -Headers $AdminAuth `
     -ContentType "application/json" -Body $securityDoc | Out-Null
 Write-OK "Doctor=admin+member, Nurse=member only"
 
 # Design document (role enforcement)
 Write-Step "Deploying write restrictions"
 try {
-    Invoke-RestMethod -Method Put -Uri "$AdminUrl/$DbName/_design/roles" `
+    Invoke-RestMethod -Method Put -Uri "$BaseUrl/$DbName/_design/roles" -Headers $AdminAuth `
         -ContentType "application/json" -Body $ValidateDocUpdate | Out-Null
     Write-OK "Nurse blocked from writing: visit, visitmed, drug"
 } catch {
@@ -449,8 +459,6 @@ try {
 # =====================================================================
 Write-Banner "Verifying Installation"
 
-$DoctorUrl = "http://doctor:${DoctorPw}@localhost:5984"
-$NurseUrl  = "http://nurse:${NursePw}@localhost:5984"
 $PassCount = 0
 $TotalCount = 6
 
@@ -503,14 +511,14 @@ Write-Host ""
 Write-Host "--- Check 4/6: Doctor CAN write visit ---" -ForegroundColor Cyan
 try {
     $ErrorActionPreference = 'Stop'
-    Invoke-RestMethod -Method Put -Uri "$DoctorUrl/$DbName/visit:verify_test" `
+    Invoke-RestMethod -Method Put -Uri "$BaseUrl/$DbName/visit:verify_test" -Headers $DoctorAuth `
         -ContentType "application/json" `
         -Body '{"_id":"visit:verify_test","type":"visit","patientId":"p_test"}' | Out-Null
     $ErrorActionPreference = 'Stop'
     Write-Pass "Doctor wrote visit document"
     try {
-        $doc = Invoke-RestMethod -Uri "$AdminUrl/$DbName/visit:verify_test"
-        Invoke-RestMethod -Method Delete -Uri "$AdminUrl/$DbName/visit:verify_test?rev=$($doc._rev)" | Out-Null
+        $doc = Invoke-RestMethod -Uri "$BaseUrl/$DbName/visit:verify_test" -Headers $AdminAuth
+        Invoke-RestMethod -Method Delete -Uri "$BaseUrl/$DbName/visit:verify_test?rev=$($doc._rev)" -Headers $AdminAuth | Out-Null
     } catch {}
 } catch {
     $ErrorActionPreference = 'Stop'
@@ -522,14 +530,14 @@ Write-Host ""
 Write-Host "--- Check 5/6: Nurse CANNOT write visit ---" -ForegroundColor Cyan
 try {
     $ErrorActionPreference = 'Stop'
-    Invoke-RestMethod -Method Put -Uri "$NurseUrl/$DbName/visit:verify_test2" `
+    Invoke-RestMethod -Method Put -Uri "$BaseUrl/$DbName/visit:verify_test2" -Headers $NurseAuth `
         -ContentType "application/json" `
         -Body '{"_id":"visit:verify_test2","type":"visit","patientId":"p_test"}' | Out-Null
     $ErrorActionPreference = 'Stop'
     Write-Fail "Nurse write SUCCEEDED (should be forbidden)"
     try {
-        $doc = Invoke-RestMethod -Uri "$AdminUrl/$DbName/visit:verify_test2"
-        Invoke-RestMethod -Method Delete -Uri "$AdminUrl/$DbName/visit:verify_test2?rev=$($doc._rev)" | Out-Null
+        $doc = Invoke-RestMethod -Uri "$BaseUrl/$DbName/visit:verify_test2" -Headers $AdminAuth
+        Invoke-RestMethod -Method Delete -Uri "$BaseUrl/$DbName/visit:verify_test2?rev=$($doc._rev)" -Headers $AdminAuth | Out-Null
     } catch {}
 } catch {
     $ErrorActionPreference = 'Stop'
@@ -547,14 +555,14 @@ Write-Host ""
 Write-Host "--- Check 6/6: Nurse CAN write patient ---" -ForegroundColor Cyan
 try {
     $ErrorActionPreference = 'Stop'
-    Invoke-RestMethod -Method Put -Uri "$NurseUrl/$DbName/patient:verify_test" `
+    Invoke-RestMethod -Method Put -Uri "$BaseUrl/$DbName/patient:verify_test" -Headers $NurseAuth `
         -ContentType "application/json" `
         -Body '{"_id":"patient:verify_test","type":"patient","firstName":"Test"}' | Out-Null
     $ErrorActionPreference = 'Stop'
     Write-Pass "Nurse wrote patient document"
     try {
-        $doc = Invoke-RestMethod -Uri "$AdminUrl/$DbName/patient:verify_test"
-        Invoke-RestMethod -Method Delete -Uri "$AdminUrl/$DbName/patient:verify_test?rev=$($doc._rev)" | Out-Null
+        $doc = Invoke-RestMethod -Uri "$BaseUrl/$DbName/patient:verify_test" -Headers $AdminAuth
+        Invoke-RestMethod -Method Delete -Uri "$BaseUrl/$DbName/patient:verify_test?rev=$($doc._rev)" -Headers $AdminAuth | Out-Null
     } catch {}
 } catch {
     $ErrorActionPreference = 'Stop'
