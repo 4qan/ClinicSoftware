@@ -9,7 +9,7 @@
     This script handles everything:
     1. Downloads CouchDB 3.5.1 MSI
     2. Installs as a Windows service (auto-starts on boot)
-    3. Generates a self-signed SSL certificate for HTTPS
+    3. Generates a self-signed SSL certificate for HTTPS (no external tools needed)
     4. Configures CouchDB with HTTPS on port 6984
     5. Opens firewall for LAN access (ports 5984 + 6984)
     6. Creates the database with role-based security
@@ -81,27 +81,6 @@ function Write-Pass {
     $script:PassCount++
 }
 
-function Find-OpenSSL {
-    # Check PATH first
-    $inPath = Get-Command openssl.exe -ErrorAction SilentlyContinue
-    if ($inPath) { return $inPath.Source }
-
-    # Common Git for Windows locations
-    $searchPaths = @(
-        "C:\Program Files\Git\usr\bin\openssl.exe",
-        "C:\Program Files (x86)\Git\usr\bin\openssl.exe",
-        "${env:LOCALAPPDATA}\Programs\Git\usr\bin\openssl.exe",
-        "C:\OpenSSL-Win64\bin\openssl.exe",
-        "C:\OpenSSL-Win32\bin\openssl.exe",
-        "C:\Program Files\OpenSSL-Win64\bin\openssl.exe"
-    )
-
-    foreach ($p in $searchPaths) {
-        if (Test-Path $p) { return $p }
-    }
-
-    return $null
-}
 
 # Embedded: validate_doc_update design document
 $ValidateDocUpdate = @'
@@ -149,19 +128,6 @@ if (-not $lanIp) {
 }
 Write-OK "LAN IP detected: $lanIp"
 
-# Find OpenSSL (required for SSL cert generation)
-Write-Step "Looking for OpenSSL"
-$opensslPath = Find-OpenSSL
-if (-not $opensslPath) {
-    Write-Fail "OpenSSL not found. It is required to generate the HTTPS certificate."
-    Write-Host ""
-    Write-Host "  Install Git for Windows (includes OpenSSL):" -ForegroundColor Yellow
-    Write-Host "  https://git-scm.com/download/win" -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "  After installing, re-run this script." -ForegroundColor Yellow
-    exit 1
-}
-Write-OK "OpenSSL found: $opensslPath"
 
 # =====================================================================
 #  CHECK FOR EXISTING INSTALLATION
@@ -268,7 +234,7 @@ Write-OK "Found $localIniPath"
 } # end if (-not $alreadyInstalled)
 
 # =====================================================================
-#  PHASE 4: GENERATE SSL CERTIFICATE
+#  PHASE 4: GENERATE SSL CERTIFICATE (pure PowerShell, no OpenSSL)
 # =====================================================================
 Write-Banner "Generating SSL Certificate"
 
@@ -284,53 +250,111 @@ if ((Test-Path $certFile) -and (Test-Path $keyFile)) {
     Write-Warn "SSL cert already exists at $certDir (regenerating)"
 }
 
-# Create OpenSSL config with SANs for localhost + LAN IP
-$opensslConf = @"
-[req]
-default_bits = 2048
-prompt = no
-default_md = sha256
-distinguished_name = dn
-x509_extensions = v3_ca
-
-[dn]
-CN = ClinicSoftware CouchDB
-
-[v3_ca]
-subjectAltName = @alt_names
-basicConstraints = CA:true
-
-[alt_names]
-IP.1 = 127.0.0.1
-IP.2 = $lanIp
-DNS.1 = localhost
-"@
-
-$confPath = Join-Path $env:TEMP "couchdb-openssl.cnf"
-Set-Content -Path $confPath -Value $opensslConf -Encoding ASCII
-
 Write-Step "Generating self-signed certificate (valid 10 years)"
 Write-Host "    SANs: localhost, 127.0.0.1, $lanIp" -ForegroundColor Gray
 
-$opensslArgs = "req -x509 -newkey rsa:2048 -keyout `"$keyFile`" -out `"$certFile`" -days 3650 -nodes -config `"$confPath`""
-$opensslProcess = Start-Process -FilePath $opensslPath -ArgumentList $opensslArgs -Wait -PassThru -NoNewWindow -RedirectStandardError (Join-Path $env:TEMP "openssl-stderr.txt")
+# Create cert with SANs using Windows built-in New-SelfSignedCertificate
+$sanExtension = "2.5.29.17={text}DNS=localhost&IPAddress=127.0.0.1&IPAddress=$lanIp"
+$cert = New-SelfSignedCertificate `
+    -Subject "CN=ClinicSoftware CouchDB" `
+    -TextExtension @($sanExtension) `
+    -CertStoreLocation "cert:\LocalMachine\My" `
+    -NotAfter (Get-Date).AddYears(10) `
+    -KeyExportPolicy Exportable `
+    -KeyAlgorithm RSA `
+    -KeyLength 2048
 
-if ($opensslProcess.ExitCode -ne 0) {
-    $sslError = Get-Content (Join-Path $env:TEMP "openssl-stderr.txt") -Raw -ErrorAction SilentlyContinue
-    Write-Fail "OpenSSL failed (exit $($opensslProcess.ExitCode)): $sslError"
+if (-not $cert) {
+    Write-Fail "New-SelfSignedCertificate failed"
     exit 1
+}
+Write-OK "Certificate created (Thumbprint: $($cert.Thumbprint))"
+
+# Export certificate to PEM (base64-encoded DER)
+Write-Step "Exporting certificate to PEM"
+$certBase64 = [Convert]::ToBase64String($cert.RawData, [System.Base64FormattingOptions]::InsertLineBreaks)
+$certPemContent = "-----BEGIN CERTIFICATE-----`r`n$certBase64`r`n-----END CERTIFICATE-----`r`n"
+Set-Content -Path $certFile -Value $certPemContent -Encoding ASCII -NoNewline
+Write-OK "cert.pem written"
+
+# Export private key to PEM using CNG PKCS#8 export
+Write-Step "Exporting private key to PEM"
+
+# Add C# helper for PEM export (works on .NET Framework 4.6.2+ / PowerShell 5.1)
+Add-Type -TypeDefinition @"
+using System;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+
+public static class PemExporter {
+    public static string ExportPrivateKeyPem(string thumbprint) {
+        X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+        store.Open(OpenFlags.ReadOnly);
+        X509Certificate2Collection certs = store.Certificates.Find(
+            X509FindType.FindByThumbprint, thumbprint, false);
+        store.Close();
+
+        if (certs.Count == 0)
+            throw new Exception("Certificate not found in store");
+
+        RSA rsa = certs[0].GetRSAPrivateKey();
+        RSACng rsaCng = rsa as RSACng;
+        if (rsaCng == null)
+            throw new Exception("Private key is not CNG-based. Cannot export.");
+
+        byte[] pkcs8 = rsaCng.Key.Export(CngKeyBlobFormat.Pkcs8PrivateBlob);
+        return "-----BEGIN PRIVATE KEY-----\r\n" +
+            Convert.ToBase64String(pkcs8, Base64FormattingOptions.InsertLineBreaks) +
+            "\r\n-----END PRIVATE KEY-----\r\n";
+    }
+}
+"@ -ReferencedAssemblies @(
+    [System.Security.Cryptography.X509Certificates.X509Certificate2].Assembly.Location,
+    [System.Security.Cryptography.RSACng].Assembly.Location
+) -ErrorAction Stop
+
+try {
+    $keyPemContent = [PemExporter]::ExportPrivateKeyPem($cert.Thumbprint)
+    Set-Content -Path $keyFile -Value $keyPemContent -Encoding ASCII -NoNewline
+    Write-OK "key.pem written"
+} catch {
+    Write-Fail "Private key export failed: $_"
+    Write-Host "    Falling back to OpenSSL if available..." -ForegroundColor Yellow
+
+    # Fallback: try OpenSSL via PFX export
+    $opensslPath = (Get-Command openssl.exe -ErrorAction SilentlyContinue).Source
+    if (-not $opensslPath) {
+        # Check common Git for Windows locations
+        foreach ($p in @("C:\Program Files\Git\usr\bin\openssl.exe", "C:\Program Files (x86)\Git\usr\bin\openssl.exe")) {
+            if (Test-Path $p) { $opensslPath = $p; break }
+        }
+    }
+
+    if ($opensslPath) {
+        $pfxPath = Join-Path $env:TEMP "couchdb-temp.pfx"
+        $pfxPwd = ConvertTo-SecureString -String "tempexport" -Force -AsPlainText
+        Export-PfxCertificate -Cert "cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath $pfxPath -Password $pfxPwd | Out-Null
+        & $opensslPath pkcs12 -in $pfxPath -nocerts -nodes -passin "pass:tempexport" -out $keyFile 2>$null
+        Remove-Item $pfxPath -Force -ErrorAction SilentlyContinue
+        if (Test-Path $keyFile) {
+            Write-OK "key.pem written (via OpenSSL fallback)"
+        } else {
+            Write-Fail "Both PEM export methods failed. Cannot continue."
+            exit 1
+        }
+    } else {
+        Write-Fail "CNG export failed and OpenSSL not found. Install Git for Windows and re-run."
+        exit 1
+    }
 }
 
 if (-not (Test-Path $certFile) -or -not (Test-Path $keyFile)) {
-    Write-Fail "SSL certificate files not created. Check OpenSSL output."
+    Write-Fail "SSL certificate files not created."
     exit 1
 }
 
 Write-OK "cert.pem: $certFile"
 Write-OK "key.pem:  $keyFile"
-
-# Clean up temp config
-Remove-Item $confPath -Force -ErrorAction SilentlyContinue
 
 # =====================================================================
 #  PHASE 5: CONFIGURE

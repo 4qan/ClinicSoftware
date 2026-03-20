@@ -128,7 +128,24 @@ foreach ($ruleName in @("CouchDB HTTP", "CouchDB HTTPS", "CouchDB LAN")) {
 }
 
 # -----------------------------------------------------------------------
-# Step 5: Clean up temp files
+# Step 5: Remove SSL certificate from Windows cert store
+# -----------------------------------------------------------------------
+Write-Step "Removing SSL certificate from cert store"
+
+$store = New-Object System.Security.Cryptography.X509Certificates.X509Store("My", "LocalMachine")
+$store.Open("ReadWrite")
+$certs = $store.Certificates | Where-Object { $_.Subject -eq "CN=ClinicSoftware CouchDB" }
+foreach ($c in $certs) {
+    $store.Remove($c)
+    Write-OK "Removed cert: $($c.Thumbprint)"
+}
+if (-not $certs) {
+    Write-Skip "No 'ClinicSoftware CouchDB' certs found in store"
+}
+$store.Close()
+
+# -----------------------------------------------------------------------
+# Step 6: Clean up temp files
 # -----------------------------------------------------------------------
 Write-Step "Cleaning up temp files"
 

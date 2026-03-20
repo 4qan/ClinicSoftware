@@ -5,7 +5,6 @@ One-time setup for the doctor's Windows machine. Installs CouchDB with HTTPS, cr
 ## Prerequisites
 
 - Windows 10 or Windows 11 (doctor's machine)
-- **Git for Windows** installed (provides OpenSSL for SSL cert generation). Download: https://git-scm.com/download/win
 - PowerShell running as Administrator
 - Both machines (doctor + nurse) on the same LAN or WiFi network
 
@@ -79,10 +78,6 @@ Then re-run `.\install-couchdb.ps1`.
 - Nurse blocked at database level from writing: visits, visit medications, drugs
 
 ## Troubleshooting
-
-**"OpenSSL not found"**
-
-Install Git for Windows from https://git-scm.com/download/win (includes OpenSSL). Re-run the script after installing.
 
 **Service not starting after install**
 
