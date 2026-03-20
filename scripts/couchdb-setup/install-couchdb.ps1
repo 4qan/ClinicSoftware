@@ -31,6 +31,7 @@ $ErrorActionPreference = 'Stop'
 # Logging
 # -----------------------------------------------------------------------
 $LogPath = Join-Path ([Environment]::GetFolderPath("Desktop")) "couchdb-setup.log"
+Stop-Transcript -ErrorAction SilentlyContinue | Out-Null
 Start-Transcript -Path $LogPath -Force | Out-Null
 Write-Host "  Log file: $LogPath" -ForegroundColor Gray
 
