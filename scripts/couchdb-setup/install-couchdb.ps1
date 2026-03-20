@@ -386,8 +386,8 @@ httpsd = {chttpd, start_link, [https]}
 
 [ssl]
 port = 6984
-certfile = $certFileForIni
-keyfile = $keyFileForIni
+certfile = CERT_PATH_PLACEHOLDER
+keyfile = KEY_PATH_PLACEHOLDER
 
 [cors]
 origins = *
@@ -396,6 +396,9 @@ methods = GET, PUT, POST, HEAD, DELETE
 headers = accept, authorization, content-type, origin, referer
 "@
 
+# Replace placeholders with actual paths (avoids heredoc variable expansion issues)
+$LocalIniContent = $LocalIniContent -replace 'CERT_PATH_PLACEHOLDER', $certFileForIni
+$LocalIniContent = $LocalIniContent -replace 'KEY_PATH_PLACEHOLDER', $keyFileForIni
 Set-Content -Path $localIniPath -Value $LocalIniContent -Encoding UTF8
 Write-OK "local.ini written to $localIniPath"
 
