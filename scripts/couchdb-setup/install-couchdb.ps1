@@ -381,9 +381,6 @@ require_valid_user_except_for_up = true
 [httpd]
 enable_cors = true
 
-[daemons]
-httpsd = {chttpd, start_link, [https]}
-
 [ssl]
 port = 6984
 certfile = CERT_PATH_PLACEHOLDER
