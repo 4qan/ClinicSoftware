@@ -2,18 +2,20 @@
 <#
 .SYNOPSIS
     One-click CouchDB installer for ClinicSoftware.
-    Self-contained: downloads CouchDB, installs, configures, creates users, verifies.
+    Self-contained: downloads CouchDB, installs, configures HTTPS, creates users, verifies.
     Run this ONCE on the doctor's Windows machine.
 
 .DESCRIPTION
     This script handles everything:
     1. Downloads CouchDB 3.5.1 MSI
     2. Installs as a Windows service (auto-starts on boot)
-    3. Opens firewall for LAN access
-    4. Creates the database with role-based security
-    5. Creates doctor + nurse user accounts
-    6. Deploys document-level write restrictions
-    7. Runs 6 verification checks
+    3. Generates a self-signed SSL certificate for HTTPS
+    4. Configures CouchDB with HTTPS on port 6984
+    5. Opens firewall for LAN access (ports 5984 + 6984)
+    6. Creates the database with role-based security
+    7. Creates doctor + nurse user accounts
+    8. Deploys document-level write restrictions
+    9. Runs 7 verification checks
 
     No other files needed. Just run this script.
 
@@ -26,7 +28,7 @@
 $ErrorActionPreference = 'Stop'
 
 # -----------------------------------------------------------------------
-# Logging — captures all output to a log file on the Desktop
+# Logging
 # -----------------------------------------------------------------------
 $LogPath = Join-Path ([Environment]::GetFolderPath("Desktop")) "couchdb-setup.log"
 Start-Transcript -Path $LogPath -Force | Out-Null
@@ -79,9 +81,29 @@ function Write-Pass {
     $script:PassCount++
 }
 
-# -----------------------------------------------------------------------
+function Find-OpenSSL {
+    # Check PATH first
+    $inPath = Get-Command openssl.exe -ErrorAction SilentlyContinue
+    if ($inPath) { return $inPath.Source }
+
+    # Common Git for Windows locations
+    $searchPaths = @(
+        "C:\Program Files\Git\usr\bin\openssl.exe",
+        "C:\Program Files (x86)\Git\usr\bin\openssl.exe",
+        "${env:LOCALAPPDATA}\Programs\Git\usr\bin\openssl.exe",
+        "C:\OpenSSL-Win64\bin\openssl.exe",
+        "C:\OpenSSL-Win32\bin\openssl.exe",
+        "C:\Program Files\OpenSSL-Win64\bin\openssl.exe"
+    )
+
+    foreach ($p in $searchPaths) {
+        if (Test-Path $p) { return $p }
+    }
+
+    return $null
+}
+
 # Embedded: validate_doc_update design document
-# -----------------------------------------------------------------------
 $ValidateDocUpdate = @'
 {
   "_id": "_design/roles",
@@ -102,42 +124,44 @@ $DoctorPw = "doctor123"
 $NursePw  = "nurse123"
 $InstallPath = $DefaultInstall
 
-# local.ini content (defined after passwords so $AdminPw expands correctly)
-$LocalIniContent = @"
-; CouchDB configuration for ClinicSoftware LAN deployment
-; Applied automatically by install-couchdb.ps1
-
-[admins]
-admin = $AdminPw
-
-[chttpd]
-bind_address = 0.0.0.0
-port = 5984
-
-[chttpd_auth]
-require_valid_user_except_for_up = true
-
-[httpd]
-enable_cors = true
-
-[cors]
-origins = *
-credentials = false
-methods = GET, PUT, POST, HEAD, DELETE
-headers = accept, authorization, content-type, origin, referer
-"@
-
 if ($InstallPath -match ' ') {
     Write-Fail "Install path '$InstallPath' contains spaces. Erlang cannot handle spaces in paths. Use something like C:\CouchDB"
     exit 1
 }
 
 $BaseUrl  = "http://localhost:5984"
+$HttpsUrl = "https://localhost:6984"
 
-# PowerShell 5.1 does NOT extract credentials from URLs — must use explicit Authorization header
+# PowerShell 5.1 does NOT extract credentials from URLs, must use explicit Authorization header
 $AdminAuth = @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("admin:${AdminPw}")) }
 $DoctorAuth = @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("doctor:${DoctorPw}")) }
 $NurseAuth = @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("nurse:${NursePw}")) }
+
+# Detect LAN IP early (needed for SSL cert generation)
+$lanIp = (Get-NetIPAddress -AddressFamily IPv4 |
+    Where-Object { $_.InterfaceAlias -notmatch 'Loopback' -and ($_.PrefixOrigin -eq 'Dhcp' -or $_.PrefixOrigin -eq 'Manual') -and $_.IPAddress -ne '127.0.0.1' } |
+    Select-Object -First 1).IPAddress
+
+if (-not $lanIp) {
+    Write-Warn "Could not detect LAN IP. SSL cert will only cover localhost."
+    Write-Warn "Find IP manually: ipconfig | findstr IPv4"
+    $lanIp = "127.0.0.1"
+}
+Write-OK "LAN IP detected: $lanIp"
+
+# Find OpenSSL (required for SSL cert generation)
+Write-Step "Looking for OpenSSL"
+$opensslPath = Find-OpenSSL
+if (-not $opensslPath) {
+    Write-Fail "OpenSSL not found. It is required to generate the HTTPS certificate."
+    Write-Host ""
+    Write-Host "  Install Git for Windows (includes OpenSSL):" -ForegroundColor Yellow
+    Write-Host "  https://git-scm.com/download/win" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "  After installing, re-run this script." -ForegroundColor Yellow
+    exit 1
+}
+Write-OK "OpenSSL found: $opensslPath"
 
 # =====================================================================
 #  CHECK FOR EXISTING INSTALLATION
@@ -218,7 +242,7 @@ if ($msiProcess.ExitCode -ne 0) {
 }
 Write-OK "MSI installer completed"
 
-# Wait for files — search for local.ini since subdirectory structure varies by version
+# Wait for files
 Write-Step "Waiting for installation files"
 $localIniPath = $null
 $timeout = 60; $elapsed = 0
@@ -237,7 +261,6 @@ if ($null -eq $localIniPath) {
 }
 if ($null -eq $localIniPath) {
     Write-Fail "local.ini not found under $InstallPath (or Program Files) after ${timeout}s"
-    Write-Host "    Check where CouchDB installed: Get-ChildItem 'C:\' -Filter 'local.ini' -Recurse" -ForegroundColor Yellow
     exit 1
 }
 Write-OK "Found $localIniPath"
@@ -245,31 +268,138 @@ Write-OK "Found $localIniPath"
 } # end if (-not $alreadyInstalled)
 
 # =====================================================================
-#  PHASE 4: CONFIGURE
+#  PHASE 4: GENERATE SSL CERTIFICATE
+# =====================================================================
+Write-Banner "Generating SSL Certificate"
+
+$certDir = Split-Path $localIniPath
+$certFile = Join-Path $certDir "cert.pem"
+$keyFile = Join-Path $certDir "key.pem"
+
+# CouchDB uses forward slashes even on Windows
+$certFileForIni = ($certFile -replace '\\', '/')
+$keyFileForIni = ($keyFile -replace '\\', '/')
+
+if ((Test-Path $certFile) -and (Test-Path $keyFile)) {
+    Write-Warn "SSL cert already exists at $certDir (regenerating)"
+}
+
+# Create OpenSSL config with SANs for localhost + LAN IP
+$opensslConf = @"
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+distinguished_name = dn
+x509_extensions = v3_ca
+
+[dn]
+CN = ClinicSoftware CouchDB
+
+[v3_ca]
+subjectAltName = @alt_names
+basicConstraints = CA:true
+
+[alt_names]
+IP.1 = 127.0.0.1
+IP.2 = $lanIp
+DNS.1 = localhost
+"@
+
+$confPath = Join-Path $env:TEMP "couchdb-openssl.cnf"
+Set-Content -Path $confPath -Value $opensslConf -Encoding ASCII
+
+Write-Step "Generating self-signed certificate (valid 10 years)"
+Write-Host "    SANs: localhost, 127.0.0.1, $lanIp" -ForegroundColor Gray
+
+$opensslArgs = "req -x509 -newkey rsa:2048 -keyout `"$keyFile`" -out `"$certFile`" -days 3650 -nodes -config `"$confPath`""
+$opensslProcess = Start-Process -FilePath $opensslPath -ArgumentList $opensslArgs -Wait -PassThru -NoNewWindow -RedirectStandardError (Join-Path $env:TEMP "openssl-stderr.txt")
+
+if ($opensslProcess.ExitCode -ne 0) {
+    $sslError = Get-Content (Join-Path $env:TEMP "openssl-stderr.txt") -Raw -ErrorAction SilentlyContinue
+    Write-Fail "OpenSSL failed (exit $($opensslProcess.ExitCode)): $sslError"
+    exit 1
+}
+
+if (-not (Test-Path $certFile) -or -not (Test-Path $keyFile)) {
+    Write-Fail "SSL certificate files not created. Check OpenSSL output."
+    exit 1
+}
+
+Write-OK "cert.pem: $certFile"
+Write-OK "key.pem:  $keyFile"
+
+# Clean up temp config
+Remove-Item $confPath -Force -ErrorAction SilentlyContinue
+
+# =====================================================================
+#  PHASE 5: CONFIGURE
 # =====================================================================
 Write-Banner "Configuring CouchDB"
 
-Write-Step "Applying local.ini (LAN binding, auth, CORS)"
+Write-Step "Applying local.ini (LAN binding, auth, CORS, SSL)"
+
+$LocalIniContent = @"
+; CouchDB configuration for ClinicSoftware LAN deployment
+; Applied automatically by install-couchdb.ps1
+
+[admins]
+admin = $AdminPw
+
+[chttpd]
+bind_address = 0.0.0.0
+port = 5984
+
+[chttpd_auth]
+require_valid_user_except_for_up = true
+
+[httpd]
+enable_cors = true
+
+[ssl]
+port = 6984
+certfile = $certFileForIni
+keyfile = $keyFileForIni
+
+[cors]
+origins = *
+credentials = false
+methods = GET, PUT, POST, HEAD, DELETE
+headers = accept, authorization, content-type, origin, referer
+"@
+
 Set-Content -Path $localIniPath -Value $LocalIniContent -Encoding UTF8
 Write-OK "local.ini written to $localIniPath"
 
-Write-Step "Opening Windows Firewall port 5984 (LAN only)"
-$existingRule = Get-NetFirewallRule -DisplayName "CouchDB LAN" -ErrorAction SilentlyContinue
-if ($existingRule) {
-    Remove-NetFirewallRule -DisplayName "CouchDB LAN"
-    Write-Warn "Removed existing rule"
+Write-Step "Opening Windows Firewall ports 5984 + 6984 (LAN only)"
+foreach ($rule in @(
+    @{ Name = "CouchDB HTTP"; Port = 5984 },
+    @{ Name = "CouchDB HTTPS"; Port = 6984 }
+)) {
+    $existing = Get-NetFirewallRule -DisplayName $rule.Name -ErrorAction SilentlyContinue
+    if ($existing) {
+        Remove-NetFirewallRule -DisplayName $rule.Name
+        Write-Warn "Removed existing '$($rule.Name)' rule"
+    }
+    New-NetFirewallRule `
+        -DisplayName $rule.Name `
+        -Direction Inbound `
+        -Protocol TCP `
+        -LocalPort $rule.Port `
+        -Action Allow `
+        -Profile Domain, Private | Out-Null
+    Write-OK "Firewall rule '$($rule.Name)' created (port $($rule.Port), Domain/Private)"
 }
-New-NetFirewallRule `
-    -DisplayName "CouchDB LAN" `
-    -Direction Inbound `
-    -Protocol TCP `
-    -LocalPort 5984 `
-    -Action Allow `
-    -Profile Domain, Private | Out-Null
-Write-OK "Firewall rule created (Domain/Private profiles only, not Public)"
+
+# Also remove old "CouchDB LAN" rule if it exists from a previous install
+$oldRule = Get-NetFirewallRule -DisplayName "CouchDB LAN" -ErrorAction SilentlyContinue
+if ($oldRule) {
+    Remove-NetFirewallRule -DisplayName "CouchDB LAN"
+    Write-Warn "Removed old 'CouchDB LAN' firewall rule"
+}
 
 # =====================================================================
-#  PHASE 5: START SERVICE
+#  PHASE 6: START SERVICE
 # =====================================================================
 Write-Banner "Starting CouchDB Service"
 
@@ -294,7 +424,7 @@ if ($svc.Status -ne 'Running') {
 Write-OK "Service running (auto-starts on boot)"
 
 # Wait for HTTP
-Write-Step "Waiting for CouchDB HTTP"
+Write-Step "Waiting for CouchDB HTTP (port 5984)"
 $timeout = 30; $elapsed = 0; $ready = $false
 while (-not $ready -and $elapsed -lt $timeout) {
     try {
@@ -306,12 +436,48 @@ while (-not $ready -and $elapsed -lt $timeout) {
     if (-not $ready) { Start-Sleep -Seconds 2; $elapsed += 2 }
 }
 if (-not $ready) {
-    Write-Fail "CouchDB not responding after ${timeout}s"
+    Write-Fail "CouchDB not responding on HTTP after ${timeout}s"
     exit 1
 }
-Write-OK "CouchDB accepting connections"
+Write-OK "HTTP ready at $BaseUrl"
 
-# Finalize single-node setup (required for CouchDB 3.x before admin operations work)
+# Wait for HTTPS
+Write-Step "Waiting for CouchDB HTTPS (port 6984)"
+
+# Allow self-signed cert for PowerShell verification
+if (-not ([System.Management.Automation.PSTypeName]'TrustAllCertsPolicy').Type) {
+    Add-Type @"
+    using System.Net;
+    using System.Security.Cryptography.X509Certificates;
+    public class TrustAllCertsPolicy : ICertificatePolicy {
+        public bool CheckValidationResult(
+            ServicePoint srvPoint, X509Certificate certificate,
+            WebRequest request, int certificateProblem) { return true; }
+    }
+"@
+}
+[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+$timeout = 30; $elapsed = 0; $httpsReady = $false
+while (-not $httpsReady -and $elapsed -lt $timeout) {
+    try {
+        $ErrorActionPreference = 'Stop'
+        $up = Invoke-RestMethod -Uri "$HttpsUrl/_up"
+        if ($up.status -eq "ok") { $httpsReady = $true }
+        $ErrorActionPreference = 'Stop'
+    } catch { }
+    if (-not $httpsReady) { Start-Sleep -Seconds 2; $elapsed += 2 }
+}
+if (-not $httpsReady) {
+    Write-Fail "CouchDB not responding on HTTPS after ${timeout}s"
+    Write-Host "    Check that cert.pem and key.pem exist in: $certDir" -ForegroundColor Yellow
+    Write-Host "    Check Windows Event Log for Erlang SSL errors" -ForegroundColor Yellow
+    exit 1
+}
+Write-OK "HTTPS ready at $HttpsUrl"
+
+# Finalize single-node setup
 Write-Step "Finalizing single-node setup"
 try {
     $setupBody = @{
@@ -325,7 +491,6 @@ try {
         -ContentType "application/json" -Body $setupBody | Out-Null
     Write-OK "Single-node setup complete"
 } catch {
-    # If already set up, CouchDB returns 400 "Cluster is already finished"
     if ($_.ErrorDetails.Message -match "already") {
         Write-Warn "Already configured as single node"
     } else {
@@ -333,7 +498,7 @@ try {
     }
 }
 
-# Verify admin access works before proceeding
+# Verify admin access
 Write-Step "Verifying admin credentials"
 try {
     $ErrorActionPreference = 'Stop'
@@ -349,16 +514,15 @@ try {
 } catch {
     $ErrorActionPreference = 'Stop'
     Write-Fail "Admin authentication failed: $_"
-    Write-Host "    Check local.ini [admins] section at: $localIniPath" -ForegroundColor Yellow
     exit 1
 }
 
 # =====================================================================
-#  PHASE 6: CREATE DATABASE AND USERS
+#  PHASE 7: CREATE DATABASE AND USERS
 # =====================================================================
 Write-Banner "Setting Up Database"
 
-# System databases (required for CouchDB 3.x)
+# System databases
 Write-Step "Creating system databases"
 foreach ($sysDb in @("_users", "_replicator", "_global_changes")) {
     try {
@@ -440,7 +604,7 @@ Invoke-RestMethod -Method Put -Uri "$BaseUrl/$DbName/_security" -Headers $AdminA
     -ContentType "application/json" -Body $securityDoc | Out-Null
 Write-OK "Doctor=admin+member, Nurse=member only"
 
-# Design document (role enforcement)
+# Design document
 Write-Step "Deploying write restrictions"
 try {
     Invoke-RestMethod -Method Put -Uri "$BaseUrl/$DbName/_design/roles" -Headers $AdminAuth `
@@ -455,16 +619,16 @@ try {
 }
 
 # =====================================================================
-#  PHASE 7: VERIFICATION (6 checks)
+#  PHASE 8: VERIFICATION (7 checks)
 # =====================================================================
 Write-Banner "Verifying Installation"
 
 $PassCount = 0
-$TotalCount = 6
+$TotalCount = 7
 
 # Check 1: Service running + auto-start
 Write-Host ""
-Write-Host "--- Check 1/6: Service running and auto-start ---" -ForegroundColor Cyan
+Write-Host "--- Check 1/7: Service running and auto-start ---" -ForegroundColor Cyan
 $svc = Get-Service -Name "Apache CouchDB"
 if ($svc.Status -eq 'Running') {
     $startType = (Get-WmiObject -Class Win32_Service -Filter "Name='Apache CouchDB'" -ErrorAction SilentlyContinue).StartMode
@@ -477,23 +641,38 @@ if ($svc.Status -eq 'Running') {
     Write-Fail "Service status: $($svc.Status)"
 }
 
-# Check 2: /_up responds
+# Check 2: HTTP responds
 Write-Host ""
-Write-Host "--- Check 2/6: CouchDB responding ---" -ForegroundColor Cyan
+Write-Host "--- Check 2/7: CouchDB HTTP responding ---" -ForegroundColor Cyan
 try {
     $ErrorActionPreference = 'Stop'
     $up = Invoke-RestMethod -Uri "$BaseUrl/_up"
     $ErrorActionPreference = 'Stop'
-    if ($up.status -eq "ok") { Write-Pass "/_up status=ok" }
+    if ($up.status -eq "ok") { Write-Pass "HTTP /_up status=ok" }
     else { Write-Fail "/_up status=$($up.status)" }
 } catch {
     $ErrorActionPreference = 'Stop'
-    Write-Fail "/_up failed: $_"
+    Write-Fail "HTTP /_up failed: $_"
 }
 
-# Check 3: Unauthenticated rejected
+# Check 3: HTTPS responds
 Write-Host ""
-Write-Host "--- Check 3/6: Auth enforced (401 on unauthenticated) ---" -ForegroundColor Cyan
+Write-Host "--- Check 3/7: CouchDB HTTPS responding ---" -ForegroundColor Cyan
+try {
+    $ErrorActionPreference = 'Stop'
+    $up = Invoke-RestMethod -Uri "$HttpsUrl/_up"
+    $ErrorActionPreference = 'Stop'
+    if ($up.status -eq "ok") { Write-Pass "HTTPS /_up status=ok (port 6984)" }
+    else { Write-Fail "HTTPS /_up status=$($up.status)" }
+} catch {
+    $ErrorActionPreference = 'Stop'
+    Write-Fail "HTTPS /_up failed: $_"
+    Write-Host "    This means the SSL cert may not be configured correctly." -ForegroundColor Yellow
+}
+
+# Check 4: Unauthenticated rejected
+Write-Host ""
+Write-Host "--- Check 4/7: Auth enforced (401 on unauthenticated) ---" -ForegroundColor Cyan
 try {
     $ErrorActionPreference = 'Stop'
     Invoke-RestMethod -Uri "$BaseUrl/$DbName" | Out-Null
@@ -506,9 +685,9 @@ try {
     else { Write-Fail "Unexpected HTTP $sc" }
 }
 
-# Check 4: Doctor writes visit
+# Check 5: Doctor writes visit
 Write-Host ""
-Write-Host "--- Check 4/6: Doctor CAN write visit ---" -ForegroundColor Cyan
+Write-Host "--- Check 5/7: Doctor CAN write visit ---" -ForegroundColor Cyan
 try {
     $ErrorActionPreference = 'Stop'
     Invoke-RestMethod -Method Put -Uri "$BaseUrl/$DbName/visit:verify_test" -Headers $DoctorAuth `
@@ -525,9 +704,9 @@ try {
     Write-Fail "Doctor write failed: $_"
 }
 
-# Check 5: Nurse blocked from visit
+# Check 6: Nurse blocked from visit
 Write-Host ""
-Write-Host "--- Check 5/6: Nurse CANNOT write visit ---" -ForegroundColor Cyan
+Write-Host "--- Check 6/7: Nurse CANNOT write visit ---" -ForegroundColor Cyan
 try {
     $ErrorActionPreference = 'Stop'
     Invoke-RestMethod -Method Put -Uri "$BaseUrl/$DbName/visit:verify_test2" -Headers $NurseAuth `
@@ -550,9 +729,9 @@ try {
     }
 }
 
-# Check 6: Nurse writes patient
+# Check 7: Nurse writes patient
 Write-Host ""
-Write-Host "--- Check 6/6: Nurse CAN write patient ---" -ForegroundColor Cyan
+Write-Host "--- Check 7/7: Nurse CAN write patient ---" -ForegroundColor Cyan
 try {
     $ErrorActionPreference = 'Stop'
     Invoke-RestMethod -Method Put -Uri "$BaseUrl/$DbName/patient:verify_test" -Headers $NurseAuth `
@@ -589,39 +768,47 @@ if ($PassCount -eq $TotalCount) {
 }
 
 Write-Host ""
-Write-Host "  Endpoint:  http://localhost:5984" -ForegroundColor White
-Write-Host "  Database:  $DbName" -ForegroundColor White
+Write-Host "  HTTP Endpoint:   http://localhost:5984" -ForegroundColor White
+Write-Host "  HTTPS Endpoint:  https://localhost:6984" -ForegroundColor White
+Write-Host "  Database:        $DbName" -ForegroundColor White
+Write-Host ""
+Write-Host "  Doctor writes: everything" -ForegroundColor White
+Write-Host "  Nurse writes:  patient, recent, settings (blocked: visit, visitmed, drug)" -ForegroundColor White
 Write-Host ""
 
-# Print LAN IP for nurse
-$lanIp = (Get-NetIPAddress -AddressFamily IPv4 |
-    Where-Object { $_.InterfaceAlias -notmatch 'Loopback' -and ($_.PrefixOrigin -eq 'Dhcp' -or $_.PrefixOrigin -eq 'Manual') -and $_.IPAddress -ne '127.0.0.1' } |
-    Select-Object -First 1).IPAddress
-
-if ($lanIp) {
-    Write-Host "  Doctor writes: everything" -ForegroundColor White
-    Write-Host "  Nurse writes:  patient, recent, settings (blocked: visit, visitmed, drug)" -ForegroundColor White
-    Write-Host ""
-    Write-Host "  --------------------------------------------------------" -ForegroundColor Yellow
-    Write-Host "  NURSE CONNECTION URL:  http://$lanIp`:5984" -ForegroundColor Yellow
-    Write-Host "  --------------------------------------------------------" -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "  Save this URL. You will need it when configuring the app." -ForegroundColor Yellow
-    Write-Host ""
+if ($lanIp -ne "127.0.0.1") {
     Write-Host "  --------------------------------------------------------" -ForegroundColor Cyan
-    Write-Host "  IMPORTANT NEXT STEPS:" -ForegroundColor Cyan
+    Write-Host "  SETUP COMPLETE. Follow these steps to start using sync:" -ForegroundColor Cyan
     Write-Host "  --------------------------------------------------------" -ForegroundColor Cyan
-    Write-Host "  1. Set a STATIC IP on this machine so the nurse's" -ForegroundColor White
-    Write-Host "     connection does not break when the IP changes." -ForegroundColor White
-    Write-Host "     (Settings > Network > Wi-Fi > IP assignment > Manual)" -ForegroundColor Gray
     Write-Host ""
-    Write-Host "  2. Open the app via HTTP (not HTTPS):" -ForegroundColor White
-    Write-Host "     http://4qan.github.io/ClinicSoftware/" -ForegroundColor White
-    Write-Host "     HTTPS will block connections to CouchDB." -ForegroundColor Gray
+    Write-Host "  STEP 1: Accept the SSL certificate (once per machine)" -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "  3. On first login, enter the server address:" -ForegroundColor White
-    Write-Host "     Doctor machine:  http://localhost:5984" -ForegroundColor White
-    Write-Host "     Nurse machine:   http://$lanIp`:5984" -ForegroundColor White
+    Write-Host "    On THIS machine (doctor), open Chrome and go to:" -ForegroundColor White
+    Write-Host "      https://localhost:6984/" -ForegroundColor White
+    Write-Host ""
+    Write-Host "    On the NURSE's machine, open Chrome and go to:" -ForegroundColor White
+    Write-Host "      https://${lanIp}:6984/" -ForegroundColor White
+    Write-Host ""
+    Write-Host "    Both: click 'Advanced' > 'Proceed to ...' to accept." -ForegroundColor White
+    Write-Host "    You should see: {`"couchdb`":`"Welcome`",...}" -ForegroundColor Gray
+    Write-Host "    This is a one-time step per browser." -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "  STEP 2: Open the app and configure" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "    Open: https://4qan.github.io/ClinicSoftware/" -ForegroundColor White
+    Write-Host ""
+    Write-Host "    On first login, enter the server address:" -ForegroundColor White
+    Write-Host "      Doctor machine:  https://localhost:6984" -ForegroundColor White
+    Write-Host "      Nurse machine:   https://${lanIp}:6984" -ForegroundColor White
+    Write-Host ""
+    Write-Host "    Log in with your credentials. The sidebar should" -ForegroundColor White
+    Write-Host "    show a green dot (synced) within a few seconds." -ForegroundColor White
+    Write-Host ""
+    Write-Host "  STEP 3 (recommended): Set a static IP on this machine" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "    Current IP: $lanIp" -ForegroundColor White
+    Write-Host "    If this IP changes, the nurse's connection will break." -ForegroundColor White
+    Write-Host "    Settings > Network > Wi-Fi > IP assignment > Manual" -ForegroundColor Gray
     Write-Host "  --------------------------------------------------------" -ForegroundColor Cyan
 } else {
     Write-Host "  Could not detect LAN IP. Find it manually:" -ForegroundColor Yellow

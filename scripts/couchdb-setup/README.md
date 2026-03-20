@@ -1,104 +1,111 @@
 # CouchDB Setup Guide
 
-One-time setup for the doctor's Windows machine. Run once before activating Phase 22 (Live Sync).
+One-time setup for the doctor's Windows machine. Installs CouchDB with HTTPS, creates user accounts, and configures role-based access.
 
 ## Prerequisites
 
 - Windows 10 or Windows 11 (doctor's machine)
-- CouchDB 3.5.1 MSI installer downloaded from https://couchdb.apache.org/#download
-- PowerShell running as Administrator (right-click PowerShell, "Run as administrator")
+- **Git for Windows** installed (provides OpenSSL for SSL cert generation). Download: https://git-scm.com/download/win
+- PowerShell running as Administrator
 - Both machines (doctor + nurse) on the same LAN or WiFi network
 
-## Setup Steps
+## Quick Start
 
-**Step 1: Download CouchDB MSI**
+### Step 1: Run the installer
 
-Go to https://couchdb.apache.org/#download and download the Windows 64-bit MSI for version 3.5.1.
-
-**Step 2: Open PowerShell as Administrator**
-
-Press Win+S, type "PowerShell", right-click, "Run as administrator".
-
-**Step 3: Navigate to the setup scripts**
+Right-click PowerShell > "Run as administrator":
 
 ```powershell
 cd path\to\ClinicSoftware\scripts\couchdb-setup
+.\install-couchdb.ps1
 ```
 
-**Step 4: Run setup.ps1**
+The script handles everything: downloads CouchDB, installs it, generates an SSL certificate, configures HTTPS, creates users, and runs verification. Takes about 2 minutes.
+
+### Step 2: Accept the SSL certificate (once per machine)
+
+The script prints the exact URLs. Generally:
+
+**On the doctor's machine**, open Chrome and go to:
+```
+https://localhost:6984/
+```
+
+**On the nurse's machine**, open Chrome and go to:
+```
+https://<DOCTOR_IP>:6984/
+```
+
+On both: click **Advanced** > **Proceed to ...** to accept the self-signed certificate. You should see `{"couchdb":"Welcome",...}`. This is a one-time step per browser.
+
+### Step 3: Open the app and connect
+
+On both machines, open:
+```
+https://4qan.github.io/ClinicSoftware/
+```
+
+On first login, enter the server address:
+- **Doctor machine:** `https://localhost:6984`
+- **Nurse machine:** `https://<DOCTOR_IP>:6984`
+
+Log in. The sidebar should show a green dot (synced) within seconds.
+
+### Step 4 (recommended): Set a static IP
+
+The doctor's machine needs a stable IP so the nurse's connection doesn't break when the router reassigns IPs.
+
+Windows: Settings > Network > Wi-Fi > IP assignment > Manual. Use the IP shown by the install script.
+
+## Starting Fresh
+
+To completely remove CouchDB and start over:
 
 ```powershell
-.\setup.ps1 `
-  -CouchDbInstaller "C:\path\to\apache-couchdb-3.5.1.msi" `
-  -AdminPassword "ADMIN_PW" `
-  -DoctorPassword "DOCTOR_PW" `
-  -NursePassword "NURSE_PW"
+.\uninstall-couchdb.ps1
 ```
 
-Replace `ADMIN_PW`, `DOCTOR_PW`, and `NURSE_PW` with the actual passwords (see Password Notes below). The script will print progress for each step and exit on any failure.
-
-**Step 5: Run verify.ps1**
-
-```powershell
-.\verify.ps1 `
-  -AdminPassword "ADMIN_PW" `
-  -DoctorPassword "DOCTOR_PW" `
-  -NursePassword "NURSE_PW"
-```
-
-All 6 checks must pass. The verify script also prints the doctor's LAN IP address that the nurse's machine uses to connect.
-
-**Step 6: Confirm LAN connectivity from nurse's machine**
-
-The verify script prints a URL in the form `http://192.168.X.Y:5984/_up`. Open that URL in a browser on the nurse's machine. It should return `{"status":"ok"}`.
-
-## Password Notes
-
-- Choose strong passwords for all three accounts.
-- Store the passwords in a physical note kept at the clinic. Do not store them in any digital file on the machine or in this repository.
-- The doctor and nurse passwords will be used again in Phase 21 when configuring app login. Keep them accessible.
-- The admin password is for CouchDB maintenance only and is not used by the app.
+Then re-run `.\install-couchdb.ps1`.
 
 ## What Gets Configured
 
 - CouchDB 3.5.1 installed as a Windows service (auto-starts on every boot)
-- CouchDB bound to `0.0.0.0:5984` (accessible from the entire LAN)
-- Windows Firewall inbound rule for port 5984 (Domain and Private network profiles only, not Public)
+- HTTP on port 5984, **HTTPS on port 6984** (self-signed cert, valid 10 years)
+- Windows Firewall rules for both ports (Domain and Private network profiles only)
 - Authentication required for all data endpoints (`/_up` remains open for connectivity checks)
-- CORS enabled for all origins with Basic auth headers (no cookies)
-- Database: `clinicsoftware_v2` (matches the local PouchDB database name)
-- Users: `doctor` (full read/write access), `nurse` (read all, write patients and settings only)
-- Nurse role blocked at the database level from writing: visits, visit medications, drugs
+- CORS enabled for all origins with Basic auth headers
+- Database: `clinicsoftware_v2`
+- Users: `doctor` (full read/write), `nurse` (read all, write patients and settings only)
+- Nurse blocked at database level from writing: visits, visit medications, drugs
 
 ## Troubleshooting
 
+**"OpenSSL not found"**
+
+Install Git for Windows from https://git-scm.com/download/win (includes OpenSSL). Re-run the script after installing.
+
 **Service not starting after install**
 
-Check Windows Event Log (Event Viewer > Windows Logs > Application) for Erlang errors. The most common cause is an installation path containing spaces. Uninstall CouchDB, re-run `setup.ps1` with `-InstallPath "C:\CouchDB"` (no spaces).
+Check Windows Event Log (Event Viewer > Windows Logs > Application) for Erlang errors. Most common cause: install path with spaces. Run `.\uninstall-couchdb.ps1`, then re-run install (default path `C:\CouchDB` has no spaces).
 
-**Firewall blocking nurse access**
+**HTTPS check fails (Check 3/7)**
 
-Verify the rule exists:
-```powershell
-Get-NetFirewallRule -DisplayName "CouchDB LAN" | Select-Object DisplayName, Enabled, Profile
-```
-If it is missing or disabled, re-run `setup.ps1`.
+The SSL cert or key file may be missing or corrupted. Check that `cert.pem` and `key.pem` exist in `C:\CouchDB\etc\`. If not, delete both files and re-run the install script (it will regenerate them).
 
-**401 error on /_up**
+**Browser says "Your connection is not private"**
 
-This means `require_valid_user = true` was used instead of `require_valid_user_except_for_up = true`. Re-run `setup.ps1` to overwrite `local.ini` with the correct value and restart the service.
+Expected for self-signed certificates. Click Advanced > Proceed. This is safe on your own LAN. You only need to do this once per browser.
 
-**Nurse write of patient document rejected (INFRA-04c failing)**
+**Nurse can't connect from her machine**
 
-Confirm the `validate_doc_update` design doc is deployed correctly:
-```powershell
-Invoke-RestMethod -Uri "http://admin:ADMIN_PW@localhost:5984/clinicsoftware_v2/_design/roles"
-```
-The response should contain the `validate_doc_update` key. If not, re-run `setup.ps1`.
+1. Verify the doctor's firewall allows port 6984: `Get-NetFirewallRule -DisplayName "CouchDB HTTPS"`
+2. Verify the URL uses the doctor's LAN IP (not `localhost`)
+3. Make sure both machines are on the same WiFi/LAN network
+4. Make sure the nurse accepted the SSL cert by visiting `https://<DOCTOR_IP>:6984/` directly
 
-**Check 3 failing (unauthenticated not rejected)**
+**Login fails with "Failed to fetch" or network error**
 
-Confirm `require_valid_user_except_for_up = true` is in `C:\CouchDB\etc\local.ini` under the `[chttpd_auth]` section, then restart the service:
-```powershell
-Restart-Service -Name Apache_CouchDB
-```
+This was the mixed content issue. Make sure:
+1. The CouchDB URL uses `https://` (not `http://`)
+2. The port is `6984` (not `5984`)
+3. The SSL cert was accepted in the browser (Step 2 above)
