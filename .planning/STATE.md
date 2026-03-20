@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Multi-User Sync
 status: unknown
-stopped_at: Completed 22-live-sync plan 01
-last_updated: "2026-03-20T14:29:37.028Z"
+stopped_at: Completed 22-live-sync plan 02
+last_updated: "2026-03-20T14:31:43Z"
 progress:
   total_phases: 9
   completed_phases: 7
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 ## Current Position
 
 Phase: 22 (live-sync) — EXECUTING
-Plan: 1 of 3
+Plan: 2 of 3
 
 ## Accumulated Context
 
@@ -56,6 +56,8 @@ Plan: 1 of 3
 - [Phase 22-01]: syncHandleRef stored in useRef not useState to prevent re-render loop on every PouchDB event
 - [Phase 22-01]: 401/403 errors hard-stop sync with user-facing message; other errors set disconnected and allow retry
 - [Phase 22-01]: Workbox NetworkOnly on cross-origin requests excludes CouchDB long-poll from service worker
+- [Phase 22-02]: Settings Sync tab uses 'Disconnected' (full word); Sidebar SyncIndicator uses 'Offline' (space-constrained) -- per UI-SPEC copywriting contract
+- [Phase 22-02]: SYNC_STATUS_CONFIG as module-level const in both SyncIndicator and SettingsPage for stable reference
 
 ### Pending Todos
 
@@ -69,8 +71,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-20T14:25:36.436Z
-Stopped at: Completed 22-live-sync plan 01
+Last session: 2026-03-20T14:31:43Z
+Stopped at: Completed 22-live-sync plan 02
 Resume file: None
 
 ---

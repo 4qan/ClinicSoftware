@@ -81,7 +81,7 @@
 - [x] **Phase 19: PouchDB Migration** - Replace Dexie with PouchDB and migrate all existing clinic data without loss (completed 2026-03-19)
 - [x] **Phase 20: CouchDB Infrastructure** - CouchDB running as a secured Windows service on the doctor's machine, accessible from nurse's machine over LAN (completed 2026-03-19)
 - [x] **Phase 21: Auth and Role Enforcement** - Two-user login with CouchDB session auth and role-based access gating (completed 2026-03-19)
-- [ ] **Phase 22: Live Sync** - Bidirectional real-time sync between machines with visible sync status
+- [x] **Phase 22: Live Sync** - Bidirectional real-time sync between machines with visible sync status (completed 2026-03-20)
 - [ ] **Phase 23: Backup Redesign** - Backup and restore adapted for the synced multi-machine environment
 
 ## Phase Details
@@ -201,7 +201,7 @@ Plans:
   3. After WiFi is restored, changes made offline on either machine sync automatically without user intervention
   4. Settings page shows current sync state (syncing / synced / disconnected) and is accurate when the network is toggled
   5. If the doctor's machine is off, nurse keeps working; her data appears on the doctor's machine once it comes back online
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [ ] 22-01-PLAN.md -- Sync engine: useSyncManager, SyncContext/Provider, Workbox exclusion, App.tsx wiring
 - [ ] 22-02-PLAN.md -- Sync UI: SyncIndicator in sidebar, Settings Sync tab with status/retry
@@ -243,7 +243,7 @@ Plans:
 | 19. PouchDB Migration | v2.0 | 3/3 | Complete | 2026-03-19 |
 | 20. CouchDB Infrastructure | v2.0 | 2/2 | Complete | 2026-03-19 |
 | 21. Auth and Role Enforcement | v2.0 | 3/3 | Complete | 2026-03-19 |
-| 22. Live Sync | 2/3 | In Progress|  | - |
+| 22. Live Sync | 3/3 | Complete   | 2026-03-20 | - |
 | 23. Backup Redesign | v2.0 | 0/TBD | Not started | - |
 
 ---
