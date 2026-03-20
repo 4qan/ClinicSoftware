@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuthContext } from '@/auth/AuthProvider'
+import { SyncIndicator } from '@/components/SyncIndicator'
 
 const navItems = [
   {
@@ -131,6 +132,9 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             </div>
           )
         )}
+        {/* Sync indicator */}
+        <SyncIndicator collapsed={collapsed} />
+
         <button
           onClick={logout}
           tabIndex={-1}
