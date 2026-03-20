@@ -18,7 +18,7 @@ Instead of building a traditional client-server app, I went with a **zero-backen
 
 - **Offline-first PWA**: Service worker caches everything on first load. No internet needed after that.
 - **Browser-local storage**: All data lives in IndexedDB via PouchDB. Nothing leaves the local network.
-- **LAN sync (in progress)**: Doctor and nurse machines sync over the local network via CouchDB. Role-based write restrictions enforced at the database level. No cloud, no internet required.
+- **LAN sync**: Doctor and nurse machines sync bidirectionally over the local network via PouchDB/CouchDB. Live replication starts on login, stops on logout, retries automatically on network failure. Role-based write restrictions enforced at the database level. No cloud, no internet required.
 - **CouchDB auth**: Username/password login against CouchDB session API. Doctor gets full access, nurse gets patient and vitals only.
 - **Manual backups**: JSON export/import for data portability. The user controls their data.
 - **Auto-print control**: Toggle automatic slip printing on/off from settings
@@ -79,6 +79,14 @@ This eliminates infrastructure costs, removes network dependency, and keeps pati
 - Sidebar and header adapt to logged-in role
 - Prescription sections hidden from nurse in visit forms
 - Doctor can reset nurse password from Settings
+
+**Live Sync**
+- Bidirectional PouchDB/CouchDB replication over LAN
+- Sync starts on login, stops on logout, retries automatically on network failure
+- Sidebar indicator shows sync state (synced / syncing / disconnected)
+- Settings Sync tab with detailed status, last-synced time, error info, and manual retry
+- Patient lists, search results, and drug searches auto-refresh when sync delivers new data
+- Both machines keep working offline; changes merge automatically when connectivity returns
 
 **Security**
 - CouchDB session authentication (username/password against `/_session`)
