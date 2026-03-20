@@ -203,9 +203,9 @@ Plans:
   5. If the doctor's machine is off, nurse keeps working; her data appears on the doctor's machine once it comes back online
 **Plans:** 3 plans
 Plans:
-- [ ] 21-01-PLAN.md -- CouchDB auth foundation: useCouchAuth hook, LoginPage rewrite, tests
-- [ ] 21-02-PLAN.md -- Role enforcement UI: ProtectedRoute, sidebar filtering, visit form restrictions
-- [ ] 21-03-PLAN.md -- Password management, install script defaults, old auth cleanup
+- [ ] 22-01-PLAN.md -- Sync engine: useSyncManager, SyncContext/Provider, Workbox exclusion, App.tsx wiring
+- [ ] 22-02-PLAN.md -- Sync UI: SyncIndicator in sidebar, Settings Sync tab with status/retry
+- [ ] 22-03-PLAN.md -- Changes feed: auto-refresh useRecentPatients, usePatientSearch, useDrugSearch
 
 ### Phase 23: Backup Redesign
 **Goal**: Manual export still produces a downloadable backup file; restore pushes data to the shared CouchDB so both machines reflect the restored state via sync; auto-snapshots continue working
@@ -215,11 +215,7 @@ Plans:
   1. Doctor can export a backup file from Settings; the file contains all clinic data in a downloadable format
   2. After a restore, both the doctor's and nurse's machines show the restored data without manual steps on the nurse's machine
   3. Auto-snapshots continue to trigger and rotate (24h interval, 3-copy rotation) after the PouchDB migration
-**Plans:** 3 plans
-Plans:
-- [ ] 21-01-PLAN.md -- CouchDB auth foundation: useCouchAuth hook, LoginPage rewrite, tests
-- [ ] 21-02-PLAN.md -- Role enforcement UI: ProtectedRoute, sidebar filtering, visit form restrictions
-- [ ] 21-03-PLAN.md -- Password management, install script defaults, old auth cleanup
+**Plans:** TBD
 
 ## Progress
 
@@ -245,10 +241,10 @@ Plans:
 | 17. Visit Vitals | v1.5 | 2/2 | Complete | 2026-03-19 |
 | 18. Unified Medication Management | v1.6 | 2/2 | Complete | 2026-03-19 |
 | 19. PouchDB Migration | v2.0 | 3/3 | Complete | 2026-03-19 |
-| 20. CouchDB Infrastructure | 2/2 | Complete    | 2026-03-19 | - |
-| 21. Auth and Role Enforcement | 3/3 | Complete    | 2026-03-19 | - |
-| 22. Live Sync | v2.0 | 0/TBD | Not started | - |
+| 20. CouchDB Infrastructure | v2.0 | 2/2 | Complete | 2026-03-19 |
+| 21. Auth and Role Enforcement | v2.0 | 3/3 | Complete | 2026-03-19 |
+| 22. Live Sync | v2.0 | 0/3 | Planned | - |
 | 23. Backup Redesign | v2.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-03-19 -- Phase 21 plans created (3 plans, 2 waves)*
+*Last updated: 2026-03-20 -- Phase 22 plans created (3 plans, 2 waves)*
