@@ -137,12 +137,12 @@ $AdminUrl = "http://admin:${AdminPw}@localhost:5984"
 # =====================================================================
 #  CHECK FOR EXISTING INSTALLATION
 # =====================================================================
-$existingSvc = Get-Service -Name Apache_CouchDB -ErrorAction SilentlyContinue
+$existingSvc = Get-Service -Name "Apache CouchDB" -ErrorAction SilentlyContinue
 $alreadyInstalled = $false
 
 if ($null -ne $existingSvc) {
     Write-Banner "CouchDB Already Installed"
-    Write-OK "Service 'Apache_CouchDB' found (Status: $($existingSvc.Status))"
+    Write-OK "Service 'Apache CouchDB' found (Status: $($existingSvc.Status))"
     Write-Host "  Skipping download and install. Will re-apply configuration." -ForegroundColor Yellow
     $alreadyInstalled = $true
 
@@ -268,16 +268,16 @@ Write-OK "Firewall rule created (Domain/Private profiles only, not Public)"
 # =====================================================================
 Write-Banner "Starting CouchDB Service"
 
-Restart-Service -Name Apache_CouchDB -ErrorAction SilentlyContinue
+Restart-Service -Name "Apache CouchDB" -ErrorAction SilentlyContinue
 Start-Sleep -Seconds 3
 
-$svc = Get-Service -Name Apache_CouchDB -ErrorAction SilentlyContinue
+$svc = Get-Service -Name "Apache CouchDB" -ErrorAction SilentlyContinue
 if ($null -eq $svc) {
-    Write-Fail "Service 'Apache_CouchDB' not found. Installation may have failed."
+    Write-Fail "Service 'Apache CouchDB' not found. Installation may have failed."
     exit 1
 }
 if ($svc.Status -ne 'Running') {
-    Start-Service -Name Apache_CouchDB
+    Start-Service -Name "Apache CouchDB"
     Start-Sleep -Seconds 3
     $svc.Refresh()
 }
@@ -419,9 +419,9 @@ $TotalCount = 6
 # Check 1: Service running + auto-start
 Write-Host ""
 Write-Host "--- Check 1/6: Service running and auto-start ---" -ForegroundColor Cyan
-$svc = Get-Service -Name Apache_CouchDB
+$svc = Get-Service -Name "Apache CouchDB"
 if ($svc.Status -eq 'Running') {
-    $startType = (Get-WmiObject -Class Win32_Service -Filter "Name='Apache_CouchDB'" -ErrorAction SilentlyContinue).StartMode
+    $startType = (Get-WmiObject -Class Win32_Service -Filter "Name='Apache CouchDB'" -ErrorAction SilentlyContinue).StartMode
     if ($startType -eq "Auto" -or $svc.StartType -eq "Automatic") {
         Write-Pass "Running, StartType=Automatic"
     } else {
