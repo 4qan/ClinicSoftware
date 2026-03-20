@@ -12,6 +12,17 @@ vi.mock('@/auth/AuthProvider', () => ({
   }),
 }))
 
+// Mock SyncContext (required by SettingsPage Sync tab)
+vi.mock('@/sync/SyncContext', () => ({
+  useSyncContext: () => ({
+    status: 'synced',
+    lastSynced: null,
+    errorMessage: null,
+    retry: vi.fn(),
+    startSync: vi.fn(),
+  }),
+}))
+
 // Mock ChangePassword to simplify rendering
 vi.mock('@/auth/ChangePassword', () => ({
   ChangePassword: () => <div>ChangePassword</div>,

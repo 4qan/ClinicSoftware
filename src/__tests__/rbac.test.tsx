@@ -36,6 +36,16 @@ vi.mock('@/auth/AuthProvider', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
+vi.mock('@/sync/SyncContext', () => ({
+  useSyncContext: () => ({
+    status: 'synced',
+    lastSynced: null,
+    errorMessage: null,
+    retry: vi.fn(),
+    startSync: vi.fn(),
+  }),
+}))
+
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { Sidebar } from '@/components/Sidebar'
 import { Header } from '@/components/Header'

@@ -14,6 +14,16 @@ vi.mock('@/auth/AuthProvider', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
+vi.mock('@/sync/SyncContext', () => ({
+  useSyncContext: () => ({
+    status: 'synced',
+    lastSynced: null,
+    errorMessage: null,
+    retry: vi.fn(),
+    startSync: vi.fn(),
+  }),
+}))
+
 vi.mock('@/db/patients', () => ({
   searchPatients: vi.fn().mockResolvedValue([]),
 }))
