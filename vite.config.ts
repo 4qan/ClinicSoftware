@@ -27,7 +27,7 @@ export default defineConfig({
         runtimeCaching: [
           {
             // CouchDB runs on a different origin (LAN IP:5984). Exclude from SW cache.
-            urlPattern: ({ url }: { url: URL }) => url.origin !== self.location.origin,
+            urlPattern: ({ sameOrigin }: { sameOrigin: boolean }) => !sameOrigin,
             handler: 'NetworkOnly' as const,
           },
         ],
