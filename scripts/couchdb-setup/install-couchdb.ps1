@@ -26,6 +26,13 @@
 $ErrorActionPreference = 'Stop'
 
 # -----------------------------------------------------------------------
+# Logging — captures all output to a log file on the Desktop
+# -----------------------------------------------------------------------
+$LogPath = Join-Path ([Environment]::GetFolderPath("Desktop")) "couchdb-setup.log"
+Start-Transcript -Path $LogPath -Force | Out-Null
+Write-Host "  Log file: $LogPath" -ForegroundColor Gray
+
+# -----------------------------------------------------------------------
 # Configuration
 # -----------------------------------------------------------------------
 $CouchDbVersion  = "3.5.1"
@@ -559,6 +566,10 @@ if ($lanIp) {
     Write-Host "    ipconfig | findstr IPv4" -ForegroundColor Yellow
 }
 
+Write-Host ""
+
+Stop-Transcript | Out-Null
+Write-Host "  Full log saved to: $LogPath" -ForegroundColor Gray
 Write-Host ""
 
 if ($PassCount -ne $TotalCount) { exit 1 }
