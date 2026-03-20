@@ -382,9 +382,10 @@ require_valid_user_except_for_up = true
 enable_cors = true
 
 [ssl]
+enable = true
 port = 6984
-certfile = CERT_PATH_PLACEHOLDER
-keyfile = KEY_PATH_PLACEHOLDER
+cert_file = CERT_PATH_PLACEHOLDER
+key_file = KEY_PATH_PLACEHOLDER
 
 [cors]
 origins = *
