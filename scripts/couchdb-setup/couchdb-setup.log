@@ -1,6 +1,6 @@
-﻿**********************
+**********************
 Windows PowerShell transcript start
-Start time: 20260320150423
+Start time: 20260320150800
 Username: LAPTOP-NN9BNH3O\furqa
 RunAs User: LAPTOP-NN9BNH3O\furqa
 Configuration Name: 
@@ -50,10 +50,23 @@ SerializationVersion: 1.1.0.1
   Starting CouchDB Service
 ========================================================
 
+
+==> Stopping service
+
+==> Starting service
     [OK] Service running (auto-starts on boot)
 
 ==> Waiting for CouchDB HTTP
     [OK] CouchDB accepting connections
+
+==> Finalizing single-node setup
+PS C:\Users\furqa\Downloads> TerminatingError(Invoke-RestMethod): "{"error":"unauthorized","reason":"You are not a server admin."}
+"
+    [!] Cluster setup returned: {"error":"unauthorized","reason":"You are not a server admin."}
+ (continuing anyway)
+
+==> Verifying admin credentials
+    [OK] Admin authenticated successfully
 
 ========================================================
   Setting Up Database
@@ -72,3 +85,4 @@ PS C:\Users\furqa\Downloads> TerminatingError(Invoke-RestMethod): "{"error":"una
 PS C:\Users\furqa\Downloads> TerminatingError(Invoke-RestMethod): "{"error":"unauthorized","reason":"You are not a server admin."}
 "
     [FAIL] Failed to create database: {"error":"unauthorized","reason":"You are not a server admin."}
+
