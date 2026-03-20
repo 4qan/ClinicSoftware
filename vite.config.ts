@@ -24,6 +24,13 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         skipWaiting: true,
         clientsClaim: true,
+        runtimeCaching: [
+          {
+            // CouchDB runs on a different origin (LAN IP:5984). Exclude from SW cache.
+            urlPattern: ({ url }: { url: URL }) => url.origin !== self.location.origin,
+            handler: 'NetworkOnly' as const,
+          },
+        ],
       },
       manifest: {
         name: 'Clinic Software',

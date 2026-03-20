@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider, useAuthContext } from './auth/AuthProvider'
+import { SyncProvider } from '@/sync/SyncContext'
 import { ToastProvider } from './components/ToastProvider'
 import { LoginPage } from './auth/LoginPage'
 import { seedDrugDatabase, deduplicateExistingDrugs } from './db/seedDrugs'
@@ -60,9 +61,11 @@ function App() {
   return (
     <BrowserRouter basename="/ClinicSoftware">
       <AuthProvider>
-        <ToastProvider>
-          <AppContent />
-        </ToastProvider>
+        <SyncProvider>
+          <ToastProvider>
+            <AppContent />
+          </ToastProvider>
+        </SyncProvider>
       </AuthProvider>
     </BrowserRouter>
   )
