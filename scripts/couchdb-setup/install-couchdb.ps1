@@ -178,18 +178,29 @@ if ($msiProcess.ExitCode -ne 0) {
 }
 Write-OK "MSI installer completed"
 
-# Wait for files
+# Wait for files — search for local.ini since subdirectory structure varies by version
 Write-Step "Waiting for installation files"
-$localIniPath = Join-Path $InstallPath "etc\local.ini"
+$localIniPath = $null
 $timeout = 60; $elapsed = 0
-while (-not (Test-Path $localIniPath) -and $elapsed -lt $timeout) {
-    Start-Sleep -Seconds 2; $elapsed += 2
+while ($null -eq $localIniPath -and $elapsed -lt $timeout) {
+    $found = Get-ChildItem -Path $InstallPath -Filter "local.ini" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($found) { $localIniPath = $found.FullName }
+    else { Start-Sleep -Seconds 2; $elapsed += 2 }
 }
-if (-not (Test-Path $localIniPath)) {
-    Write-Fail "local.ini not found at $localIniPath after ${timeout}s"
+if ($null -eq $localIniPath) {
+    # Also check Program Files in case APPLICATIONFOLDER was ignored
+    $altPath = "C:\Program Files\Apache CouchDB"
+    if (Test-Path $altPath) {
+        $found = Get-ChildItem -Path $altPath -Filter "local.ini" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($found) { $localIniPath = $found.FullName }
+    }
+}
+if ($null -eq $localIniPath) {
+    Write-Fail "local.ini not found under $InstallPath (or Program Files) after ${timeout}s"
+    Write-Host "    Check where CouchDB installed: Get-ChildItem 'C:\' -Filter 'local.ini' -Recurse" -ForegroundColor Yellow
     exit 1
 }
-Write-OK "Installation files confirmed"
+Write-OK "Found $localIniPath"
 
 # =====================================================================
 #  PHASE 4: CONFIGURE
