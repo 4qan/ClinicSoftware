@@ -1,6 +1,38 @@
-C:\CouchDB\etc\local.ini:9:port = 5984
-C:\CouchDB\etc\local.ini:17:[daemons]
-C:\CouchDB\etc\local.ini:18:httpsd = {chttpd, start_link, [https]}
-C:\CouchDB\etc\local.ini:20:[ssl]
-C:\CouchDB\etc\local.ini:21:port = 6984
-C:\CouchDB\etc\local.ini:23:keyfile = C:/CouchDB/etc/key.pem
+; CouchDB configuration for ClinicSoftware LAN deployment
+; Applied automatically by install-couchdb.ps1
+
+[admins]
+admin = admin123
+
+[chttpd]
+bind_address = 0.0.0.0
+port = 5984
+
+[chttpd_auth]
+require_valid_user_except_for_up = true
+
+[httpd]
+enable_cors = true
+
+[daemons]
+httpsd = {chttpd, start_link, [https]}
+
+[ssl]
+port = 6984
+certfile = C:/CouchDB/etc/cert.pem
+keyfile = C:/CouchDB/etc/key.pem
+
+[cors]
+origins = *
+credentials = false
+methods = GET, PUT, POST, HEAD, DELETE
+headers = accept, authorization, content-type, origin, referer
+
+ Directory: C:\CouchDB\etc
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----         3/21/2026  12:16 AM           1198 cert.pem
+-a----         3/21/2026  12:16 AM           1744 key.pem
+
