@@ -24,10 +24,10 @@ Requirements for v2.0 Multi-User Sync. Nurse and doctor on separate computers, d
 
 ### Sync
 
-- [ ] **SYNC-01**: Data created or edited on one machine appears on the other machine automatically within seconds when both are on the same network
-- [ ] **SYNC-02**: If the network drops, both users keep working normally; data syncs automatically when the network returns
+- [x] **SYNC-01**: Data created or edited on one machine appears on the other machine automatically within seconds when both are on the same network
+- [x] **SYNC-02**: If the network drops, both users keep working normally; data syncs automatically when the network returns
 - [ ] **SYNC-03**: Sync status (connected/disconnected/last synced) is visible in Settings
-- [ ] **SYNC-04**: If the doctor's computer is off, the nurse keeps working; data syncs when the doctor's computer comes back on
+- [x] **SYNC-04**: If the doctor's computer is off, the nurse keeps working; data syncs when the doctor's computer comes back on
 
 ### CouchDB Infrastructure
 
@@ -87,10 +87,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-04 | Phase 21 | Complete |
 | AUTH-05 | Phase 21 | Complete |
 | AUTH-06 | Phase 21 | Complete |
-| SYNC-01 | Phase 22 | Pending |
-| SYNC-02 | Phase 22 | Pending |
+| SYNC-01 | Phase 22 | Complete |
+| SYNC-02 | Phase 22 | Complete |
 | SYNC-03 | Phase 22 | Pending |
-| SYNC-04 | Phase 22 | Pending |
+| SYNC-04 | Phase 22 | Complete |
 | BKUP-01 | Phase 23 | Pending |
 | BKUP-02 | Phase 23 | Pending |
 | BKUP-03 | Phase 23 | Pending |

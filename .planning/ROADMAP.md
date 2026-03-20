@@ -201,7 +201,7 @@ Plans:
   3. After WiFi is restored, changes made offline on either machine sync automatically without user intervention
   4. Settings page shows current sync state (syncing / synced / disconnected) and is accurate when the network is toggled
   5. If the doctor's machine is off, nurse keeps working; her data appears on the doctor's machine once it comes back online
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 Plans:
 - [ ] 22-01-PLAN.md -- Sync engine: useSyncManager, SyncContext/Provider, Workbox exclusion, App.tsx wiring
 - [ ] 22-02-PLAN.md -- Sync UI: SyncIndicator in sidebar, Settings Sync tab with status/retry
@@ -243,7 +243,7 @@ Plans:
 | 19. PouchDB Migration | v2.0 | 3/3 | Complete | 2026-03-19 |
 | 20. CouchDB Infrastructure | v2.0 | 2/2 | Complete | 2026-03-19 |
 | 21. Auth and Role Enforcement | v2.0 | 3/3 | Complete | 2026-03-19 |
-| 22. Live Sync | v2.0 | 0/3 | Planned | - |
+| 22. Live Sync | 1/3 | In Progress|  | - |
 | 23. Backup Redesign | v2.0 | 0/TBD | Not started | - |
 
 ---

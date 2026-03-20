@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Multi-User Sync
 status: unknown
-stopped_at: Completed 21-02-PLAN.md
-last_updated: "2026-03-19T18:48:10.976Z"
+stopped_at: Completed 22-live-sync plan 01
+last_updated: "2026-03-20T14:25:36.438Z"
 progress:
   total_phases: 9
   completed_phases: 7
-  total_plans: 15
-  completed_plans: 15
+  total_plans: 18
+  completed_plans: 16
 ---
 
 # Project State: ClinicSoftware
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** The doctor can see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even with no internet.
-**Current focus:** Phase 21 — auth-and-role-enforcement
+**Current focus:** Phase 22 — live-sync
 
 ## Current Position
 
-Phase: 21 (auth-and-role-enforcement) — EXECUTING
-Plan: 2 of 3
+Phase: 22 (live-sync) — EXECUTING
+Plan: 1 of 3
 
 ## Accumulated Context
 
@@ -53,6 +53,9 @@ Plan: 2 of 3
 - [Phase 21-03]: install-couchdb.ps1 uses hardcoded defaults (admin123/doctor123/nurse123) -- zero-friction setup, passwords changeable via app after install
 - [Phase 21-02]: Silent redirect to / for nurse on doctor-only routes (no toast, no 403 page)
 - [Phase 21-02]: useAuthContext injected into visit pages for conditional prescription rendering
+- [Phase 22-01]: syncHandleRef stored in useRef not useState to prevent re-render loop on every PouchDB event
+- [Phase 22-01]: 401/403 errors hard-stop sync with user-facing message; other errors set disconnected and allow retry
+- [Phase 22-01]: Workbox NetworkOnly on cross-origin requests excludes CouchDB long-poll from service worker
 
 ### Pending Todos
 
@@ -66,8 +69,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T18:44:34.110Z
-Stopped at: Completed 21-02-PLAN.md
+Last session: 2026-03-20T14:25:36.436Z
+Stopped at: Completed 22-live-sync plan 01
 Resume file: None
 
 ---
