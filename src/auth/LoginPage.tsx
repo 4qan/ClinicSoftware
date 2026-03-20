@@ -79,7 +79,7 @@ export function LoginPage() {
               </label>
               <input
                 id="couchUrl"
-                type="url"
+                type="text"
                 value={couchUrl}
                 onChange={(e) => setCouchUrl(e.target.value)}
                 className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg"
