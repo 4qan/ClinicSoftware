@@ -607,6 +607,22 @@ if ($lanIp) {
     Write-Host "  --------------------------------------------------------" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "  Save this URL. You will need it when configuring the app." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "  --------------------------------------------------------" -ForegroundColor Cyan
+    Write-Host "  IMPORTANT NEXT STEPS:" -ForegroundColor Cyan
+    Write-Host "  --------------------------------------------------------" -ForegroundColor Cyan
+    Write-Host "  1. Set a STATIC IP on this machine so the nurse's" -ForegroundColor White
+    Write-Host "     connection does not break when the IP changes." -ForegroundColor White
+    Write-Host "     (Settings > Network > Wi-Fi > IP assignment > Manual)" -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "  2. Open the app via HTTP (not HTTPS):" -ForegroundColor White
+    Write-Host "     http://4qan.github.io/ClinicSoftware/" -ForegroundColor White
+    Write-Host "     HTTPS will block connections to CouchDB." -ForegroundColor Gray
+    Write-Host ""
+    Write-Host "  3. On first login, enter the server address:" -ForegroundColor White
+    Write-Host "     Doctor machine:  http://localhost:5984" -ForegroundColor White
+    Write-Host "     Nurse machine:   http://$lanIp`:5984" -ForegroundColor White
+    Write-Host "  --------------------------------------------------------" -ForegroundColor Cyan
 } else {
     Write-Host "  Could not detect LAN IP. Find it manually:" -ForegroundColor Yellow
     Write-Host "    ipconfig | findstr IPv4" -ForegroundColor Yellow
