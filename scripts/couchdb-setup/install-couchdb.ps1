@@ -269,19 +269,20 @@ Write-OK "Firewall rule created (Domain/Private profiles only, not Public)"
 # =====================================================================
 Write-Banner "Starting CouchDB Service"
 
-Restart-Service -Name "Apache CouchDB" -ErrorAction SilentlyContinue
+# Force a full stop + start so the new local.ini is loaded
+Write-Step "Stopping service"
+Stop-Service -Name "Apache CouchDB" -Force -ErrorAction SilentlyContinue
 Start-Sleep -Seconds 3
 
+Write-Step "Starting service"
 $svc = Get-Service -Name "Apache CouchDB" -ErrorAction SilentlyContinue
 if ($null -eq $svc) {
     Write-Fail "Service 'Apache CouchDB' not found. Installation may have failed."
     exit 1
 }
-if ($svc.Status -ne 'Running') {
-    Start-Service -Name "Apache CouchDB"
-    Start-Sleep -Seconds 3
-    $svc.Refresh()
-}
+Start-Service -Name "Apache CouchDB"
+Start-Sleep -Seconds 5
+$svc.Refresh()
 if ($svc.Status -ne 'Running') {
     Write-Fail "Service failed to start. Check Windows Event Log for Erlang errors."
     exit 1
@@ -305,6 +306,42 @@ if (-not $ready) {
     exit 1
 }
 Write-OK "CouchDB accepting connections"
+
+# Finalize single-node setup (required for CouchDB 3.x before admin operations work)
+Write-Step "Finalizing single-node setup"
+try {
+    $setupBody = @{
+        action       = "enable_single_node"
+        username     = "admin"
+        password     = $AdminPw
+        bind_address = "0.0.0.0"
+        port         = 5984
+    } | ConvertTo-Json -Compress
+    Invoke-RestMethod -Method Post -Uri "$AdminUrl/_cluster_setup" `
+        -ContentType "application/json" -Body $setupBody | Out-Null
+    Write-OK "Single-node setup complete"
+} catch {
+    # If already set up, CouchDB returns 400 "Cluster is already finished"
+    if ($_.ErrorDetails.Message -match "already") {
+        Write-Warn "Already configured as single node"
+    } else {
+        Write-Warn "Cluster setup returned: $($_.ErrorDetails.Message) (continuing anyway)"
+    }
+}
+
+# Verify admin access works before proceeding
+Write-Step "Verifying admin credentials"
+try {
+    $ErrorActionPreference = 'Stop'
+    Invoke-RestMethod -Uri "$AdminUrl/_session" | Out-Null
+    $ErrorActionPreference = 'Stop'
+    Write-OK "Admin authenticated successfully"
+} catch {
+    $ErrorActionPreference = 'Stop'
+    Write-Fail "Admin authentication failed: $_"
+    Write-Host "    Check local.ini [admins] section at: $localIniPath" -ForegroundColor Yellow
+    exit 1
+}
 
 # =====================================================================
 #  PHASE 6: CREATE DATABASE AND USERS
