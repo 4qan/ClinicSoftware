@@ -89,12 +89,26 @@ $ValidateDocUpdate = @'
 }
 '@
 
-# -----------------------------------------------------------------------
-# Embedded: local.ini configuration
-# -----------------------------------------------------------------------
-$LocalIniContent = @'
+# =====================================================================
+#  PHASE 1: CONFIGURATION
+# =====================================================================
+Write-Banner "ClinicSoftware CouchDB Installer"
+
+Write-Host "  This will install and configure CouchDB on this machine."
+Write-Host "  The nurse's machine needs nothing installed (just the same WiFi)."
+Write-Host ""
+$AdminPw  = "admin123"
+$DoctorPw = "doctor123"
+$NursePw  = "nurse123"
+$InstallPath = $DefaultInstall
+
+# local.ini content (defined after passwords so $AdminPw expands correctly)
+$LocalIniContent = @"
 ; CouchDB configuration for ClinicSoftware LAN deployment
 ; Applied automatically by install-couchdb.ps1
+
+[admins]
+admin = $AdminPw
 
 [chttpd]
 bind_address = 0.0.0.0
@@ -111,20 +125,7 @@ origins = *
 credentials = false
 methods = GET, PUT, POST, HEAD, DELETE
 headers = accept, authorization, content-type, origin, referer
-'@
-
-# =====================================================================
-#  PHASE 1: COLLECT PASSWORDS
-# =====================================================================
-Write-Banner "ClinicSoftware CouchDB Installer"
-
-Write-Host "  This will install and configure CouchDB on this machine."
-Write-Host "  The nurse's machine needs nothing installed (just the same WiFi)."
-Write-Host ""
-$AdminPw  = "admin123"
-$DoctorPw = "doctor123"
-$NursePw  = "nurse123"
-$InstallPath = $DefaultInstall
+"@
 
 if ($InstallPath -match ' ') {
     Write-Fail "Install path '$InstallPath' contains spaces. Erlang cannot handle spaces in paths. Use something like C:\CouchDB"
@@ -549,7 +550,7 @@ Write-Host ""
 
 # Print LAN IP for nurse
 $lanIp = (Get-NetIPAddress -AddressFamily IPv4 |
-    Where-Object { $_.InterfaceAlias -notmatch 'Loopback' -and $_.PrefixOrigin -eq 'Dhcp' } |
+    Where-Object { $_.InterfaceAlias -notmatch 'Loopback' -and ($_.PrefixOrigin -eq 'Dhcp' -or $_.PrefixOrigin -eq 'Manual') -and $_.IPAddress -ne '127.0.0.1' } |
     Select-Object -First 1).IPAddress
 
 if ($lanIp) {
