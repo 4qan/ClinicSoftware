@@ -128,6 +128,34 @@ $BaseUrl  = "http://localhost:5984"
 $AdminUrl = "http://admin:${AdminPw}@localhost:5984"
 
 # =====================================================================
+#  CHECK FOR EXISTING INSTALLATION
+# =====================================================================
+$existingSvc = Get-Service -Name Apache_CouchDB -ErrorAction SilentlyContinue
+$alreadyInstalled = $false
+
+if ($null -ne $existingSvc) {
+    Write-Banner "CouchDB Already Installed"
+    Write-OK "Service 'Apache_CouchDB' found (Status: $($existingSvc.Status))"
+    Write-Host "  Skipping download and install. Will re-apply configuration." -ForegroundColor Yellow
+    $alreadyInstalled = $true
+
+    # Find local.ini in known locations
+    $localIniPath = $null
+    foreach ($searchPath in @($InstallPath, "C:\Program Files\Apache CouchDB")) {
+        if (Test-Path $searchPath) {
+            $found = Get-ChildItem -Path $searchPath -Filter "local.ini" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($found) { $localIniPath = $found.FullName; break }
+        }
+    }
+    if ($null -eq $localIniPath) {
+        Write-Fail "CouchDB service exists but local.ini not found. Manual inspection needed."
+        exit 1
+    }
+    Write-OK "Found $localIniPath"
+}
+
+if (-not $alreadyInstalled) {
+# =====================================================================
 #  PHASE 2: DOWNLOAD COUCHDB
 # =====================================================================
 Write-Banner "Downloading CouchDB $CouchDbVersion"
@@ -201,6 +229,8 @@ if ($null -eq $localIniPath) {
     exit 1
 }
 Write-OK "Found $localIniPath"
+
+} # end if (-not $alreadyInstalled)
 
 # =====================================================================
 #  PHASE 4: CONFIGURE
