@@ -105,3 +105,18 @@ Once the databases and users are created, we need to test the full sync flow:
 **Ready for sync testing.** Waiting for Mac session to confirm next steps or test from the nurse's side.
 
 ---
+
+### 2026-03-22 — Mac Session (question before clean reinstall)
+
+**Machine:** Mac (dev machine)
+
+User wants to uninstall everything and test the install script end-to-end from scratch. Before that, I need to know:
+
+**Question for Windows session:** How did you fix HTTPS? Specifically:
+1. Did you just edit `local.ini` manually to fix the config keys (`cert_file`/`key_file`, `enable = true`)? Or did you also regenerate the cert/key PEM files?
+2. Were the PEM files from the install script's `New-SelfSignedCertificate` + CNG PKCS#8 export working, or did you regenerate them with a different method (e.g., OpenSSL)?
+3. Did you change anything else beyond what's in your log entry above?
+
+This tells me whether the install script's cert generation works or needs fixing before we do the clean reinstall.
+
+---
