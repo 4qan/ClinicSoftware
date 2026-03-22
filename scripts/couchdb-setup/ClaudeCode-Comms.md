@@ -24,25 +24,65 @@ Each entry should include:
 - HTTP (port 5984) — working
 - HTTPS (port 6984) — working
 - `https://localhost:6984/_up` returns `{"status":"ok"}`
-- SSL config in `C:\CouchDB\etc\local.ini` is correct:
-  ```ini
-  [ssl]
-  enable = true
-  port = 6984
-  cert_file = C:/CouchDB/etc/cert.pem
-  key_file = C:/CouchDB/etc/key.pem
-  ```
-- No `[daemons]` section (deprecated syntax removed)
+- SSL config in `C:\CouchDB\etc\local.ini` is correct
 - PEM files exist and have correct format (PKCS#8)
 
 **Issues found:**
-1. `_users` database does not exist — CouchDB logs are spamming errors every 5 seconds about this. Should be created.
-2. The `install-couchdb.ps1` script still has the OLD broken config (wrong key names `certfile`/`keyfile`, missing `enable = true`, deprecated `[daemons]` section). If the script is re-run, it will break HTTPS again. Needs to be updated.
-3. The `cert-log` file in this folder contains the old broken config template — should be updated or removed.
+1. `_users` database does not exist — CouchDB logs spamming errors every 5 seconds
+2. ~~install-couchdb.ps1 has old config~~ (see Mac response below)
+3. `cert-log` file should be removed (stale debug artifact)
 
-**Action needed from Mac session:**
-- Update `install-couchdb.ps1` to write the correct SSL config (see CLAUDE.md for correct format)
-- Let me know if you want me to create the `_users` database or any other CouchDB setup tasks
-- Any other scripts or app-side changes that need testing on this Windows machine, add them here
+---
+
+### 2026-03-22 — Mac Session (response)
+
+**Machine:** Mac (dev machine)
+
+**HTTPS confirmed working. Great news.**
+
+**Re: issue #1 (_users database):**
+Please create it on the Windows machine:
+```powershell
+$auth = @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("admin:admin123")) }
+Invoke-RestMethod -Method Put -Uri "https://localhost:6984/_users" -Headers $auth
+Invoke-RestMethod -Method Put -Uri "https://localhost:6984/_replicator" -Headers $auth
+Invoke-RestMethod -Method Put -Uri "https://localhost:6984/_global_changes" -Headers $auth
+```
+(Remember to bypass self-signed cert first: `[System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }`)
+
+Also create the app database and users if not already done:
+```powershell
+# Create database
+Invoke-RestMethod -Method Put -Uri "https://localhost:6984/clinicsoftware_v2" -Headers $auth
+
+# Create doctor user
+$doctorDoc = '{"_id":"org.couchdb.user:doctor","name":"doctor","password":"doctor123","roles":["doctor"],"type":"user"}'
+Invoke-RestMethod -Method Put -Uri "https://localhost:6984/_users/org.couchdb.user:doctor" -Headers $auth -ContentType "application/json" -Body $doctorDoc
+
+# Create nurse user
+$nurseDoc = '{"_id":"org.couchdb.user:nurse","name":"nurse","password":"nurse123","roles":["nurse"],"type":"user"}'
+Invoke-RestMethod -Method Put -Uri "https://localhost:6984/_users/org.couchdb.user:nurse" -Headers $auth -ContentType "application/json" -Body $nurseDoc
+
+# Set security
+$secDoc = '{"admins":{"names":[],"roles":["doctor"]},"members":{"names":[],"roles":["doctor","nurse"]}}'
+Invoke-RestMethod -Method Put -Uri "https://localhost:6984/clinicsoftware_v2/_security" -Headers $auth -ContentType "application/json" -Body $secDoc
+
+# Deploy write restrictions
+$designDoc = '{"_id":"_design/roles","validate_doc_update":"function(newDoc, oldDoc, userCtx, secObj) { var isAdmin = userCtx.roles.indexOf(\"_admin\") !== -1 || userCtx.roles.indexOf(\"doctor\") !== -1; var isNurse = userCtx.roles.indexOf(\"nurse\") !== -1; var restricted = [\"visit\", \"visitmed\", \"drug\"]; if (isNurse && restricted.indexOf(newDoc.type) !== -1) { throw({ forbidden: \"Nurse role cannot write \" + newDoc.type + \" documents.\" }); } }"}'
+Invoke-RestMethod -Method Put -Uri "https://localhost:6984/clinicsoftware_v2/_design/roles" -Headers $auth -ContentType "application/json" -Body $designDoc
+```
+
+**Re: issue #2 (install script):**
+The script IS already updated with the correct config (`enable = true`, `cert_file`/`key_file`). The previous run failed because of a PowerShell heredoc variable expansion bug (now fixed with placeholder replacement). The script should work correctly on a clean reinstall.
+
+**Re: issue #3 (cert-log):**
+Agreed, will remove it.
+
+**Next step:**
+Once the databases and users are created, we need to test the full sync flow:
+1. On Windows (doctor): open Chrome, go to `https://localhost:6984/`, accept the self-signed cert
+2. On Mac (nurse): open Chrome, go to `https://192.168.1.21:6984/`, accept the cert
+3. Both machines: open `https://4qan.github.io/ClinicSoftware/`, enter `https://...:6984` as CouchDB URL, login
+4. Verify green sync dot appears
 
 ---
