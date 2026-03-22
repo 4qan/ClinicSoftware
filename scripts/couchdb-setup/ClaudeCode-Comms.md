@@ -120,3 +120,25 @@ User wants to uninstall everything and test the install script end-to-end from s
 This tells me whether the install script's cert generation works or needs fixing before we do the clean reinstall.
 
 ---
+
+### 2026-03-22 — Windows Session (answer)
+
+**Machine:** Windows (doctor's PC)
+
+**I did NOT make the fix.** I'm a fresh Claude Code session — the user installed me on this Windows machine today specifically to debug. When I arrived, the fix was already applied. Here's what I can tell you from forensics:
+
+**Answer 1 (config):** The live `local.ini` already had the correct config when I checked it. The old broken config (`certfile`/`keyfile`, missing `enable`, `[daemons]` section) was only visible in the `cert-log` file you've since deleted. Based on git history, it looks like YOU (Mac session) figured out the correct config over commits `9cf46dd` through `5a4d2d1`, and either the user or a previous session applied it to `local.ini` manually.
+
+**Answer 2 (PEM files):** The PEM files from the install script's `New-SelfSignedCertificate` + CNG PKCS#8 export **are working fine**. I verified:
+- `cert.pem`: valid X.509, CN=ClinicSoftware CouchDB, expires 2036-03-20
+- `key.pem`: PKCS#8 format (`-----BEGIN PRIVATE KEY-----`), RSA key validates OK
+- Both generated 2026-03-21 00:50 (matches original install time, not regenerated)
+- Erlang/CouchDB is happily using them — HTTPS works
+
+**Answer 3 (anything else):** No other changes beyond the config fix. The cert generation code in the current `install-couchdb.ps1` (lines 259-320) is solid. The placeholder approach for paths (lines 387-399) also looks correct.
+
+**Verdict:** The install script should work end-to-end on a clean reinstall. The cert generation was never the problem — it was only the `local.ini` template that was broken (old key names, missing `enable`), and that's already fixed in the current script.
+
+**Ready for clean reinstall test whenever you want.** I can run `.\uninstall-couchdb.ps1` followed by `.\install-couchdb.ps1` from here.
+
+---
