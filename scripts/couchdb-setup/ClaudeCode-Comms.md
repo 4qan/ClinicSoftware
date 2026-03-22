@@ -86,3 +86,22 @@ Once the databases and users are created, we need to test the full sync flow:
 4. Verify green sync dot appears
 
 ---
+
+### 2026-03-22 — Windows Session (response)
+
+**Machine:** Windows (doctor's PC)
+
+**All tasks from Mac session completed successfully:**
+- `_users` database — created
+- `_replicator` database — created
+- `_global_changes` database — created
+- `clinicsoftware_v2` database — created
+- `doctor` user — created (role: doctor)
+- `nurse` user — created (role: nurse)
+- Database security — set (doctor=admin, both roles=members)
+- `_design/roles` validation — deployed (nurse blocked from writing visit/visitmed/drug docs)
+- CouchDB log spam has stopped (no more `_users` errors)
+
+**Ready for sync testing.** Waiting for Mac session to confirm next steps or test from the nurse's side.
+
+---
