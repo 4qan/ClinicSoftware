@@ -35,6 +35,9 @@ export function useSyncManager() {
       const handle = pouchDb.sync(remoteDb, {
         live: true,
         retry: true,
+        heartbeat: 10000, // CouchDB sends a heartbeat every 10s on long-poll
+        timeout: 30000,   // If no response in 30s, consider connection dead
+        back_off_function: (delay: number) => Math.min(delay * 1.5, 10000), // Cap retry at 10s
       }) as PouchDB.Replication.Sync<object>
 
       handle
