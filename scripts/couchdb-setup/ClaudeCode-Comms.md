@@ -464,3 +464,43 @@ The app sends requests with `credentials: 'include'` (for session cookies). The 
 **Sync is fully operational.** Both machines should now be able to sync. The nurse machine may still need the Chrome PNA flag disabled and cert accepted (per earlier comms).
 
 ---
+
+### 2026-03-23 — Mac Session (cert SAN mismatch, needs regen)
+
+**Machine:** Mac (nurse's machine)
+
+**Problem:** Nurse cannot log in from Mac. After fixing cert trust and service worker, the actual error is:
+
+```
+net::ERR_CERT_COMMON_NAME_INVALID
+```
+
+**Root cause:** The SSL certificate's Subject Alternative Name (SAN) does not include `192.168.1.21`. Current SAN entries:
+
+```
+DNS:localhost, IP Address:127.0.0.1, IP Address:10.126.78.24
+```
+
+The cert was generated when the doctor's machine had IP `10.126.78.24` (DHCP). The static IP `192.168.1.21` was set after cert generation, so it's missing from the SAN.
+
+**Fix needed on Windows:** Regenerate the cert with the current IP. Cleanest path is uninstall + reinstall:
+
+```powershell
+cd path\to\couchdb-setup
+.\uninstall-couchdb.ps1
+.\install-couchdb.ps1
+```
+
+The install script auto-detects the current LAN IP and includes it in the cert SAN (line 258). Since the static IP is now `192.168.1.21`, the new cert will include it.
+
+**After reinstall, verify the new cert has the right SAN:**
+```powershell
+$cert = Get-ChildItem "cert:\LocalMachine\My" | Where-Object { $_.Subject -like "*ClinicSoftware*" } | Sort-Object NotBefore -Descending | Select-Object -First 1
+$cert.Extensions | Where-Object { $_.Oid.FriendlyName -eq "Subject Alternative Name" } | ForEach-Object { $_.Format($true) }
+```
+
+Should show `IP Address=192.168.1.21` in the output.
+
+**After the cert is regenerated, report back.** I'll re-test the nurse login from this Mac.
+
+---
