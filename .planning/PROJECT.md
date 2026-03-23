@@ -67,7 +67,7 @@ The doctor can see a patient, write a prescription with medication autocomplete,
 
 ## Context
 
-Shipped through v1.5 with TypeScript/React. Phase 19 (PouchDB migration) complete: all DB operations now use PouchDB.
+Shipped through v1.5 with TypeScript/React. Phase 19 (PouchDB migration) complete: all DB operations now use PouchDB. Phase 21 (Auth and Role Enforcement) complete: CouchDB-backed login replaces PBKDF2, role-based UI guards enforce doctor/nurse access. Phase 22 (Live Sync) complete: bidirectional PouchDB replication with SyncContext, sidebar sync indicator, Settings Sync tab, and live data refresh via changes feed.
 Tech stack: React 19, TypeScript, Vite, TailwindCSS v4, PouchDB 9.0.0 (migrated from Dexie.js), VitePWA, react-router-dom v7.
 Deployed to GitHub Pages at https://4qan.github.io/ClinicSoftware/.
 Dexie schema progression: v1 (foundation) -> v2 (drugs/visits) -> v3 (dosage->quantity rename) -> v4 (rxNotesLang) -> v5 (slipType) -> v6 (vitals).
@@ -93,11 +93,11 @@ Clinic is in an area with unreliable internet. Doctor uses an old Windows system
 |----------|-----------|---------|
 | PWA over native Windows app | Browser-based, no install, works on any device, offline via Service Worker | Good |
 | Offline-first with IndexedDB (no cloud sync in v1) | Unreliable internet, cloud sync deferred to v2 | Good |
-| Single-user auth (no roles) | Only the doctor uses the system | Good |
+| CouchDB auth with roles | Replaced PBKDF2 local auth; CouchDB /_session provides login + role extraction | Good (Phase 21) |
 | Local drug database + custom entries | Pre-loaded 120+ drugs, custom entries in settings | Good |
 | Patient ID format: YYYY-XXXX | Compliance team recommendation, atomic counter | Good |
 | Dexie.js for IndexedDB | Clean API, indexed queries, transaction support | Good |
-| PBKDF2 100k iterations via Web Crypto API | Offline auth, no server dependency | Good |
+| PBKDF2 removed in Phase 21 | Replaced by CouchDB auth; no longer needed | Superseded |
 | Medications as snapshots (not live references) | Decouples prescriptions from drug edits | Good |
 | RX-05 deferred to v2 | Single-user clinic doesn't need immutability yet | Good |
 | A5 print via @media print + @page | Browser-native, no print library dependency | Good |
@@ -125,4 +125,4 @@ Clinic is in an area with unreliable internet. Doctor uses an old Windows system
 | Pre-created user accounts | Doctor and nurse accounts created during development, no setup wizard needed | — Pending |
 
 ---
-*Last updated: 2026-03-19 after Phase 19 (PouchDB migration) complete*
+*Last updated: 2026-03-20 after Phase 22 (Live Sync) complete*

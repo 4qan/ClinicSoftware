@@ -12,13 +12,13 @@ Offline-first PWA for patient management and prescription writing. All data stor
 ## Security
 
 - **Public repo.** Never commit secrets, API keys, credentials, .env files, or patient data to this repository.
-- All patient data is client-side only (IndexedDB). No data leaves the user's device.
-- Auth is local PIN/password hashing (PBKDF2), not a server-side system.
+- All patient data stays on the clinic LAN (IndexedDB + CouchDB sync). No cloud, no external calls.
+- Auth is CouchDB session auth (`/_session`) with role-based access (doctor/nurse).
 
 ## Stack
 
 - React 19 + TypeScript + Vite
 - TailwindCSS v4
-- Dexie.js (IndexedDB wrapper)
+- PouchDB 9.0.0 (IndexedDB, syncs to CouchDB over LAN)
 - VitePWA (service worker + manifest)
 - react-router-dom v7
