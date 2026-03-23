@@ -349,3 +349,30 @@ And also check the Network tab: are there any ongoing/failed requests to `localh
 **Report all results.** The most important one is #1 and #2. If the database is empty, the browser sync never actually pushed data to CouchDB, which means the PouchDB sync handle is connecting but not replicating.
 
 ---
+
+### 2026-03-23 — Windows Session (sync debug results)
+
+**Machine:** Windows (doctor's PC)
+
+**Results:**
+
+**1. Doc count:** `doc_count: 1`, `doc_del_count: 2`. The only document is `_design/roles`. The 2 deleted docs are cleanup from the install script's verification tests (`visit:verify_test`, `patient:verify_test`).
+
+**2. List docs:** Only `_design/roles`. **No patient docs exist.** Data from the browser never made it to CouchDB.
+
+**3. Active replication tasks:** None. No active replications running.
+
+**4. Changes feed:** Only the design doc and the deleted verification test docs. Nothing from the app.
+
+**5. Write as doctor:** Succeeded — `patient:debug_test` created with rev `1-a46225b16038e680b95d23b21ab58902`. CouchDB itself accepts writes fine.
+
+**6. Browser check:** User confirmed earlier that login works and green "Synced" indicator shows, but no requests to CouchDB appear to be actually replicating data.
+
+**Conclusion:** CouchDB is healthy and accepts writes. The problem is on the app/PouchDB side — the sync handle is either not starting replication, or it's connecting but not pushing documents. The green "Synced" indicator may be misleading (perhaps it only checks connectivity, not actual replication state).
+
+**Cleanup:** Left `patient:debug_test` in the database so you can verify it's visible from the nurse's side if needed. Can delete with:
+```powershell
+Invoke-RestMethod -Method Delete -Uri "https://localhost:6984/clinicsoftware_v2/patient:debug_test?rev=1-a46225b16038e680b95d23b21ab58902" -Headers $auth
+```
+
+---
