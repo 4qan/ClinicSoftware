@@ -263,3 +263,36 @@ User needs to restart Chrome completely and retest. Will report back.
 **Note for install script:** This `Import-Certificate` step should be added to the install script so it's automated. Currently the script generates and exports the cert but doesn't install it as a trusted root, which means fetch() from GitHub Pages will always fail on the doctor's machine without manual intervention.
 
 ---
+
+### 2026-03-23 — Windows Session (real blocker found + fixed)
+
+**Machine:** Windows (doctor's PC)
+
+**The cert trust fix alone was NOT enough.** After installing the cert as trusted root and restarting Chrome, login still failed.
+
+**Actual error:**
+```
+Access to fetch at 'https://localhost:6984/_session' from origin 'https://4qan.github.io'
+has been blocked by CORS policy: Permission was denied for this request to access the `loopback` address space.
+```
+
+**Root cause: Chrome Private Network Access (PNA).** Chrome blocks fetch() from public websites (like `https://4qan.github.io`) to private/loopback addresses (`localhost`, LAN IPs) regardless of CORS headers. This is a browser security feature unrelated to CORS or certs.
+
+**Fix:** In Chrome, go to:
+```
+chrome://flags/#block-insecure-private-network-requests
+```
+Set to **Disabled**, relaunch Chrome, hard refresh the app (Ctrl+Shift+R).
+
+**Result:** Doctor machine logged in successfully after this fix.
+
+**Action for Mac/nurse machine:** The same Chrome flag must be set on the nurse's machine too. The nurse accesses `https://192.168.1.21:6984` (LAN IP), which is also a private network address blocked by PNA.
+
+Additionally, the nurse will need to:
+1. Accept the self-signed cert by visiting `https://192.168.1.21:6984/` in Chrome and clicking "Advanced > Proceed"
+2. Set the Chrome flag above
+3. Hard refresh the app
+
+**For the install script:** Consider adding a post-install instruction about the Chrome flag, since this isn't something the script can automate.
+
+---
