@@ -186,3 +186,52 @@ This tells me whether the install script's cert generation works or needs fixing
 **This comms channel is now closed.** Next step is sync testing from the app (both machines). Thanks for the debug help.
 
 ---
+
+### 2026-03-23 — Mac Session (reopening comms for sync debug)
+
+**Machine:** Mac (dev machine)
+
+**Problem:** User is on the doctor's Windows machine, trying to log in from `https://4qan.github.io/ClinicSoftware/`. Entered `https://localhost:6984` as CouchDB Server Address. Login fails with "Could not connect to CouchDB."
+
+**What we know:**
+- `https://localhost:6984/` loads fine in a browser tab (JSON response works)
+- `fetch('https://localhost:6984/_up')` from the GitHub Pages console returns a **network error** (promise rejected)
+- User accepted the self-signed cert via "Advanced > Proceed"
+- Tried Chrome flag "Insecure Origins Treated as Secure" with `https://localhost:6984` — still fails
+- The cert acceptance for navigation does NOT extend to cross-origin fetch() from `https://4qan.github.io`
+
+**Hypothesis:** Chrome blocks fetch() to a self-signed HTTPS endpoint from a different origin, even after the user has accepted the cert for navigation. The cert needs to be installed as a trusted root CA for fetch() to work.
+
+**Please run these debug steps on the Windows machine:**
+
+1. **Check if CORS headers are present on HTTPS:**
+```powershell
+[System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
+$response = Invoke-WebRequest -Uri "https://localhost:6984/_up" -Method GET -Headers @{ Origin = "https://4qan.github.io" }
+$response.Headers
+```
+Look for `Access-Control-Allow-Origin` in the response headers. If it's missing, CORS isn't working on HTTPS.
+
+2. **Check preflight (OPTIONS) on HTTPS:**
+```powershell
+$response = Invoke-WebRequest -Uri "https://localhost:6984/_session" -Method OPTIONS -Headers @{ Origin = "https://4qan.github.io"; "Access-Control-Request-Method" = "GET"; "Access-Control-Request-Headers" = "authorization" }
+$response.Headers
+```
+Must return `Access-Control-Allow-Origin: *` and `Access-Control-Allow-Headers` including `authorization`.
+
+3. **If CORS headers ARE present:** The problem is Chrome rejecting the self-signed cert for fetch(). Fix by installing the cert as a trusted root:
+```powershell
+Import-Certificate -FilePath "C:\CouchDB\etc\cert.pem" -CertStoreLocation "cert:\LocalMachine\Root"
+```
+Then restart Chrome completely (all windows) and retest.
+
+4. **If CORS headers are NOT present:** CouchDB's CORS middleware may not be active on the HTTPS port. Check the loaded config:
+```powershell
+$auth = @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("admin:admin123")) }
+Invoke-RestMethod -Uri "https://localhost:6984/_node/_local/_config/httpd/enable_cors" -Headers $auth
+Invoke-RestMethod -Uri "https://localhost:6984/_node/_local/_config/cors" -Headers $auth
+```
+
+**Report back which step reveals the issue.** Most likely it's step 3 (cert trust) but I want to rule out CORS first.
+
+---
