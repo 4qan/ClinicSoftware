@@ -376,3 +376,57 @@ Invoke-RestMethod -Method Delete -Uri "https://localhost:6984/clinicsoftware_v2/
 ```
 
 ---
+
+### 2026-03-23 — Mac Session (deeper sync debug needed)
+
+**Machine:** Mac (dev machine)
+
+**Status update:** I fixed the `paused` event handler to check for errors (commit `0643ddd`, deployed to GitHub Pages). But after hard refresh, the doctor machine still shows green "Synced" with no error. PouchDB believes sync is working, yet CouchDB has no app data.
+
+**The problem is subtle:** PouchDB thinks replication succeeded, but data never reaches CouchDB. Need to debug from the browser on the doctor machine.
+
+**Please do these checks on the doctor machine's Chrome (on the GitHub Pages tab):**
+
+**1. Check Network tab for CouchDB requests:**
+- Open DevTools (F12) > Network tab
+- Type `6984` in the filter box
+- Hard refresh the page (Ctrl+Shift+R) and log in again
+- After login, report: what requests go to `localhost:6984`? List the URLs and status codes.
+- Specifically look for: `_changes`, `_revs_diff`, `_bulk_docs`, `_local` — these are PouchDB replication requests. If only `_session` appears, PouchDB isn't even attempting replication.
+
+**2. Check Service Worker:**
+- DevTools > Application tab > Service Workers (left sidebar)
+- Is there a service worker registered? What's its status?
+- If it says "waiting to activate", click **"skipWaiting"** or **"Unregister"**, then hard refresh
+- Report the service worker status
+
+**3. Run this in the Console tab (after logging in):**
+```js
+// Check what's in local PouchDB
+const PouchDB = (await import('/ClinicSoftware/assets/vendor-*.js')).default;
+```
+Actually, that won't work easily. Instead, run:
+```js
+// Check IndexedDB directly
+const request = indexedDB.open('_pouch_clinicsoftware_v2');
+request.onsuccess = () => {
+  const db = request.result;
+  console.log('IndexedDB stores:', Array.from(db.objectStoreNames));
+  db.close();
+};
+request.onerror = () => console.error('Failed to open IndexedDB');
+```
+
+**4. Check console for sync log messages:**
+After logging in, look for any `[sync]` prefixed messages in the console. The latest code adds `console.warn('[sync] paused with error:')` and `console.error('[sync] fatal error:')`. If you see neither, the sync is silently succeeding (paused with no error).
+
+**5. Most important — check if replication requests exist:**
+After login, wait 10 seconds, then in Console run:
+```js
+performance.getEntriesByType('resource').filter(r => r.name.includes('6984')).map(r => r.name)
+```
+This shows ALL requests made to port 6984. Report the full list.
+
+**My leading hypothesis:** Either (a) PouchDB is not making replication requests at all (sync handle created but replication never starts), or (b) a stale service worker from before phase 22 is intercepting/blocking the requests. Step 2 is critical.
+
+---
