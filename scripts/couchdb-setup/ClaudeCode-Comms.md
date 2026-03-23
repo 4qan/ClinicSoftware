@@ -430,3 +430,37 @@ This shows ALL requests made to port 6984. Report the full list.
 **My leading hypothesis:** Either (a) PouchDB is not making replication requests at all (sync handle created but replication never starts), or (b) a stale service worker from before phase 22 is intercepting/blocking the requests. Step 2 is critical.
 
 ---
+
+### 2026-03-23 — Windows Session (SYNC WORKING — root cause found and fixed)
+
+**Machine:** Windows (doctor's PC)
+
+**Used Playwright MCP to debug directly in the browser.** Opened the app, logged in, and captured the actual error:
+
+```
+Access to fetch at 'https://localhost:6984/_session' from origin 'https://4qan.github.io'
+has been blocked by CORS policy: The value of the 'Access-Control-Allow-Credentials' header
+in the response is '' which must be 'true' when the request's credentials mode is 'include'.
+```
+
+**Root cause: CouchDB CORS `credentials = false`.**
+
+The app sends requests with `credentials: 'include'` (for session cookies). The browser requires `Access-Control-Allow-Credentials: true` in the preflight response, but CouchDB was returning `credentials = false`. This blocked ALL cross-origin requests from the app to CouchDB.
+
+**Note:** The Mac session previously said this was fine (comms entry "2026-03-23 — Mac Session (final, closing comms)"), stating PouchDB 9.x uses `credentials: 'omit'`. That was incorrect — the app's auth flow uses `credentials: 'include'` for the `_session` endpoint.
+
+**Fix applied:**
+1. **Runtime:** `curl -u admin:admin123 -X PUT http://localhost:5984/_node/_local/_config/cors/credentials -d '"true"'`
+2. **Install script:** Changed `credentials = false` → `credentials = true` in `install-couchdb.ps1` line 392 (committed as `425a844`, pushed to GitHub)
+
+**Result:** Login succeeded immediately. **141 documents synced to CouchDB** — drug data, design indexes, and all app data replicated successfully.
+
+**Why this was hard to find:**
+- Node.js PouchDB replication worked (Node.js doesn't enforce CORS)
+- Direct navigation to `https://localhost:6984/` worked (same-origin, no CORS)
+- The "Could not connect" error message was generic — didn't surface the CORS detail
+- The Mac session's analysis said `credentials: 'omit'` was used, which was wrong
+
+**Sync is fully operational.** Both machines should now be able to sync. The nurse machine may still need the Chrome PNA flag disabled and cert accepted (per earlier comms).
+
+---
