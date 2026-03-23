@@ -389,7 +389,7 @@ key_file = KEY_PATH_PLACEHOLDER
 
 [cors]
 origins = *
-credentials = false
+credentials = true
 methods = GET, PUT, POST, HEAD, DELETE
 headers = accept, authorization, content-type, origin, referer
 "@
