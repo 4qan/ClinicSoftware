@@ -118,9 +118,16 @@ $DoctorAuth = @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Enco
 $NurseAuth = @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("nurse:${NursePw}")) }
 
 # Detect LAN IP early (needed for SSL cert generation)
+# Prefer Wi-Fi/Ethernet adapters, skip VPN/virtual adapters (Windscribe, Hyper-V, etc.)
 $lanIp = (Get-NetIPAddress -AddressFamily IPv4 |
-    Where-Object { $_.InterfaceAlias -notmatch 'Loopback' -and ($_.PrefixOrigin -eq 'Dhcp' -or $_.PrefixOrigin -eq 'Manual') -and $_.IPAddress -ne '127.0.0.1' } |
+    Where-Object { $_.InterfaceAlias -notmatch 'Loopback|Windscribe|VPN|vEthernet|Bluetooth' -and $_.InterfaceAlias -match 'Wi-Fi|Ethernet|LAN' -and ($_.PrefixOrigin -eq 'Dhcp' -or $_.PrefixOrigin -eq 'Manual') -and $_.IPAddress -ne '127.0.0.1' } |
     Select-Object -First 1).IPAddress
+# Fallback: any non-loopback, non-VPN adapter
+if (-not $lanIp) {
+    $lanIp = (Get-NetIPAddress -AddressFamily IPv4 |
+        Where-Object { $_.InterfaceAlias -notmatch 'Loopback|Windscribe|VPN|vEthernet|Bluetooth' -and ($_.PrefixOrigin -eq 'Dhcp' -or $_.PrefixOrigin -eq 'Manual') -and $_.IPAddress -ne '127.0.0.1' } |
+        Select-Object -First 1).IPAddress
+}
 
 if (-not $lanIp) {
     Write-Warn "Could not detect LAN IP. SSL cert will only cover localhost."
