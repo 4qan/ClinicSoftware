@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { useAuthContext } from '@/auth/AuthProvider'
 import { useSyncManager, type SyncStatus } from './useSyncManager'
 import { getCouchUrl } from '@/db/localSettings'
@@ -21,7 +21,20 @@ export function useSyncContext(): SyncContextType {
 
 export function SyncProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated, credentials } = useAuthContext()
-  const { status, lastSynced, errorMessage, start, stop, retry: _retry } = useSyncManager()
+  const { status: pouchStatus, lastSynced, errorMessage: pouchError, start, stop, retry: _retry } = useSyncManager()
+  const [browserOnline, setBrowserOnline] = useState(navigator.onLine)
+
+  // Track browser online/offline state
+  useEffect(() => {
+    const goOnline = () => setBrowserOnline(true)
+    const goOffline = () => setBrowserOnline(false)
+    window.addEventListener('online', goOnline)
+    window.addEventListener('offline', goOffline)
+    return () => {
+      window.removeEventListener('online', goOnline)
+      window.removeEventListener('offline', goOffline)
+    }
+  }, [])
 
   useEffect(() => {
     if (!isAuthenticated || !credentials) {
@@ -45,6 +58,10 @@ export function SyncProvider({ children }: { children: ReactNode }) {
       start(url, credentials)
     }
   }
+
+  // Override status to disconnected when browser reports offline
+  const status: SyncStatus = !browserOnline ? 'disconnected' : pouchStatus
+  const errorMessage = !browserOnline ? 'Network offline' : pouchError
 
   return (
     <SyncContext.Provider value={{ status, lastSynced, errorMessage, retry: startSync, startSync }}>
