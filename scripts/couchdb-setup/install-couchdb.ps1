@@ -447,6 +447,20 @@ if ($oldRule) {
     Write-Warn "Removed old 'CouchDB LAN' firewall rule"
 }
 
+# Set Chrome enterprise policy to allow Private Network Access from GitHub Pages
+# This is required because Chrome blocks fetch() from public HTTPS sites to private IPs.
+# The policy applies to all Chrome instances including PWAs (unlike command-line flags).
+Write-Step "Setting Chrome policy for Private Network Access"
+$policyPath = "HKLM:\SOFTWARE\Policies\Google\Chrome\InsecurePrivateNetworkRequestsAllowedForUrls"
+try {
+    New-Item -Path $policyPath -Force | Out-Null
+    New-ItemProperty -Path $policyPath -Name "1" -Value "https://4qan.github.io" -PropertyType String -Force | Out-Null
+    Write-OK "Chrome policy set: allow private network requests from https://4qan.github.io"
+} catch {
+    Write-Warn "Could not set Chrome policy: $_"
+    Write-Warn "You may need to manually disable chrome://flags/#block-insecure-private-network-requests"
+}
+
 # =====================================================================
 #  PHASE 6: START SERVICE
 # =====================================================================

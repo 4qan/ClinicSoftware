@@ -45,7 +45,16 @@ cd path\to\couchdb-setup
 .\install-couchdb.ps1
 ```
 
-The script downloads CouchDB 3.5.1, installs it, generates an SSL certificate, configures HTTPS, creates users and roles, and runs 7 verification checks. Takes about 2 minutes.
+The script handles everything automatically:
+- Downloads and installs CouchDB 3.5.1
+- Generates SSL certificate with your LAN IP
+- Installs cert as Trusted Root CA (so Chrome trusts it for all requests)
+- Sets Chrome enterprise policy to allow private network access from the app
+- Configures HTTPS, CORS, users, roles, and database
+- Opens firewall ports
+- Runs 7 verification checks
+
+Takes about 2 minutes.
 
 **Verify the certificate includes your IP** (printed during install). If you see the wrong IP, see Troubleshooting below.
 
@@ -54,32 +63,13 @@ The script downloads CouchDB 3.5.1, installs it, generates an SSL certificate, c
 - HTTPS on port 6984 (self-signed cert, valid 10 years, includes your LAN IP)
 - HTTP on port 5984 (local access only)
 - Firewall rules for ports 5984 and 6984
-- SSL certificate installed as Trusted Root CA (so Chrome trusts it for fetch requests)
+- SSL certificate in Trusted Root CA store
+- Chrome policy: allow `https://4qan.github.io` to access private network
 - Database: `clinicsoftware_v2`
 - Users: `doctor` (full access), `nurse` (limited: cannot write visits, medications, or drugs)
 - Admin: `admin` / `admin123`
 
-### Step 3: Disable Chrome Private Network Access (PNA)
-
-Chrome blocks web pages served over HTTPS (like the app on GitHub Pages) from making requests to private network addresses (like `localhost:6984`). This must be disabled.
-
-**Option A: Chrome flag (if available)**
-
-Go to `chrome://flags/#block-insecure-private-network-requests`, set to **Disabled**, click **Relaunch**.
-
-> This flag was removed in Chrome 146+. If it doesn't exist, use Option B.
-
-**Option B: Launch Chrome with command-line flag**
-
-Close Chrome completely, then launch it from a command prompt:
-
-```cmd
-"C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-features=PrivateNetworkAccessRespectPreflightResults,BlockInsecurePrivateNetworkRequests
-```
-
-You can create a desktop shortcut with this command for convenience. Chrome must always be launched this way for sync to work.
-
-### Step 4: Accept the Certificate in Chrome
+### Step 3: Accept the Certificate in Chrome
 
 Open Chrome and go to:
 
@@ -89,7 +79,7 @@ https://localhost:6984/
 
 You should see `{"couchdb":"Welcome",...}`. If Chrome shows a privacy warning, click **Advanced** > **Proceed to localhost**.
 
-### Step 5: Log In to the App
+### Step 4: Log In to the App
 
 1. Open Chrome and go to `https://4qan.github.io/ClinicSoftware/`
 2. Click **Change server address**
@@ -97,12 +87,13 @@ You should see `{"couchdb":"Welcome",...}`. If Chrome shows a privacy warning, c
 4. Click **Save and Continue**
 5. Log in with username `doctor`, password `doctor123`
 6. The sidebar should show a green dot ("Synced") within a few seconds
+7. **Install as PWA (recommended):** Click the install icon in Chrome's address bar (or Menu > "Install Clinic Software"). The app will open as a standalone window and work like a native app.
 
 ---
 
 ## Part 2: Nurse's Machine
 
-The nurse's machine does NOT need CouchDB installed. It only needs Chrome configured to trust the doctor's certificate and allow private network requests.
+The nurse's machine does NOT need CouchDB installed. It needs Chrome configured to trust the doctor's certificate and allow private network requests.
 
 Replace `DOCTOR_IP` below with the doctor's actual static IP (e.g., `192.168.1.21`).
 
@@ -120,19 +111,20 @@ Open PowerShell as Administrator and run:
 Import-Certificate -FilePath "path\to\cert.pem" -CertStoreLocation "cert:\LocalMachine\Root"
 ```
 
-#### Step 3: Disable Chrome PNA
+#### Step 3: Allow Private Network Access
 
-**Option A: Chrome flag (if available)**
+Chrome blocks web pages served from public HTTPS sites (like GitHub Pages) from making requests to private network addresses. This must be allowed via Chrome enterprise policy.
 
-Go to `chrome://flags/#block-insecure-private-network-requests`, set to **Disabled**, click **Relaunch**.
+Open PowerShell as Administrator and run:
 
-**Option B: Launch Chrome with command-line flag (Chrome 146+)**
-
-Close Chrome completely, then launch from command prompt:
-
-```cmd
-"C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-features=PrivateNetworkAccessRespectPreflightResults,BlockInsecurePrivateNetworkRequests
+```powershell
+New-Item -Path "HKLM:\SOFTWARE\Policies\Google\Chrome\InsecurePrivateNetworkRequestsAllowedForUrls" -Force
+New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Google\Chrome\InsecurePrivateNetworkRequestsAllowedForUrls" -Name "1" -Value "https://4qan.github.io" -PropertyType String -Force
 ```
+
+Restart Chrome completely after running this.
+
+> This policy applies to all Chrome instances including PWAs. No command-line flags needed.
 
 #### Step 4: Accept the Certificate in Chrome
 
@@ -152,6 +144,7 @@ You should see `{"couchdb":"Welcome",...}`. If you see a privacy warning, click 
 4. Click **Save and Continue**
 5. Log in with username `nurse`, password `nurse123`
 6. Green dot ("Synced") should appear in the sidebar
+7. **Install as PWA (recommended):** Click the install icon in Chrome's address bar. The app works as a standalone window after this.
 
 ---
 
@@ -165,24 +158,27 @@ Open Terminal and run (replace `DOCTOR_IP` with the actual IP):
 
 ```bash
 openssl s_client -connect DOCTOR_IP:6984 -servername DOCTOR_IP </dev/null 2>/dev/null | openssl x509 > /tmp/couchdb-cert.pem
+```
+
+Then:
+
+```bash
 sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain /tmp/couchdb-cert.pem
 ```
 
-Enter your Mac password when prompted. Both commands must be run, each on its own line.
+Enter your Mac password when prompted.
 
-#### Step 2: Disable Chrome PNA
+#### Step 2: Allow Private Network Access
 
-**Option A: Chrome flag (if available)**
-
-Go to `chrome://flags/#block-insecure-private-network-requests`, set to **Disabled**, click **Relaunch**.
-
-**Option B: Launch Chrome with command-line flag (Chrome 146+)**
-
-Quit Chrome completely (Cmd+Q), then open Terminal and run:
+Open Terminal and run:
 
 ```bash
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-features=PrivateNetworkAccessRespectPreflightResults,BlockInsecurePrivateNetworkRequests
+defaults write com.google.Chrome InsecurePrivateNetworkRequestsAllowedForUrls -array "https://4qan.github.io"
 ```
+
+Restart Chrome completely (Cmd+Q, reopen) after running this.
+
+> This policy applies to all Chrome instances including PWAs. No command-line flags needed.
 
 #### Step 3: Accept the Certificate in Chrome
 
@@ -202,6 +198,7 @@ You should see `{"couchdb":"Welcome",...}`. If Chrome shows a privacy warning, c
 4. Click **Save and Continue**
 5. Log in with username `nurse`, password `nurse123`
 6. Green dot ("Synced") should appear in the sidebar
+7. **Install as PWA (recommended):** Click the install icon in Chrome's address bar.
 
 ---
 
@@ -238,11 +235,13 @@ Check these in order:
 
 1. **CouchDB running?** (doctor's machine): Open `https://localhost:6984/_up` in Chrome. Should return `{"status":"ok"}`.
 2. **Network reachable?** (nurse's machine): Open `https://DOCTOR_IP:6984/` in Chrome. If it doesn't load, the machines aren't on the same network or the firewall is blocking port 6984.
-3. **Chrome PNA disabled?** Check `chrome://flags/#block-insecure-private-network-requests` is **Disabled**, or that Chrome was launched with the `--disable-features` flag.
+3. **Chrome PNA policy set?** Verify:
+   - Windows: `reg query "HKLM\SOFTWARE\Policies\Google\Chrome\InsecurePrivateNetworkRequestsAllowedForUrls"` should show `https://4qan.github.io`
+   - Mac: `defaults read com.google.Chrome InsecurePrivateNetworkRequestsAllowedForUrls` should show `https://4qan.github.io`
 4. **Cert trusted for fetch?** Open DevTools (F12) > Console and look at the error:
    - `net::ERR_CERT_AUTHORITY_INVALID`: Certificate not trusted. Re-do the "Trust the Certificate" step for your OS.
    - `net::ERR_CERT_COMMON_NAME_INVALID`: Certificate doesn't include this IP in its SAN. The cert must be regenerated on the doctor's machine (uninstall + reinstall CouchDB).
-   - `net::ERR_FAILED` with no detail: Likely PNA blocking. See step 3.
+   - `net::ERR_FAILED` with no detail: PNA still blocking. Re-do the "Allow Private Network Access" step and restart Chrome.
 
 ### Certificate has wrong IP (ERR_CERT_COMMON_NAME_INVALID)
 

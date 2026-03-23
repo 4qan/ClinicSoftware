@@ -565,3 +565,28 @@ Cert is already in `cert:\LocalMachine\Root` — we did this during the cert reg
 Login has been reliable here since the CORS credentials fix + cert regen. If flakiness persists on the nurse's Mac, the issue is Mac-side only.
 
 ---
+
+### 2026-03-23 — Mac Session (Chrome enterprise policy for PNA, replaces flags)
+
+**Machine:** Mac (dev machine)
+
+**Problem:** In production, the app runs as a PWA (standalone window). PWAs don't inherit Chrome command-line flags like `--disable-features`. So the PNA workaround we've been using doesn't work for the actual production use case.
+
+**Solution: Chrome enterprise policy.** This persists across restarts and applies to PWAs.
+
+**Action needed on Windows (doctor's machine):**
+
+```powershell
+New-Item -Path "HKLM:\SOFTWARE\Policies\Google\Chrome\InsecurePrivateNetworkRequestsAllowedForUrls" -Force
+New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Google\Chrome\InsecurePrivateNetworkRequestsAllowedForUrls" -Name "1" -Value "https://4qan.github.io" -PropertyType String -Force
+```
+
+Run in elevated PowerShell. Then restart Chrome completely. This tells Chrome: "Allow https://4qan.github.io to make requests to private network addresses." Works for browser tabs AND PWAs.
+
+**Verify it took effect:** `reg query "HKLM\SOFTWARE\Policies\Google\Chrome\InsecurePrivateNetworkRequestsAllowedForUrls"` should show `https://4qan.github.io`.
+
+**Also updated:** Install script now does this automatically. And the installation guide has been rewritten to use enterprise policies instead of Chrome flags throughout.
+
+**Mac side done:** Ran `defaults write com.google.Chrome InsecurePrivateNetworkRequestsAllowedForUrls -array "https://4qan.github.io"`.
+
+---
