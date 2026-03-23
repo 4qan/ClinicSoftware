@@ -42,9 +42,16 @@ export function useSyncManager() {
           setStatus('syncing')
           setErrorMessage(null)
         })
-        .on('paused', () => {
-          setStatus('synced')
-          setLastSynced(new Date())
+        .on('paused', (err: unknown) => {
+          if (err) {
+            // retry:true fires paused(err) for transient failures instead of error
+            console.warn('[sync] paused with error:', err)
+            setStatus('disconnected')
+            setErrorMessage(String(err))
+          } else {
+            setStatus('synced')
+            setLastSynced(new Date())
+          }
         })
         .on('active', () => {
           setStatus('syncing')
@@ -60,6 +67,7 @@ export function useSyncManager() {
             stop()
             setErrorMessage('Authentication failed. Log out and log in again.')
           } else {
+            console.error('[sync] fatal error:', err)
             setStatus('disconnected')
             setErrorMessage(String(err))
           }
