@@ -193,7 +193,14 @@ export async function seedDrugDatabase(): Promise<void> {
 
   const toInsert = drugs.filter(d => !existingIds.has(d._id))
   if (toInsert.length > 0) {
-    await pouchDb.bulkDocs(toInsert as PouchDB.Core.PutDocument<Record<string, unknown>>[])
+    const results = await pouchDb.bulkDocs(toInsert as PouchDB.Core.PutDocument<Record<string, unknown>>[])
+    // Ignore conflicts: they mean the drug arrived via sync before we could insert it
+    const errors = results.filter(
+      (r): r is PouchDB.Core.Error => 'error' in r && (r as PouchDB.Core.Error).status !== 409,
+    )
+    if (errors.length > 0) {
+      console.warn(`[seed] ${errors.length} non-conflict error(s) during drug seeding`)
+    }
   }
 }
 

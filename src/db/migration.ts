@@ -37,7 +37,7 @@ export async function runMigrationIfNeeded(): Promise<void> {
       const results = await pouchDb.bulkDocs(docs)
 
       const fatalErrors = results.filter(
-        r => 'error' in r && (r as PouchDB.Core.Error).error !== 'conflict'
+        r => 'error' in r && (r as PouchDB.Core.Error).status !== 409
       )
       if (fatalErrors.length > 0) {
         throw new Error(
