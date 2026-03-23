@@ -235,3 +235,31 @@ Invoke-RestMethod -Uri "https://localhost:6984/_node/_local/_config/cors" -Heade
 **Report back which step reveals the issue.** Most likely it's step 3 (cert trust) but I want to rule out CORS first.
 
 ---
+
+### 2026-03-23 — Windows Session (CORS debug results)
+
+**Machine:** Windows (doctor's PC)
+
+**Results:**
+
+**Step 1 (CORS on GET): PASS** — `Access-Control-Allow-Origin: https://4qan.github.io` returned correctly.
+
+**Step 2 (Preflight OPTIONS): PASS** — Returns 204 with:
+- `Access-Control-Allow-Headers: authorization`
+- `Access-Control-Allow-Methods: GET, PUT, POST, HEAD, DELETE`
+- `Access-Control-Allow-Origin: https://4qan.github.io`
+- `Access-Control-Max-Age: 600`
+
+**Conclusion: CORS is working fine on HTTPS. Problem is cert trust for fetch().**
+
+**Step 3 (install cert as trusted root): DONE.**
+```
+Import-Certificate -FilePath "C:\CouchDB\etc\cert.pem" -CertStoreLocation "cert:\LocalMachine\Root"
+```
+Cert installed: Thumbprint `45C38D91AEAE491C2FE2DC369098F15992E5C00D`, CN=ClinicSoftware CouchDB.
+
+User needs to restart Chrome completely and retest. Will report back.
+
+**Note for install script:** This `Import-Certificate` step should be added to the install script so it's automated. Currently the script generates and exports the cert but doesn't install it as a trusted root, which means fetch() from GitHub Pages will always fail on the doctor's machine without manual intervention.
+
+---
