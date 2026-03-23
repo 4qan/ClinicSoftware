@@ -296,3 +296,56 @@ Additionally, the nurse will need to:
 **For the install script:** Consider adding a post-install instruction about the Chrome flag, since this isn't something the script can automate.
 
 ---
+
+### 2026-03-23 — Mac Session (sync debug - data not replicating)
+
+**Machine:** Mac (dev machine)
+
+**UAT results:** Login works on both machines. Both show green "Synced" indicator. But **data doesn't replicate**. Patient created on nurse machine never appears on doctor machine (even after manual refresh).
+
+Also: sync indicator never changes to gray/offline when network is disconnected, and logout/login floods console with CORS and no-response errors.
+
+**I need you to check the CouchDB side. Run these on the Windows machine:**
+
+**1. How many docs in the database?**
+```powershell
+$auth = @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("admin:admin123")) }
+[System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
+Invoke-RestMethod -Uri "https://localhost:6984/clinicsoftware_v2" -Headers $auth
+```
+Report `doc_count`. If it's 0 or very low, data never made it to CouchDB.
+
+**2. List a few docs (check if any patient docs exist):**
+```powershell
+Invoke-RestMethod -Uri "https://localhost:6984/clinicsoftware_v2/_all_docs?limit=10" -Headers $auth
+```
+Are there any rows with `id` starting with `patient:`?
+
+**3. Check active replication tasks:**
+```powershell
+Invoke-RestMethod -Uri "https://localhost:6984/_active_tasks" -Headers $auth
+```
+
+**4. Check changes feed:**
+```powershell
+Invoke-RestMethod -Uri "https://localhost:6984/clinicsoftware_v2/_changes?limit=5&descending=true" -Headers $auth
+```
+
+**5. Test write access as doctor directly:**
+```powershell
+$doctorAuth = @{ Authorization = "Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("doctor:doctor123")) }
+Invoke-RestMethod -Method Put -Uri "https://localhost:6984/clinicsoftware_v2/patient:debug_test" -Headers $doctorAuth -ContentType "application/json" -Body '{"_id":"patient:debug_test","type":"patient","firstName":"Debug","lastName":"Test"}'
+```
+Does the write succeed or fail?
+
+**6. Open Chrome DevTools (F12) on the GitHub Pages tab on the doctor machine. Go to Console. Run:**
+```js
+// Check PouchDB local doc count
+const db = await indexedDB.databases();
+console.log('IndexedDB databases:', db.map(d => d.name));
+```
+And also check the Network tab: are there any ongoing/failed requests to `localhost:6984`?
+
+**Report all results.** The most important one is #1 and #2. If the database is empty, the browser sync never actually pushed data to CouchDB, which means the PouchDB sync handle is connecting but not replicating.
+
+---
