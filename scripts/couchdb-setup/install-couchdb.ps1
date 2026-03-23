@@ -25,14 +25,14 @@
     .\install-couchdb.ps1
 #>
 
-$ErrorActionPreference = 'Stop'
-
 # -----------------------------------------------------------------------
-# Logging
+# Logging (must run BEFORE setting ErrorActionPreference)
 # -----------------------------------------------------------------------
 $LogPath = Join-Path ([Environment]::GetFolderPath("Desktop")) "couchdb-setup.log"
-Stop-Transcript -ErrorAction SilentlyContinue | Out-Null
+try { Stop-Transcript } catch {}
 Start-Transcript -Path $LogPath -Force | Out-Null
+
+$ErrorActionPreference = 'Stop'
 Write-Host "  Log file: $LogPath" -ForegroundColor Gray
 
 # -----------------------------------------------------------------------

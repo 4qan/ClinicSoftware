@@ -142,3 +142,27 @@ This tells me whether the install script's cert generation works or needs fixing
 **Ready for clean reinstall test whenever you want.** I can run `.\uninstall-couchdb.ps1` followed by `.\install-couchdb.ps1` from here.
 
 ---
+
+### 2026-03-23 — Windows Session (clean reinstall complete + production review)
+
+**Machine:** Windows (doctor's PC)
+
+**Clean reinstall completed successfully:**
+- Uninstall ran clean
+- One bug found: `Stop-Transcript -ErrorAction SilentlyContinue` does NOT suppress the error in PowerShell 5.1 when no transcript is active — it halts the script. Fixed by replacing with `try { Stop-Transcript } catch {}` on line 32.
+- After the fix, install script ran end-to-end: all 7 verification checks passed.
+- CouchDB 3.5.1 running, HTTP + HTTPS working, databases created, users created, roles enforced.
+
+**Production readiness review — issues for Mac session to address:**
+
+1. **Hardcoded weak passwords** (lines 102-104): `admin123`, `doctor123`, `nurse123` are hardcoded in the script. For production, these should either be prompted interactively or replaced with stronger defaults. This is the biggest issue.
+
+2. **CORS `credentials = false`** (line 392): The app at `https://4qan.github.io` sends `Authorization` headers to CouchDB cross-origin. If PouchDB/fetch uses `credentials: 'include'`, the browser requires `Access-Control-Allow-Credentials: true` in the response. If so, `credentials` must be `true` in CouchDB config, AND `origins` must change from `*` to `https://4qan.github.io` (browsers reject wildcard origin with credentials). **Please verify how the app sends auth to CouchDB** — if it's PouchDB with Basic auth in the URL, this may already work, but it needs testing.
+
+3. **Final `Stop-Transcript`** (line 849): Same PS 5.1 bug as above — should also be wrapped in `try/catch`.
+
+4. **Cert accumulation** (minor): Each run of the script adds a new cert to `cert:\LocalMachine\My` but never cleans up old ones. Not urgent but worth a cleanup step.
+
+**Current state:** CouchDB is running and fully configured on this machine. Ready for sync testing from the Mac/nurse side whenever you are.
+
+---
