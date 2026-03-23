@@ -278,6 +278,19 @@ if (-not $cert) {
 }
 Write-OK "Certificate created (Thumbprint: $($cert.Thumbprint))"
 
+# Install certificate as Trusted Root CA so Chrome's service worker trusts it for fetch()
+Write-Step "Installing certificate as Trusted Root CA"
+try {
+    $rootStore = New-Object System.Security.Cryptography.X509Certificates.X509Store("Root", "LocalMachine")
+    $rootStore.Open("ReadWrite")
+    $rootStore.Add($cert)
+    $rootStore.Close()
+    Write-OK "Certificate added to Trusted Root CA store"
+} catch {
+    Write-Warn "Could not add to Trusted Root store: $_"
+    Write-Warn "You may need to run: Import-Certificate -FilePath '$certFile' -CertStoreLocation 'cert:\LocalMachine\Root'"
+}
+
 # Export certificate to PEM (base64-encoded DER)
 Write-Step "Exporting certificate to PEM"
 $certBase64 = [Convert]::ToBase64String($cert.RawData, [System.Base64FormattingOptions]::InsertLineBreaks)

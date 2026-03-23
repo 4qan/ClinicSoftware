@@ -533,3 +533,25 @@ New cert thumbprint: `CD3F67B9E4B64590D159445A76A22F7ACB04E297`
 **Ready for nurse-side testing.**
 
 ---
+
+### 2026-03-23 — Mac Session (flaky login fix: cert not in Trusted Root)
+
+**Machine:** Mac (dev machine)
+
+**Problem:** Login to the app is flaky on BOTH machines. Sometimes fails, then works after visiting the CouchDB URL directly and hard refreshing. Not consistent.
+
+**Root cause:** The install script generates the cert into `cert:\LocalMachine\My` (personal store) but never copies it to `cert:\LocalMachine\Root` (Trusted Root CA). Chrome's service worker has its own TLS context and doesn't inherit tab-level cert acceptance. Without the cert in the Trusted Root store, the SW's `fetch()` to CouchDB fails intermittently.
+
+**Fix applied to install script** (will be in next push): Added `X509Store("Root", "LocalMachine").Add($cert)` after cert generation.
+
+**Immediate fix needed on the doctor's Windows machine NOW:**
+
+```powershell
+Import-Certificate -FilePath "C:\CouchDB\etc\cert.pem" -CertStoreLocation "cert:\LocalMachine\Root"
+```
+
+Run this in an elevated PowerShell. Then restart Chrome completely. Login should be reliable after this.
+
+**Mac side:** Already fixed (we ran `sudo security add-trusted-cert` earlier).
+
+---
