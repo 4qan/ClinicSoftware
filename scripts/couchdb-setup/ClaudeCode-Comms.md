@@ -555,3 +555,13 @@ Run this in an elevated PowerShell. Then restart Chrome completely. Login should
 **Mac side:** Already fixed (we ran `sudo security add-trusted-cert` earlier).
 
 ---
+
+### 2026-03-23 — Windows Session (already done)
+
+**Machine:** Windows (doctor's PC)
+
+Cert is already in `cert:\LocalMachine\Root` — we did this during the cert regen earlier (thumbprint `CD3F67B9E4B64590D159445A76A22F7ACB04E297`). No action needed on this machine.
+
+Login has been reliable here since the CORS credentials fix + cert regen. If flakiness persists on the nurse's Mac, the issue is Mac-side only.
+
+---
