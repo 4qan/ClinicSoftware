@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { getSetting } from '@/db/pouchdb'
+import { getCouchUrl } from '@/db/localSettings'
 
 const SESSION_KEY = 'clinic_couch_session'
 const LEGACY_SESSION_KEY = 'clinic_auth_session'
@@ -43,8 +43,8 @@ export function useCouchAuth() {
   useEffect(() => {
     async function init() {
       try {
-        const url = (await getSetting('couchUrl')) as string | undefined
-        couchUrlRef.current = url ?? null
+        const url = getCouchUrl()
+        couchUrlRef.current = url
 
         const raw = sessionStorage.getItem(SESSION_KEY)
         if (!raw) {
@@ -89,7 +89,7 @@ export function useCouchAuth() {
 
   const login = useCallback(
     async (username: string, password: string): Promise<LoginResult> => {
-      const url = couchUrlRef.current ?? ((await getSetting('couchUrl')) as string | undefined) ?? null
+      const url = couchUrlRef.current ?? getCouchUrl()
       couchUrlRef.current = url
 
       if (!url) {

@@ -55,13 +55,19 @@ vi.mock('@/auth/AuthProvider', () => ({
   useAuthContext: vi.fn(),
 }))
 
-import { pouchDb, getSetting } from '@/db/pouchdb'
+vi.mock('@/db/localSettings', () => ({
+  getCouchUrl: vi.fn(),
+  setCouchUrl: vi.fn(),
+}))
+
+import { pouchDb } from '@/db/pouchdb'
 import { useAuthContext } from '@/auth/AuthProvider'
+import { getCouchUrl } from '@/db/localSettings'
 import { useSyncManager } from '@/sync/useSyncManager'
 import { SyncProvider, useSyncContext } from '@/sync/SyncContext'
 
 const mockPouchDbSync = vi.mocked(pouchDb.sync)
-const mockGetSetting = vi.mocked(getSetting)
+const mockGetCouchUrl = vi.mocked(getCouchUrl)
 const mockUseAuthContext = vi.mocked(useAuthContext)
 
 function makeSyncProviderWrapper() {
@@ -222,7 +228,7 @@ describe('SyncProvider', () => {
       changePassword: vi.fn(),
       resetNursePassword: vi.fn(),
     })
-    mockGetSetting.mockResolvedValue('http://localhost:5984')
+    mockGetCouchUrl.mockReturnValue('http://localhost:5984')
 
     const { result } = renderHook(() => useSyncContext(), {
       wrapper: makeSyncProviderWrapper(),
@@ -232,7 +238,7 @@ describe('SyncProvider', () => {
       expect(result.current.status).toBe('syncing')
     })
 
-    expect(mockGetSetting).toHaveBeenCalledWith('couchUrl')
+    expect(mockGetCouchUrl).toHaveBeenCalled()
     expect(mockPouchDbSync).toHaveBeenCalledTimes(1)
   })
 
@@ -248,7 +254,7 @@ describe('SyncProvider', () => {
       changePassword: vi.fn(),
       resetNursePassword: vi.fn(),
     })
-    mockGetSetting.mockResolvedValue('http://localhost:5984')
+    mockGetCouchUrl.mockReturnValue('http://localhost:5984')
 
     const { result, rerender } = renderHook(() => useSyncContext(), {
       wrapper: makeSyncProviderWrapper(),

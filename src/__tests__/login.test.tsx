@@ -5,7 +5,13 @@ import { MemoryRouter } from 'react-router-dom'
 import { AuthProvider } from '@/auth/AuthProvider'
 import { LoginPage } from '@/auth/LoginPage'
 
-// Mock getSetting from pouchdb module
+// Mock localSettings (couchUrl is stored in localStorage, not PouchDB)
+vi.mock('@/db/localSettings', () => ({
+  getCouchUrl: vi.fn(),
+  setCouchUrl: vi.fn(),
+}))
+
+// Mock pouchdb (still needed for AuthProvider/useCouchAuth)
 vi.mock('@/db/pouchdb', () => ({
   getSetting: vi.fn(),
   putSetting: vi.fn(),
@@ -15,8 +21,8 @@ vi.mock('@/db/pouchdb', () => ({
   resetPouchDb: vi.fn(),
 }))
 
-import { getSetting } from '@/db/pouchdb'
-const mockGetSetting = vi.mocked(getSetting)
+import { getCouchUrl } from '@/db/localSettings'
+const mockGetCouchUrl = vi.mocked(getCouchUrl)
 
 function renderLoginPage() {
   return render(
@@ -43,7 +49,7 @@ describe('Login Flow (CouchDB auth)', () => {
   })
 
   it('renders username and password fields', () => {
-    mockGetSetting.mockResolvedValue(undefined)
+    mockGetCouchUrl.mockReturnValue('http://localhost:5984')
     renderLoginPage()
 
     expect(screen.getByLabelText('Username')).toBeInTheDocument()
@@ -52,7 +58,7 @@ describe('Login Flow (CouchDB auth)', () => {
   })
 
   it('does not render recovery flow', () => {
-    mockGetSetting.mockResolvedValue(undefined)
+    mockGetCouchUrl.mockReturnValue('http://localhost:5984')
     renderLoginPage()
 
     expect(screen.queryByText(/forgot password/i)).toBeNull()
@@ -61,7 +67,7 @@ describe('Login Flow (CouchDB auth)', () => {
 
   it('shows error on wrong credentials (401)', async () => {
     const user = userEvent.setup()
-    mockGetSetting.mockResolvedValue('http://localhost:5984')
+    mockGetCouchUrl.mockReturnValue('http://localhost:5984')
     vi.mocked(globalThis.fetch).mockResolvedValue({
       ok: false,
       status: 401,
@@ -78,24 +84,20 @@ describe('Login Flow (CouchDB auth)', () => {
     })
   })
 
-  it('shows error when CouchDB not configured', async () => {
-    const user = userEvent.setup()
-    mockGetSetting.mockResolvedValue(undefined)
+  it('shows URL setup form when CouchDB not configured', async () => {
+    mockGetCouchUrl.mockReturnValue(null)
 
     renderLoginPage()
 
-    await user.type(screen.getByLabelText('Username'), 'doctor')
-    await user.type(screen.getByLabelText('Password'), 'test')
-    await user.click(screen.getByRole('button', { name: /log in/i }))
-
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent(/couchdb is not configured/i)
+      expect(screen.getByLabelText('CouchDB Server Address')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /save and continue/i })).toBeInTheDocument()
     })
   })
 
   it('successful login sets authenticated state', async () => {
     const user = userEvent.setup()
-    mockGetSetting.mockResolvedValue('http://localhost:5984')
+    mockGetCouchUrl.mockReturnValue('http://localhost:5984')
     vi.mocked(globalThis.fetch).mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ userCtx: { name: 'doctor', roles: ['doctor'] } }),

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, type ReactNode } from 'react'
 import { useAuthContext } from '@/auth/AuthProvider'
 import { useSyncManager, type SyncStatus } from './useSyncManager'
-import { getSetting } from '@/db/pouchdb'
+import { getCouchUrl } from '@/db/localSettings'
 
 export interface SyncContextType {
   status: SyncStatus
@@ -29,11 +29,10 @@ export function SyncProvider({ children }: { children: ReactNode }) {
       return
     }
 
-    getSetting('couchUrl').then((url) => {
-      if (typeof url === 'string' && url) {
-        start(url, credentials)
-      }
-    })
+    const url = getCouchUrl()
+    if (url) {
+      start(url, credentials)
+    }
 
     return () => stop()
   }, [isAuthenticated, credentials, start, stop])
@@ -41,11 +40,10 @@ export function SyncProvider({ children }: { children: ReactNode }) {
   const startSync = () => {
     stop()
     if (!credentials) return
-    getSetting('couchUrl').then((url) => {
-      if (typeof url === 'string' && url && credentials) {
-        start(url, credentials)
-      }
-    })
+    const url = getCouchUrl()
+    if (url && credentials) {
+      start(url, credentials)
+    }
   }
 
   return (

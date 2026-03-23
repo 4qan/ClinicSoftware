@@ -1,6 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { useAuthContext } from './AuthProvider'
-import { getSetting, putSetting } from '../db/pouchdb'
+import { getCouchUrl, setCouchUrl as saveCouchUrl } from '../db/localSettings'
 
 export function LoginPage() {
   const { login } = useAuthContext()
@@ -14,10 +14,9 @@ export function LoginPage() {
   const [urlSaving, setUrlSaving] = useState(false)
 
   useEffect(() => {
-    getSetting('couchUrl').then((url) => {
-      if (!url) setNeedsUrl(true)
-      else setCouchUrl(url as string)
-    })
+    const url = getCouchUrl()
+    if (!url) setNeedsUrl(true)
+    else setCouchUrl(url)
   }, [])
 
   async function handleSaveUrl(e: FormEvent) {
@@ -26,7 +25,7 @@ export function LoginPage() {
     if (!trimmed) return
     setUrlSaving(true)
     try {
-      await putSetting('couchUrl', trimmed)
+      saveCouchUrl(trimmed)
       setNeedsUrl(false)
       setError('')
     } finally {
