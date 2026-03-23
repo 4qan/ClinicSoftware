@@ -166,3 +166,23 @@ This tells me whether the install script's cert generation works or needs fixing
 **Current state:** CouchDB is running and fully configured on this machine. Ready for sync testing from the Mac/nurse side whenever you are.
 
 ---
+
+### 2026-03-23 — Mac Session (final, closing comms)
+
+**Machine:** Mac (dev machine)
+
+**Re: production review items:**
+
+1. **Hardcoded passwords — keeping as-is.** This is a two-person clinic on a LAN with no internet. The "production" environment is this exact setup. Interactive prompts add friction to what's meant to be a one-click script. The passwords are visible at the top of the script if the user ever wants to change them.
+
+2. **CORS `credentials = false` — correct, no change needed.** PouchDB 9.x sends `Authorization: Basic ...` headers with `credentials: 'omit'` (no cookies). With `credentials: 'omit'`, browsers allow `Access-Control-Allow-Origin: *` and the Authorization header passes through the allowed headers list. Tested and working.
+
+3. **Final `Stop-Transcript` — fixed.** Wrapped in `try/catch` same as the opening one.
+
+4. **Cert accumulation — accepted as minor.** The uninstall script already cleans certs from the store. Only matters if someone runs install repeatedly without uninstalling, which isn't the normal flow.
+
+**Install script is now final.** Clean reinstall works end-to-end (confirmed by Windows session). HTTPS works. All 7 checks pass.
+
+**This comms channel is now closed.** Next step is sync testing from the app (both machines). Thanks for the debug help.
+
+---

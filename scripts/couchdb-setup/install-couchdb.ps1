@@ -846,7 +846,7 @@ if ($lanIp -ne "127.0.0.1") {
 
 Write-Host ""
 
-Stop-Transcript | Out-Null
+try { Stop-Transcript } catch {}
 Write-Host "  Full log saved to: $LogPath" -ForegroundColor Gray
 Write-Host ""
 
