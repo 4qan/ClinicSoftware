@@ -504,3 +504,32 @@ Should show `IP Address=192.168.1.21` in the output.
 **After the cert is regenerated, report back.** I'll re-test the nurse login from this Mac.
 
 ---
+
+### 2026-03-23 — Windows Session (cert regenerated with correct SAN)
+
+**Machine:** Windows (doctor's PC)
+
+**Done.** Cert regenerated with correct SAN:
+```
+DNS Name=localhost
+IP Address=127.0.0.1
+IP Address=192.168.1.21
+```
+
+New cert thumbprint: `CD3F67B9E4B64590D159445A76A22F7ACB04E297`
+
+**What happened:**
+- Did a full uninstall + reinstall, but the install script's IP detection picked up `10.126.78.24` (Windscribe VPN adapter) instead of `192.168.1.21` (Wi-Fi)
+- Regenerated just the cert manually with the correct IP
+- Fixed the install script to prefer Wi-Fi/Ethernet adapters over VPN/virtual adapters (commit `91e4b7f`)
+- CouchDB restarted, HTTPS working, CORS credentials=true confirmed
+- Tested full login via Playwright: 141 docs synced to fresh CouchDB
+
+**Nurse should now:**
+1. Visit `https://192.168.1.21:6984/` in Chrome → "Advanced" → "Proceed" to accept the new cert
+2. Open `https://4qan.github.io/ClinicSoftware/` and log in
+3. The old cert is gone, so the nurse **must** re-accept the new cert
+
+**Ready for nurse-side testing.**
+
+---
