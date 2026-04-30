@@ -82,7 +82,7 @@
 - [x] **Phase 20: CouchDB Infrastructure** - CouchDB running as a secured Windows service on the doctor's machine, accessible from nurse's machine over LAN (completed 2026-03-19)
 - [x] **Phase 21: Auth and Role Enforcement** - Two-user login with CouchDB session auth and role-based access gating (completed 2026-03-19)
 - [x] **Phase 22: Live Sync** - Bidirectional real-time sync between machines with visible sync status (completed 2026-03-20)
-- [ ] **Phase 22.1: Solo Mode** - Single-machine default deployment with no CouchDB; networked mode preserved as opt-in upgrade
+- [x] **Phase 22.1: Solo Mode** - Single-machine default deployment with no CouchDB; networked mode preserved as opt-in upgrade (completed 2026-04-30)
 - [ ] **Phase 23: Backup Redesign** - Backup and restore adapted for the synced multi-machine environment
 
 ## Phase Details
@@ -221,7 +221,7 @@ Plans:
   6. Solo password change updates the local hash with no CouchDB calls
   7. Backup export schema (SCHEMA_VERSION=2) is byte-equivalent to networked export
   8. Networked path preserved: `localStorage.deploymentMode='networked'` boots the Phase 22 flow unchanged; legacy installs (couchUrl present, no deploymentMode) infer networked
-**Plans:** 6/7 plans executed
+**Plans:** 7/7 plans complete
 Plans:
 - [x] 22.1-01-PLAN.md -- Settings layer: deploymentMode + soloCredentials accessors with legacy-install inference
 - [x] 22.1-02-PLAN.md -- PBKDF2 passwordHash utility (Web Crypto, zero deps) + jsdom polyfill
@@ -229,7 +229,7 @@ Plans:
 - [x] 22.1-04-PLAN.md -- Provider tree split (App.tsx / AuthProvider) + SyncContext gating + ProtectedRoute solo bypass
 - [x] 22.1-05-PLAN.md -- LoginPage + Sidebar + Header solo-mode UI gating
 - [x] 22.1-06-PLAN.md -- SettingsPage Networking tab (disabled), ResetNursePassword gating, "Add a second computer" card
-- [ ] 22.1-07-PLAN.md -- fetchSpy helper, end-to-end solo workflow test, networked test describe.skip sweep
+- [x] 22.1-07-PLAN.md -- fetchSpy helper, end-to-end solo workflow test, networked test describe.skip sweep
 
 ### Phase 23: Backup Redesign
 **Goal**: Manual export still produces a downloadable backup file; restore pushes data to the shared CouchDB so both machines reflect the restored state via sync; auto-snapshots continue working
@@ -268,7 +268,7 @@ Plans:
 | 20. CouchDB Infrastructure | v2.0 | 2/2 | Complete | 2026-03-19 |
 | 21. Auth and Role Enforcement | v2.0 | 3/3 | Complete | 2026-03-19 |
 | 22. Live Sync | 3/3 | Complete    | 2026-03-20 | - |
-| 22.1 Solo Mode | v2.0 | 6/7 | In Progress|  |
+| 22.1 Solo Mode | v2.0 | 7/7 | Complete   | 2026-04-30 |
 | 23. Backup Redesign | v2.0 | 0/TBD | Not started | - |
 
 ---
