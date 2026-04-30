@@ -46,6 +46,18 @@ vi.mock('@/sync/SyncContext', () => ({
   }),
 }))
 
+// Phase 22.1: ProtectedRoute reads getDeploymentMode(). Default to 'networked'
+// for the existing role-gating tests. The solo-bypass tests below override
+// per-test via mockGetDeploymentMode.
+vi.mock('@/db/localSettings', () => ({
+  getDeploymentMode: vi.fn(() => 'networked'),
+  getCouchUrl: vi.fn(() => null),
+  setCouchUrl: vi.fn(),
+}))
+
+import { getDeploymentMode } from '@/db/localSettings'
+const mockGetDeploymentMode = vi.mocked(getDeploymentMode)
+
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { Sidebar } from '@/components/Sidebar'
 import { Header } from '@/components/Header'
@@ -53,6 +65,8 @@ import { Header } from '@/components/Header'
 beforeEach(() => {
   vi.clearAllMocks()
   mockAuthContext.role = 'doctor'
+  mockAuthContext.isAuthenticated = true
+  mockGetDeploymentMode.mockReturnValue('networked')
 })
 
 // ─── ProtectedRoute ──────────────────────────────────────────────────────────
@@ -104,6 +118,35 @@ describe('ProtectedRoute', () => {
       </MemoryRouter>,
     )
     expect(screen.queryByText('Should Not Appear')).toBeNull()
+  })
+
+  // ─── Phase 22.1: Solo-mode bypass (D-14) ─────────────────────────────────
+  it('solo mode -- renders children even when role is null (single-user assumption)', () => {
+    mockGetDeploymentMode.mockReturnValue('solo')
+    mockAuthContext.role = null
+    mockAuthContext.isAuthenticated = true
+    render(
+      <MemoryRouter>
+        <ProtectedRoute allowedRoles={['doctor']}>
+          <div>Solo Secret</div>
+        </ProtectedRoute>
+      </MemoryRouter>,
+    )
+    expect(screen.getByText('Solo Secret')).toBeDefined()
+  })
+
+  it('solo mode -- still redirects unauthenticated users (auth check before solo bypass)', () => {
+    mockGetDeploymentMode.mockReturnValue('solo')
+    mockAuthContext.isAuthenticated = false
+    mockAuthContext.role = null
+    render(
+      <MemoryRouter>
+        <ProtectedRoute allowedRoles={['doctor']}>
+          <div>Should Not Render</div>
+        </ProtectedRoute>
+      </MemoryRouter>,
+    )
+    expect(screen.queryByText('Should Not Render')).toBeNull()
   })
 })
 

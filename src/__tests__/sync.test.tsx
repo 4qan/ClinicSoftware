@@ -58,16 +58,18 @@ vi.mock('@/auth/AuthProvider', () => ({
 vi.mock('@/db/localSettings', () => ({
   getCouchUrl: vi.fn(),
   setCouchUrl: vi.fn(),
+  getDeploymentMode: vi.fn(() => 'networked'),
 }))
 
 import { pouchDb } from '@/db/pouchdb'
 import { useAuthContext } from '@/auth/AuthProvider'
-import { getCouchUrl } from '@/db/localSettings'
+import { getCouchUrl, getDeploymentMode } from '@/db/localSettings'
 import { useSyncManager } from '@/sync/useSyncManager'
 import { SyncProvider, useSyncContext } from '@/sync/SyncContext'
 
 const mockPouchDbSync = vi.mocked(pouchDb.sync)
 const mockGetCouchUrl = vi.mocked(getCouchUrl)
+const mockGetDeploymentMode = vi.mocked(getDeploymentMode)
 const mockUseAuthContext = vi.mocked(useAuthContext)
 
 function makeSyncProviderWrapper() {
@@ -86,6 +88,9 @@ describe('useSyncManager', () => {
       syncState.handle = h
       return h as unknown as ReturnType<typeof pouchDb.sync>
     })
+    // Default to networked mode so existing tests behave as Phase 22.
+    // Solo-gating tests override this per-test.
+    mockGetDeploymentMode.mockReturnValue('networked')
   })
 
   it('Test 1: start() creates sync handle and sets status to syncing', () => {
@@ -214,6 +219,9 @@ describe('SyncProvider', () => {
       syncState.handle = h
       return h as unknown as ReturnType<typeof pouchDb.sync>
     })
+    // Default to networked mode so existing tests behave as Phase 22.
+    // Solo-gating tests override this per-test.
+    mockGetDeploymentMode.mockReturnValue('networked')
   })
 
   it('Test 8: SyncProvider calls start() when isAuthenticated is true with credentials', async () => {
@@ -286,5 +294,69 @@ describe('SyncProvider', () => {
     })
 
     expect(capturedHandle.cancel).toHaveBeenCalled()
+  })
+})
+
+describe('SyncProvider - solo mode gating (Phase 22.1 D-03)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    syncState.handle = null
+    mockPouchDbSync.mockImplementation((..._args: unknown[]) => {
+      const h = createFakeSyncHandle()
+      syncState.handle = h
+      return h as unknown as ReturnType<typeof pouchDb.sync>
+    })
+  })
+
+  it('Test 10: solo mode -- start() never invoked even when authenticated with credentials', async () => {
+    mockGetDeploymentMode.mockReturnValue('solo')
+    mockUseAuthContext.mockReturnValue({
+      isAuthenticated: true,
+      credentials: 'dXNlcjpwYXNz',
+      isLoading: false,
+      role: 'doctor',
+      username: 'doctor',
+      login: vi.fn(),
+      logout: vi.fn(),
+      changePassword: vi.fn(),
+      resetNursePassword: vi.fn(),
+    })
+    mockGetCouchUrl.mockReturnValue('http://localhost:5984')
+
+    renderHook(() => useSyncContext(), {
+      wrapper: makeSyncProviderWrapper(),
+    })
+
+    // Give effects a chance to run.
+    await new Promise((r) => setTimeout(r, 10))
+
+    // Belt-and-suspenders: pouchDb.sync (called inside start()) must never fire.
+    expect(mockPouchDbSync).not.toHaveBeenCalled()
+  })
+
+  it('Test 11: solo mode -- startSync() also short-circuits (defense in depth)', async () => {
+    mockGetDeploymentMode.mockReturnValue('solo')
+    mockUseAuthContext.mockReturnValue({
+      isAuthenticated: true,
+      credentials: 'dXNlcjpwYXNz',
+      isLoading: false,
+      role: 'doctor',
+      username: 'doctor',
+      login: vi.fn(),
+      logout: vi.fn(),
+      changePassword: vi.fn(),
+      resetNursePassword: vi.fn(),
+    })
+    mockGetCouchUrl.mockReturnValue('http://localhost:5984')
+
+    const { result } = renderHook(() => useSyncContext(), {
+      wrapper: makeSyncProviderWrapper(),
+    })
+
+    act(() => {
+      result.current.startSync()
+    })
+
+    expect(mockPouchDbSync).not.toHaveBeenCalled()
   })
 })
