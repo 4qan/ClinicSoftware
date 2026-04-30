@@ -221,14 +221,14 @@ Plans:
   6. Solo password change updates the local hash with no CouchDB calls
   7. Backup export schema (SCHEMA_VERSION=2) is byte-equivalent to networked export
   8. Networked path preserved: `localStorage.deploymentMode='networked'` boots the Phase 22 flow unchanged; legacy installs (couchUrl present, no deploymentMode) infer networked
-**Plans:** 4/7 plans executed
+**Plans:** 6/7 plans executed
 Plans:
 - [x] 22.1-01-PLAN.md -- Settings layer: deploymentMode + soloCredentials accessors with legacy-install inference
 - [x] 22.1-02-PLAN.md -- PBKDF2 passwordHash utility (Web Crypto, zero deps) + jsdom polyfill
 - [x] 22.1-03-PLAN.md -- useSoloAuth hook (mirrors useCouchAuth shape; zero-fetch contract)
 - [x] 22.1-04-PLAN.md -- Provider tree split (App.tsx / AuthProvider) + SyncContext gating + ProtectedRoute solo bypass
-- [ ] 22.1-05-PLAN.md -- LoginPage + Sidebar + Header solo-mode UI gating
-- [ ] 22.1-06-PLAN.md -- SettingsPage Networking tab (disabled), ResetNursePassword gating, "Add a second computer" card
+- [x] 22.1-05-PLAN.md -- LoginPage + Sidebar + Header solo-mode UI gating
+- [x] 22.1-06-PLAN.md -- SettingsPage Networking tab (disabled), ResetNursePassword gating, "Add a second computer" card
 - [ ] 22.1-07-PLAN.md -- fetchSpy helper, end-to-end solo workflow test, networked test describe.skip sweep
 
 ### Phase 23: Backup Redesign
@@ -268,7 +268,7 @@ Plans:
 | 20. CouchDB Infrastructure | v2.0 | 2/2 | Complete | 2026-03-19 |
 | 21. Auth and Role Enforcement | v2.0 | 3/3 | Complete | 2026-03-19 |
 | 22. Live Sync | 3/3 | Complete    | 2026-03-20 | - |
-| 22.1 Solo Mode | v2.0 | 4/7 | In Progress|  |
+| 22.1 Solo Mode | v2.0 | 6/7 | In Progress|  |
 | 23. Backup Redesign | v2.0 | 0/TBD | Not started | - |
 
 ---
