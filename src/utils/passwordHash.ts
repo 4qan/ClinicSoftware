@@ -1,26 +1,12 @@
 /**
  * PBKDF2 password hashing via Web Crypto API.
  * Per Phase 22.1 D-05: SHA-256, 100k iterations (floor), 16-byte random salt.
- * Stored envelope shape lives in src/db/soloCredentials.ts (Plan 01).
- *
- * NOTE: Plan 01 (parallel wave 1) creates src/db/soloCredentials.ts with the
- * canonical SoloCredentialEnvelope interface. Because this plan executes in a
- * separate worktree, that file is not yet present here. The interface is
- * declared inline below with the identical shape so this module is
- * self-contained until the parallel worktrees merge. Plan 03+ should import
- * SoloCredentialEnvelope from '@/db/soloCredentials' (the canonical home).
  */
+import type { SoloCredentialEnvelope } from '@/db/soloCredentials'
 
 export const PBKDF2_ITERATIONS = 100_000 // floor per D-05
 const KEY_LENGTH_BITS = 256
 const SALT_BYTES = 16
-
-export interface SoloCredentialEnvelope {
-  username: string
-  salt: string // base64
-  hash: string // base64
-  iterations: number
-}
 
 function bytesToBase64(bytes: Uint8Array): string {
   let binary = ''
