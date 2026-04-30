@@ -1,6 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { useAuthContext } from './AuthProvider'
-import { getCouchUrl, setCouchUrl as saveCouchUrl } from '../db/localSettings'
+import { getCouchUrl, setCouchUrl as saveCouchUrl, getDeploymentMode } from '../db/localSettings'
 
 export function LoginPage() {
   const { login } = useAuthContext()
@@ -12,12 +12,14 @@ export function LoginPage() {
   const [couchUrl, setCouchUrl] = useState('')
   const [needsUrl, setNeedsUrl] = useState(false)
   const [urlSaving, setUrlSaving] = useState(false)
+  const isSolo = getDeploymentMode() === 'solo'
 
   useEffect(() => {
+    if (isSolo) return
     const url = getCouchUrl()
     if (!url) setNeedsUrl(true)
     else setCouchUrl(url)
-  }, [])
+  }, [isSolo])
 
   async function handleSaveUrl(e: FormEvent) {
     e.preventDefault()
@@ -70,7 +72,7 @@ export function LoginPage() {
         <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">Clinic Software</h1>
         <p className="text-gray-500 text-center mb-6">Enter your credentials to continue</p>
 
-        {needsUrl ? (
+        {!isSolo && needsUrl ? (
           <form onSubmit={handleSaveUrl} className="space-y-4">
             <div>
               <label htmlFor="couchUrl" className="block text-base font-medium text-gray-700 mb-1">
@@ -115,7 +117,7 @@ export function LoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg"
-                placeholder="doctor or nurse"
+                placeholder={isSolo ? 'Username' : 'doctor or nurse'}
                 autoFocus
                 required
               />
@@ -132,7 +134,7 @@ export function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-3 pr-16 text-lg border border-gray-300 rounded-lg"
-                  placeholder="Enter password"
+                  placeholder={isSolo ? 'Password' : 'Enter password'}
                   required
                 />
                 <button
@@ -158,13 +160,15 @@ export function LoginPage() {
               {isSubmitting ? 'Logging in...' : 'Log In'}
             </button>
 
-            <button
-              type="button"
-              onClick={() => setNeedsUrl(true)}
-              className="w-full text-sm text-gray-500 hover:text-gray-700"
-            >
-              Change server address
-            </button>
+            {!isSolo && (
+              <button
+                type="button"
+                onClick={() => setNeedsUrl(true)}
+                className="w-full text-sm text-gray-500 hover:text-gray-700"
+              >
+                Change server address
+              </button>
+            )}
           </form>
         )}
       </div>
