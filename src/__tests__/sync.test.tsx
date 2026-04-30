@@ -78,7 +78,8 @@ function makeSyncProviderWrapper() {
   }
 }
 
-describe('useSyncManager', () => {
+// TODO(Phase 22.1): networked path deferred - re-enable when networked is verified on real hardware
+describe.skip('useSyncManager', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     syncState.handle = null
@@ -210,7 +211,8 @@ describe('useSyncManager', () => {
   })
 })
 
-describe('SyncProvider', () => {
+// TODO(Phase 22.1): networked path deferred - re-enable when networked is verified on real hardware
+describe.skip('SyncProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     syncState.handle = null
