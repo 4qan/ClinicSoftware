@@ -268,7 +268,7 @@ Plans:
 | 20. CouchDB Infrastructure | v2.0 | 2/2 | Complete | 2026-03-19 |
 | 21. Auth and Role Enforcement | v2.0 | 3/3 | Complete | 2026-03-19 |
 | 22. Live Sync | 3/3 | Complete    | 2026-03-20 | - |
-| 22.1 Solo Mode | v2.0 | 7/7 | Complete   | 2026-04-30 |
+| 22.1 Solo Mode | v2.0 | 7/7 | Complete    | 2026-04-30 |
 | 23. Backup Redesign | v2.0 | 0/TBD | Not started | - |
 
 ---
