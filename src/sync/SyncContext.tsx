@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { useAuthContext } from '@/auth/AuthProvider'
 import { useSyncManager, type SyncStatus } from './useSyncManager'
-import { getCouchUrl } from '@/db/localSettings'
+import { getCouchUrl, getDeploymentMode } from '@/db/localSettings'
 
 export interface SyncContextType {
   status: SyncStatus
@@ -37,6 +37,12 @@ export function SyncProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
+    // D-03 / SPEC req 3: in solo mode, replication never starts. Early return
+    // BEFORE any start() path so pouchDb.sync (called inside useSyncManager.start)
+    // is never invoked. Belt-and-suspenders with App.tsx omitting SyncProvider
+    // from SoloProviders.
+    if (getDeploymentMode() === 'solo') return
+
     if (!isAuthenticated || !credentials) {
       stop()
       return
@@ -51,6 +57,9 @@ export function SyncProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated, credentials, start, stop])
 
   const startSync = () => {
+    // Defense in depth -- UI is disabled in solo (Plan 06), but a programmatic
+    // call must still short-circuit so manual retries cannot bypass the gate.
+    if (getDeploymentMode() === 'solo') return
     stop()
     if (!credentials) return
     const url = getCouchUrl()
