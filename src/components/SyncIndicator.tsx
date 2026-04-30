@@ -16,6 +16,7 @@ export function SyncIndicator({ collapsed }: SyncIndicatorProps) {
 
   return (
     <div
+      data-testid="sync-indicator"
       aria-label={`Sync status: ${label}`}
       className={
         collapsed

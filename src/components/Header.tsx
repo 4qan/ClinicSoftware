@@ -3,9 +3,11 @@ import { useState, useRef, useEffect } from 'react'
 import { useAuthContext } from '@/auth/AuthProvider'
 import { searchPatients } from '@/db/patients'
 import type { Patient } from '@/db/index'
+import { getDeploymentMode } from '@/db/localSettings'
 
 export function Header() {
   const { logout, role } = useAuthContext()
+  const isSolo = getDeploymentMode() === 'solo'
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<Patient[]>([])
@@ -106,9 +108,12 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500 hidden sm:inline">
-            {role === 'doctor' ? 'Doctor' : 'Nurse'}
-          </span>
+          {/* Role chip — hidden in solo mode (D-11): only one user, label adds no info */}
+          {!isSolo && (
+            <span className="text-sm text-gray-500 hidden sm:inline">
+              {role === 'doctor' ? 'Doctor' : 'Nurse'}
+            </span>
+          )}
           {role !== 'nurse' && (
             <Link
               to="/settings"
