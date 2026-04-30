@@ -2,14 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Multi-User Sync
-status: unknown
-stopped_at: Completed 22-live-sync plan 02
-last_updated: "2026-03-20T14:37:00.093Z"
+status: Executing Phase 22.1
+stopped_at: Phase 22.1 UI-SPEC approved
+last_updated: "2026-04-30T17:55:42.527Z"
 progress:
-  total_phases: 9
+  total_phases: 10
   completed_phases: 8
-  total_plans: 18
+  total_plans: 25
   completed_plans: 18
+  percent: 72
 ---
 
 # Project State: ClinicSoftware
@@ -19,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** The doctor can see a patient, write a prescription with medication autocomplete, and print it in under 2 minutes, even with no internet.
-**Current focus:** Phase 22 — live-sync
+**Current focus:** Phase 22.1 — solo-mode
 
 ## Current Position
 
-Phase: 22 (live-sync) — EXECUTING
-Plan: 2 of 3
+Phase: 22.1 (solo-mode) — EXECUTING
+Plan: 1 of 7
 
 ## Accumulated Context
 
@@ -71,9 +72,9 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-20T14:31:43Z
-Stopped at: Completed 22-live-sync plan 02
-Resume file: None
+Last session: 2026-04-30T14:06:43.166Z
+Stopped at: Phase 22.1 UI-SPEC approved
+Resume file: .planning/phases/22.1-solo-mode/22.1-UI-SPEC.md
 
 ---
 *Last updated: 2026-03-19 -- v2.0 roadmap created*

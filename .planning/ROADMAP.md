@@ -82,6 +82,7 @@
 - [x] **Phase 20: CouchDB Infrastructure** - CouchDB running as a secured Windows service on the doctor's machine, accessible from nurse's machine over LAN (completed 2026-03-19)
 - [x] **Phase 21: Auth and Role Enforcement** - Two-user login with CouchDB session auth and role-based access gating (completed 2026-03-19)
 - [x] **Phase 22: Live Sync** - Bidirectional real-time sync between machines with visible sync status (completed 2026-03-20)
+- [ ] **Phase 22.1: Solo Mode** - Single-machine default deployment with no CouchDB; networked mode preserved as opt-in upgrade
 - [ ] **Phase 23: Backup Redesign** - Backup and restore adapted for the synced multi-machine environment
 
 ## Phase Details
@@ -207,6 +208,29 @@ Plans:
 - [ ] 22-02-PLAN.md -- Sync UI: SyncIndicator in sidebar, Settings Sync tab with status/retry
 - [ ] 22-03-PLAN.md -- Changes feed: auto-refresh useRecentPatients, usePatientSearch, useDrugSearch
 
+### Phase 22.1: Solo Mode
+**Goal**: A non-technical doctor can open the app on a freshly set-up machine and use it immediately, with no CouchDB install, no first-run wizard, and no setup decisions; the existing networked (doctor + nurse) mode continues to work as an explicit opt-in upgrade from Settings
+**Depends on**: Phase 22
+**Requirements**: 9 SPEC requirements (SPEC-22.1-1 through SPEC-22.1-9) — see `.planning/phases/22.1-solo-mode/22.1-SPEC.md` for full text and 13 acceptance criteria
+**Success Criteria** (locked in SPEC.md; summary):
+  1. Fresh install boots into the working UI; CouchDB is not required
+  2. Solo login validates against PBKDF2-hashed local credentials (defaults `doctor`/`doctor123`); zero outbound CouchDB requests
+  3. SyncProvider does not mount in solo; replication never starts
+  4. SyncIndicator, role chips, ResetNursePassword, and CouchDB URL form are absent from solo DOM
+  5. All routes accessible in solo (ProtectedRoute bypassed); Settings shows a disabled "Add a second computer" upgrade scaffold
+  6. Solo password change updates the local hash with no CouchDB calls
+  7. Backup export schema (SCHEMA_VERSION=2) is byte-equivalent to networked export
+  8. Networked path preserved: `localStorage.deploymentMode='networked'` boots the Phase 22 flow unchanged; legacy installs (couchUrl present, no deploymentMode) infer networked
+**Plans:** 7 plans
+Plans:
+- [ ] 22.1-01-PLAN.md -- Settings layer: deploymentMode + soloCredentials accessors with legacy-install inference
+- [ ] 22.1-02-PLAN.md -- PBKDF2 passwordHash utility (Web Crypto, zero deps) + jsdom polyfill
+- [ ] 22.1-03-PLAN.md -- useSoloAuth hook (mirrors useCouchAuth shape; zero-fetch contract)
+- [ ] 22.1-04-PLAN.md -- Provider tree split (App.tsx / AuthProvider) + SyncContext gating + ProtectedRoute solo bypass
+- [ ] 22.1-05-PLAN.md -- LoginPage + Sidebar + Header solo-mode UI gating
+- [ ] 22.1-06-PLAN.md -- SettingsPage Networking tab (disabled), ResetNursePassword gating, "Add a second computer" card
+- [ ] 22.1-07-PLAN.md -- fetchSpy helper, end-to-end solo workflow test, networked test describe.skip sweep
+
 ### Phase 23: Backup Redesign
 **Goal**: Manual export still produces a downloadable backup file; restore pushes data to the shared CouchDB so both machines reflect the restored state via sync; auto-snapshots continue working
 **Depends on**: Phase 22
@@ -244,7 +268,8 @@ Plans:
 | 20. CouchDB Infrastructure | v2.0 | 2/2 | Complete | 2026-03-19 |
 | 21. Auth and Role Enforcement | v2.0 | 3/3 | Complete | 2026-03-19 |
 | 22. Live Sync | 3/3 | Complete    | 2026-03-20 | - |
+| 22.1 Solo Mode | v2.0 | 0/7 | Planned (not started) | - |
 | 23. Backup Redesign | v2.0 | 0/TBD | Not started | - |
 
 ---
-*Last updated: 2026-03-20 -- Phase 22 plans created (3 plans, 2 waves)*
+*Last updated: 2026-04-30 -- Phase 22.1 plans created (7 plans, 5 waves)*
