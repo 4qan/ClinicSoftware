@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { AuthProvider, useAuthContext } from './auth/AuthProvider'
+import { SoloAuthProvider, NetworkedAuthProvider, useAuthContext } from './auth/AuthProvider'
 import { SyncProvider } from '@/sync/SyncContext'
+import { getDeploymentMode } from '@/db/localSettings'
 import { ToastProvider } from './components/ToastProvider'
 import { LoginPage } from './auth/LoginPage'
 import { seedDrugDatabase, deduplicateExistingDrugs } from './db/seedDrugs'
@@ -58,16 +59,36 @@ function AppContent() {
 }
 
 function App() {
+  const mode = getDeploymentMode() // D-01: read once at boot
   return (
     <BrowserRouter basename="/ClinicSoftware">
-      <AuthProvider>
-        <SyncProvider>
-          <ToastProvider>
-            <AppContent />
-          </ToastProvider>
-        </SyncProvider>
-      </AuthProvider>
+      {mode === 'solo' ? <SoloProviders /> : <NetworkedProviders />}
     </BrowserRouter>
+  )
+}
+
+function SoloProviders() {
+  // SyncProvider intentionally omitted in solo (D-03 option A). SyncContext is
+  // also short-circuited internally as defense in depth (Task 2). The two
+  // gates together mitigate T-22.1-18.
+  return (
+    <SoloAuthProvider>
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
+    </SoloAuthProvider>
+  )
+}
+
+function NetworkedProviders() {
+  return (
+    <NetworkedAuthProvider>
+      <SyncProvider>
+        <ToastProvider>
+          <AppContent />
+        </ToastProvider>
+      </SyncProvider>
+    </NetworkedAuthProvider>
   )
 }
 
