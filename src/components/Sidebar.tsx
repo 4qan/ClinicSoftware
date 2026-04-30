@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuthContext } from '@/auth/AuthProvider'
 import { SyncIndicator } from '@/components/SyncIndicator'
+import { getDeploymentMode } from '@/db/localSettings'
 
 const navItems = [
   {
@@ -58,6 +59,7 @@ const NURSE_ALLOWED_PATHS = ['/', '/patients']
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const location = useLocation()
   const { logout, role } = useAuthContext()
+  const isSolo = getDeploymentMode() === 'solo'
 
   const visibleItems = role === 'nurse'
     ? navItems.filter(item => NURSE_ALLOWED_PATHS.includes(item.path))
@@ -116,8 +118,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </nav>
 
       <div className={`${collapsed ? 'px-2' : 'px-3'} pb-5`}>
-        {/* Role label */}
-        {role && (
+        {/* Role label — hidden in solo mode (D-11): only one user, label adds no info */}
+        {!isSolo && role && (
           collapsed ? (
             <div className="flex justify-center py-2 mb-1" title={role === 'doctor' ? 'Doctor' : 'Nurse'}>
               <span className="text-sm font-semibold text-gray-400">
@@ -132,8 +134,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             </div>
           )
         )}
-        {/* Sync indicator */}
-        <SyncIndicator collapsed={collapsed} />
+        {/* Sync indicator — hidden in solo mode (D-10): permanent disconnected dot would be visual noise on a single machine */}
+        {!isSolo && <SyncIndicator collapsed={collapsed} />}
 
         <button
           onClick={logout}
