@@ -9,6 +9,8 @@ import { LoginPage } from '@/auth/LoginPage'
 vi.mock('@/db/localSettings', () => ({
   getCouchUrl: vi.fn(),
   setCouchUrl: vi.fn(),
+  getDeploymentMode: vi.fn(() => 'networked'),
+  setDeploymentMode: vi.fn(),
 }))
 
 // Mock pouchdb (still needed for AuthProvider/useCouchAuth)
