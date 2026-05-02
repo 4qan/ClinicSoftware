@@ -18,9 +18,10 @@ Instead of building a traditional client-server app, I went with a **zero-backen
 
 - **Offline-first PWA**: Service worker caches everything on first load. No internet needed after that.
 - **Browser-local storage**: All data lives in IndexedDB via PouchDB. Nothing leaves the local network.
-- **LAN sync**: Doctor and nurse machines sync bidirectionally over the local network via PouchDB/CouchDB. Live replication starts on login, stops on logout, retries automatically on network failure. Role-based write restrictions enforced at the database level. No cloud, no internet required.
-- **CouchDB auth**: Username/password login against CouchDB session API. Doctor gets full access, nurse gets patient and vitals only.
-- **Manual backups**: JSON export/import for data portability. The user controls their data.
+- **Solo by default**: A fresh install boots straight into the working UI with local credentials (PBKDF2 hash in localStorage). No CouchDB install, no first-run wizard, no setup decisions.
+- **Networked mode (opt-in)**: When the clinic adds a second machine, flipping `deploymentMode` to `networked` restores doctor + nurse roles, LAN sync, and CouchDB session auth. The path is preserved, not removed.
+- **LAN sync (networked)**: Doctor and nurse machines sync bidirectionally over the local network via PouchDB/CouchDB. Live replication starts on login, stops on logout, retries automatically on network failure. Role-based write restrictions enforced at the database level. No cloud, no internet required.
+- **Manual backups**: JSON export/import for data portability. The user controls their data. Backup format is identical across solo and networked, so a solo backup restores cleanly into a networked setup later.
 - **Auto-print control**: Toggle automatic slip printing on/off from settings
 
 This eliminates infrastructure costs, removes network dependency, and keeps patient data on the clinic's machines.
@@ -72,7 +73,15 @@ This eliminates infrastructure costs, removes network dependency, and keeps pati
 - Escape to dismiss dropdowns, inline forms, and overlays
 - Tab directly to Print button, Enter to print, focus restores after print dialog
 
-**Multi-User Access**
+**Solo Mode (default)**
+- Fresh install lands directly on a clean username/password login — no URL prompt, no CouchDB
+- Default credentials `doctor` / `doctor123`, mutable from Settings → Account → Change Password
+- Credentials hashed locally with PBKDF2 (100k SHA-256, 16-byte salt) in localStorage
+- Zero outbound CouchDB traffic across login, session restore, password change, and full clinical workflow
+- Settings shows a disabled "Add a second computer" upgrade scaffold for the future networked migration
+- Legacy install safety: an existing `couchUrl` in localStorage boots into networked mode automatically, so Phase 22 deployments are never silently downgraded
+
+**Multi-User Access (networked mode)**
 - Two roles: Doctor (full access) and Nurse (patients + vitals only)
 - CouchDB session auth with role extraction
 - Route guards redirect unauthorized access silently
@@ -80,7 +89,7 @@ This eliminates infrastructure costs, removes network dependency, and keeps pati
 - Prescription sections hidden from nurse in visit forms
 - Doctor can reset nurse password from Settings
 
-**Live Sync**
+**Live Sync (networked mode)**
 - Bidirectional PouchDB/CouchDB replication over LAN
 - Sync starts on login, stops on logout, retries automatically on network failure
 - Sidebar indicator shows sync state (synced / syncing / disconnected)
