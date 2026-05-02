@@ -73,7 +73,7 @@ beforeEach(async () => {
 })
 
 describe('PrintVisitPage - dynamic @page injection (PRENG-01)', () => {
-  it('injects @page style into document.head before window.print with A5 default', async () => {
+  it('injects @page style into document.head before window.print using prescription default (A4)', async () => {
     const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {})
 
     renderPrintPage(testVisitId)
@@ -90,7 +90,7 @@ describe('PrintVisitPage - dynamic @page injection (PRENG-01)', () => {
     // Style injected synchronously before setTimeout fires
     const styleEl = document.getElementById('print-page-style')
     expect(styleEl).not.toBeNull()
-    expect(styleEl!.textContent).toContain('@page { size: A5 portrait; margin: 8mm; }')
+    expect(styleEl!.textContent).toContain('@page { size: A4 portrait; margin: 10mm; }')
 
     printSpy.mockRestore()
   })
@@ -258,11 +258,11 @@ describe('PrintVisitPage - conditional rendering (PRENG-03)', () => {
 })
 
 describe('PrintVisitPage - size badge', () => {
-  it('displays paper size badge with default A5 for prescription preview', async () => {
+  it('displays paper size badge with default A4 for prescription preview', async () => {
     renderPrintPage(testVisitId)
 
     await waitFor(() => {
-      expect(screen.getByText('Paper: A5 (148 x 210 mm)')).toBeInTheDocument()
+      expect(screen.getByText('Paper: A4 (210 x 297 mm)')).toBeInTheDocument()
     })
   })
 
@@ -276,7 +276,7 @@ describe('PrintVisitPage - size badge', () => {
     })
   })
 
-  it('shows A5 badge when stored size is A6 (fallback)', async () => {
+  it('shows Slip badge when stored dispensary size is invalid (fallback to dispensary default)', async () => {
     await putSetting('printDispensarySize', 'A6')
 
     renderPrintPage(testVisitId)
@@ -288,14 +288,14 @@ describe('PrintVisitPage - size badge', () => {
     fireEvent.click(screen.getAllByText('Dispensary')[0])
 
     await waitFor(() => {
-      // A6 falls back to A5; badge should show A5 dimensions
-      expect(screen.getByText('Paper: A5 (148 x 210 mm)')).toBeInTheDocument()
+      // Invalid stored value falls back to the dispensary default (Slip)
+      expect(screen.getByText('Paper: Slip (78 x 115 mm)')).toBeInTheDocument()
     })
   })
 })
 
 describe('PrintVisitPage - preview frame dimensions (SCALE-04)', () => {
-  it('preview frame dimensions match A5 paper proportions by default', async () => {
+  it('preview frame dimensions match A4 paper proportions by default (prescription default)', async () => {
     renderPrintPage(testVisitId)
 
     await waitFor(() => {
@@ -304,9 +304,9 @@ describe('PrintVisitPage - preview frame dimensions (SCALE-04)', () => {
 
     const frame = document.querySelector('[data-testid="preview-frame"]') as HTMLElement
     expect(frame).not.toBeNull()
-    // A5: width=148mm, height=210mm; PREVIEW_PX_PER_MM=2.8
-    expect(frame.style.width).toBe(`${Math.round(148 * 2.8)}px`)
-    expect(frame.style.minHeight).toBe(`${Math.round(210 * 2.8)}px`)
+    // A4: width=210mm, height=297mm; PREVIEW_PX_PER_MM=2.8
+    expect(frame.style.width).toBe(`${Math.round(210 * 2.8)}px`)
+    expect(frame.style.minHeight).toBe(`${Math.round(297 * 2.8)}px`)
   })
 
   it('preview frame dimensions change when prescription size is A4', async () => {

@@ -51,12 +51,16 @@ vi.mock('@/db/printSettings', () => ({
   getPrintSettings: (...args: unknown[]) => mockGetPrintSettings(...args),
   savePrintSetting: (...args: unknown[]) => mockSavePrintSetting(...args),
   saveAutoPrint: (...args: unknown[]) => mockSaveAutoPrint(...args),
-  PAPER_SIZE_ORDER: ['A5', 'A4', 'Letter'],
+  PAPER_SIZE_ORDER: ['A5', 'A4', 'Letter', 'Slip'],
+  PRESCRIPTION_SIZE_ORDER: ['A5', 'A4', 'Letter'],
   PAPER_SIZES: {
     A5: { width: 148, height: 210, label: 'A5 (148 x 210 mm)' },
     A4: { width: 210, height: 297, label: 'A4 (210 x 297 mm)' },
     Letter: { width: 216, height: 279, label: 'Letter (216 x 279 mm)' },
+    Slip: { width: 78, height: 115, label: 'Slip (78 x 115 mm)' },
   },
+  DEFAULT_PRESCRIPTION_SIZE: 'A4',
+  DEFAULT_DISPENSARY_SIZE: 'Slip',
 }))
 
 function renderSettings() {
@@ -153,12 +157,26 @@ describe('PrintSettings component', () => {
     })
   })
 
-  it('each dropdown shows 3 options (A6 removed)', async () => {
+  it('prescription dropdown shows 3 options (A5/A4/Letter, no Slip)', async () => {
     await openPrintTab()
     await waitFor(() => {
       const selects = screen.getAllByRole('combobox')
-      expect(selects[0].querySelectorAll('option')).toHaveLength(3)
-      expect(selects[1].querySelectorAll('option')).toHaveLength(3)
+      const prescriptionOptions = Array.from(selects[0].querySelectorAll('option')).map(
+        (o) => (o as HTMLOptionElement).value
+      )
+      expect(prescriptionOptions).toEqual(['A5', 'A4', 'Letter'])
+      expect(prescriptionOptions).not.toContain('Slip')
+    })
+  })
+
+  it('dispensary dropdown shows 4 options including Slip', async () => {
+    await openPrintTab()
+    await waitFor(() => {
+      const selects = screen.getAllByRole('combobox')
+      const dispensaryOptions = Array.from(selects[1].querySelectorAll('option')).map(
+        (o) => (o as HTMLOptionElement).value
+      )
+      expect(dispensaryOptions).toEqual(['A5', 'A4', 'Letter', 'Slip'])
     })
   })
 
