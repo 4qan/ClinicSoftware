@@ -53,8 +53,11 @@ This eliminates infrastructure costs, removes network dependency, and keeps pati
 - Seed-once logic ensures predefined drugs load only on first use
 
 **Bilingual Printing (English + Urdu)**
-- Configurable paper sizes (A5, A4, Letter) for prescription and dispensary slips independently
-- Proportional layout scaling: fonts, spacing, and content area fill the selected page size
+- Configurable paper sizes per slip type — prescription supports A5/A4/Letter; dispensary supports A5/A4/Letter plus a narrow **Slip (78×115mm)** for thermal/receipt-style printing
+- First-run defaults: prescription = A4, dispensary = Slip (matches typical clinic dispensing workflow)
+- Slip layout: numbered hanging-indent rows with bordered qty box and uppercase form tag (`14 TABLET`, `60ml SYRUP`, `1 INHALER`) — form-agnostic, scannable at narrow width
+- Chunked multi-page pagination on Slip: each printed page is a complete slip with repeated header (patient/date) and `Page X / Y` footer, so a pharmacist holding multiple pages always knows the patient
+- Proportional layout scaling on standard sizes: fonts, spacing, and content area fill the selected page size
 - On-screen preview before printing with paper-proportional dimensions
 - Urdu instructions in Nastaliq script with per-size line-height tuning
 - Bilingual column headers and natural Urdu sentence construction
