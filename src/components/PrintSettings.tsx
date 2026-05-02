@@ -4,13 +4,16 @@ import {
   savePrintSetting,
   saveAutoPrint,
   PAPER_SIZE_ORDER,
+  PRESCRIPTION_SIZE_ORDER,
   PAPER_SIZES,
+  DEFAULT_PRESCRIPTION_SIZE,
+  DEFAULT_DISPENSARY_SIZE,
 } from '@/db/printSettings'
 import type { PaperSize } from '@/db/printSettings'
 
 export function PrintSettings() {
-  const [prescriptionSize, setPrescriptionSize] = useState<PaperSize>('A5')
-  const [dispensarySize, setDispensarySize] = useState<PaperSize>('A5')
+  const [prescriptionSize, setPrescriptionSize] = useState<PaperSize>(DEFAULT_PRESCRIPTION_SIZE)
+  const [dispensarySize, setDispensarySize] = useState<PaperSize>(DEFAULT_DISPENSARY_SIZE)
   const [autoPrint, setAutoPrint] = useState<boolean>(true)
 
   useEffect(() => {
@@ -59,7 +62,7 @@ export function PrintSettings() {
             onChange={(e) => handlePrescriptionChange(e.target.value as PaperSize)}
             className="w-full px-3 py-2 text-base border border-gray-300 rounded-lg"
           >
-            {PAPER_SIZE_ORDER.map((size) => (
+            {PRESCRIPTION_SIZE_ORDER.map((size) => (
               <option key={size} value={size}>
                 {PAPER_SIZES[size].label}
               </option>

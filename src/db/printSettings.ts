@@ -38,11 +38,14 @@ export const PRESCRIPTION_SIZE_ORDER: PaperSize[] = ['A5', 'A4', 'Letter']
 
 const VALID_SIZES: PaperSize[] = ['A5', 'A4', 'Letter', 'Slip']
 
-function coerceSize(raw: unknown): PaperSize {
-  return VALID_SIZES.includes(raw as PaperSize) ? (raw as PaperSize) : 'A5'
+function coerceSize(raw: unknown, fallback: PaperSize): PaperSize {
+  return VALID_SIZES.includes(raw as PaperSize) ? (raw as PaperSize) : fallback
 }
 
-const DEFAULT_SIZE: PaperSize = 'A5'
+// First-run defaults. Dispensary defaults to Slip (the common case for a clinic
+// running thermal/receipt-style dispensing). Prescription defaults to A4.
+export const DEFAULT_PRESCRIPTION_SIZE: PaperSize = 'A4'
+export const DEFAULT_DISPENSARY_SIZE: PaperSize = 'Slip'
 
 export async function getPrintSettings(): Promise<PrintSettings> {
   const [prescriptionRaw, dispensaryRaw, autoPrintRaw] = await Promise.all([
@@ -51,8 +54,8 @@ export async function getPrintSettings(): Promise<PrintSettings> {
     getSetting('autoPrint'),
   ])
   return {
-    prescriptionSize: coerceSize(prescriptionRaw ?? DEFAULT_SIZE),
-    dispensarySize: coerceSize(dispensaryRaw ?? DEFAULT_SIZE),
+    prescriptionSize: coerceSize(prescriptionRaw ?? DEFAULT_PRESCRIPTION_SIZE, DEFAULT_PRESCRIPTION_SIZE),
+    dispensarySize: coerceSize(dispensaryRaw ?? DEFAULT_DISPENSARY_SIZE, DEFAULT_DISPENSARY_SIZE),
     autoPrint: autoPrintRaw !== false,
   }
 }

@@ -6,7 +6,14 @@ import { DispensarySlip } from '@/components/DispensarySlip'
 import { getVisit } from '@/db/visits'
 import { getPatient } from '@/db/patients'
 import { getClinicInfo } from '@/db/settings'
-import { getPrintSettings, PAPER_SIZES, PAGE_SIZE_KEYWORD, calcMargin } from '@/db/printSettings'
+import {
+  getPrintSettings,
+  PAPER_SIZES,
+  PAGE_SIZE_KEYWORD,
+  calcMargin,
+  DEFAULT_PRESCRIPTION_SIZE,
+  DEFAULT_DISPENSARY_SIZE,
+} from '@/db/printSettings'
 
 const PREVIEW_PX_PER_MM = 2.8
 
@@ -170,7 +177,7 @@ export function PrintVisitPage() {
 
   const activeSize: PaperSize = printSettings
     ? (previewMode === 'prescription' ? printSettings.prescriptionSize : printSettings.dispensarySize)
-    : 'A5'
+    : (previewMode === 'prescription' ? DEFAULT_PRESCRIPTION_SIZE : DEFAULT_DISPENSARY_SIZE)
 
   const showPrescription = printMode !== null ? printMode === 'prescription' : previewMode === 'prescription'
   const showDispensary = printMode !== null ? printMode === 'dispensary' : previewMode === 'dispensary'
@@ -281,7 +288,7 @@ export function PrintVisitPage() {
             medications={prescriptionMeds}
             patient={patient}
             clinicInfo={clinicInfo}
-            paperSize={printSettings?.prescriptionSize ?? 'A5'}
+            paperSize={printSettings?.prescriptionSize ?? DEFAULT_PRESCRIPTION_SIZE}
           />
         </div>
       )}
@@ -291,7 +298,7 @@ export function PrintVisitPage() {
             visit={visit}
             medications={dispensaryMeds}
             patient={patient}
-            paperSize={printSettings?.dispensarySize ?? 'A5'}
+            paperSize={printSettings?.dispensarySize ?? DEFAULT_DISPENSARY_SIZE}
           />
         </div>
       )}
