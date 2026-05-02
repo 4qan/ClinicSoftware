@@ -9,6 +9,5 @@ window.HTMLElement.prototype.scrollIntoView = function () {}
 // Per pattern-mapper L2: vitest+jsdom historically misses crypto.subtle.
 if (!globalThis.crypto || !globalThis.crypto.subtle) {
   const { webcrypto } = await import('node:crypto')
-  // @ts-expect-error -- assigning Node's webcrypto to globalThis.crypto for test env
   globalThis.crypto = webcrypto as unknown as Crypto
 }
